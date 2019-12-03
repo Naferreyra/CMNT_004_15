@@ -12,7 +12,7 @@ class PhoneController(http.Controller):
             raise werkzeug.exceptions.abort(
                 Response(_("Odoo could not load due to the caller phone number is an internal number")))
 
-        phone = phone[1::]
+        phone = str(int(phone))
         valid_try = True
         try:
             phone_parsed = phonenumbers.parse("+" + phone, None)
