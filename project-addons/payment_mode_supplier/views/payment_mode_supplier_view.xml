@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="payment_mode_suppliers_form" model="ir.ui.view">
+        <field name="name">payment.mode.supplier.form</field>
+        <field name="model">payment.mode.supplier</field>
+        <field name="arch" type="xml">
+            <form string="Suppliers Payment Mode">
+                <group string="Suppliers Payment Mode">
+                    <field name="name"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="payment_mode_suppliers_action" model="ir.actions.act_window">
+        <field name="name">Suppliers Payment Mode</field>
+        <field name="res_model">payment.mode.supplier</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="payment_mode_suppliers_menu" name="Suppliers Payment Mode" string="Suppliers Payment Mode"
+              action="payment_mode_suppliers_action"
+              parent="suppliers_menu"/>
+
+</odoo>

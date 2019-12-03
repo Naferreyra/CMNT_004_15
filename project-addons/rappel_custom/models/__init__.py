@@ -4,3 +4,4 @@ from . import rappel
 from . import rappel_calculated
 from . import rappel_current_info
 from . import res_partner_rappel_rel
+from . import sale

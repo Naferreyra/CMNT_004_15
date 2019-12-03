@@ -1,0 +1,35 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#       * payment_mode_supplier
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 11.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-11-27 11:54+0000\n"
+"PO-Revision-Date: 2019-11-27 11:54+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+
+#. module: payment_mode_supplier
+#: model:ir.model.fields,field_description:payment_mode_supplier.field_res_partner_payment_mode_suppliers
+#: model:ir.actions.act_window,name:payment_mode_supplier.payment_mode_suppliers_action
+#: model:ir.ui.menu,name:payment_mode_supplier.payment_mode_suppliers_menu
+#: model:ir.ui.view,arch_db:payment_mode_supplier.payment_mode_supplier_form
+msgid "Suppliers Payment Mode"
+msgstr "Modo de Pago de los Proveedores"
+
+#. module: payment_mode_supplier
+#: model:ir.model.fields,field_description:payment_mode_supplier.field_payment_mode_supplier_name
+msgid "Name"
+msgstr "Nombre"
+
+#. module: payment_mode_supplier
+#: model:ir.ui.menu,name:payment_mode_supplier.suppliers_menu
+msgid "Suppliers"
+msgstr "Proveedores"

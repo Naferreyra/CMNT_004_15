@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="purchase_order_form" model="ir.ui.view">
+        <field name="name">payment.mode.supplier.purchase_order.form</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <field name="payment_mode_id" position="after">
+                <field name="payment_mode_suppliers"/>
+            </field>
+        </field>
+    </record>
+
+    <menuitem id="suppliers_menu" name="Supplier"
+              parent="purchase.menu_product_in_config_purchase"/>
+
+</odoo>
