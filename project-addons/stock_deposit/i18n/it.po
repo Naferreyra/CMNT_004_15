@@ -372,3 +372,8 @@ msgstr "Perdida"
 #: model:ir.ui.view,arch_db:stock_deposit.view_stock_deposit_form
 msgid "Deposit loss"
 msgstr "A perdere"
+
+#. module: stock_deposit
+#: selection:sale.order.line,invoice_status:0
+msgid "Deposit"
+msgstr "Deposito"

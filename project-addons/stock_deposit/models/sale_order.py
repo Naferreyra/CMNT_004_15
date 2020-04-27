@@ -29,6 +29,22 @@ class SaleOrderLine(models.Model):
 
     deposit = fields.Boolean('Deposit')
     deposit_date = fields.Date('Date Dep.')
+    invoice_status = fields.Selection(selection_add=[('deposit', 'Deposit')])
+
+    @api.depends('deposit')
+    def _compute_invoice_status(self):
+        """Add new invoice status:
+        - deposit: if the product is a deposit not recalculate invoice_state
+        """
+        super(SaleOrderLine, self)._compute_invoice_status()
+        location_deposit_ids = self.env['stock.location'].search([('deposit', '=', True)]).ids
+        for line in self:
+            if line.deposit \
+                    and any(move.location_dest_id.id in location_deposit_ids for move in line.move_ids)\
+                    and line.qty_invoiced == 0\
+                    and not self._context.get('to_invoice_deposit', False):
+                line.invoice_status = 'deposit'
+
 
     @api.depends('product_uom_qty', 'discount', 'price_unit', 'tax_id', 'deposit')
     def _compute_amount(self):
@@ -46,14 +62,6 @@ class SaleOrderLine(models.Model):
             self.deposit_date = result.strftime(DEFAULT_SERVER_DATE_FORMAT)
         else:
             self.deposit_date = False
-
-    @api.multi
-    def invoice_line_create(self, invoice_id, qty):
-        lines = self.env['sale.order.line']
-        for line in self:
-            if not line.deposit or self.env.context.get('invoice_deposit', False):
-                lines += line
-        return super(SaleOrderLine, lines).invoice_line_create(invoice_id, qty)
 
 
 class SaleOrder(models.Model):

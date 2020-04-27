@@ -18,7 +18,7 @@
 #
 ##############################################################################
 
-from odoo import models, api
+from odoo import models, api, fields
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 import time
 from datetime import datetime, timedelta
@@ -70,3 +70,11 @@ class ProcurementRule(models.Model):
             vals['picking_type_id'] = picking_type_id.id
 
         return vals
+
+
+class StockLotacion(models.Model):
+
+    _inherit = 'stock.location'
+
+    deposit = fields.Boolean("Deposit", default=False)
+
