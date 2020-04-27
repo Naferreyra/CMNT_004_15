@@ -69,14 +69,16 @@ class ResPartnerBank(models.Model):
 
     @api.multi
     def write(self, vals):
-        super(ResPartnerBank, self).write(vals)
+        res = super(ResPartnerBank, self).write(vals)
         acc_number = vals.get('acc_number', False)
         if acc_number:
             validate_iban(acc_number)
+        return res
 
     @api.model
     def create(self, vals):
-        super(ResPartnerBank, self).create(vals)
+        res = super(ResPartnerBank, self).create(vals)
         acc_number = vals.get('acc_number', False)
         if acc_number:
             validate_iban(acc_number)
+        return res

@@ -96,3 +96,19 @@ msgstr "Fattura dello spedizioniere"
 #: code:addons/pmp_landed_costs/models/product.py:32
 msgid "The HS Code format is incorrect"
 msgstr "Il formato HS Code non è corretto"
+
+#. module: pmp_landed_costs
+#: model:ir.model.fields,field_description:pmp_landed_costs.field_stock_valuation_adjustment_lines_cost_purchase
+msgid "Purchase Price"
+msgstr "Prezzo d'aquisto"
+
+#. module: pmp_landed_costs
+#: model:ir.model.fields,field_description:pmp_landed_costs.field_stock_valuation_adjustment_lines_cost_purchase_per_unit
+msgid "Purchase Price (Per Unit)"
+msgstr "Prezzo d'aquisto (unità)"
+
+#. module: pmp_landed_costs
+#: code:addons/pmp_landed_costs/models/stock_landed_costs.py:66
+#, python-format
+msgid "Not all the products have HS Code: %s"
+msgstr "Non tutti i prodotti hanno il codice HS: %s"

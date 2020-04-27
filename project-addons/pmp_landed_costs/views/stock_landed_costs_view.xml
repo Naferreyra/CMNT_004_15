@@ -8,6 +8,16 @@
             <xpath expr="//field[@name='valuation_adjustment_lines']/tree/field[@name='additional_landed_cost']" position="after">
                 <field name="new_unit_cost"/>
             </xpath>
+            <xpath expr="//field[@name='valuation_adjustment_lines']/tree/field[@name='additional_landed_cost']" position="before">
+                <field name="cost_purchase" sum="Total."/>
+                <field name="cost_purchase_per_unit"/>
+            </xpath>
+            <xpath expr="//field[@name='valuation_adjustment_lines']/tree/field[@name='former_cost_per_unit']" position="attributes">
+                <attribute name="invisible">0</attribute>
+            </xpath>
+            <xpath expr="//field[@name='valuation_adjustment_lines']/tree/field[@name='former_cost']" position="attributes">
+                <attribute name="invisible">0</attribute>
+            </xpath>
             <xpath expr="//field[@name='valuation_adjustment_lines']/tree/field[@name='weight']" position="attributes">
                 <attribute name="sum">Weight</attribute>
             </xpath>

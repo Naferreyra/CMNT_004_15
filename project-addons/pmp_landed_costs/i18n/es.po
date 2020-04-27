@@ -97,3 +97,19 @@ msgstr "Factura del transitario"
 #, python-format
 msgid "The HS Code format is incorrect"
 msgstr "El formato del HS Code es incorrecto"
+
+#. module: pmp_landed_costs
+#: model:ir.model.fields,field_description:pmp_landed_costs.field_stock_valuation_adjustment_lines_cost_purchase
+msgid "Purchase Price"
+msgstr "Precio de compra"
+
+#. module: pmp_landed_costs
+#: model:ir.model.fields,field_description:pmp_landed_costs.field_stock_valuation_adjustment_lines_cost_purchase_per_unit
+msgid "Purchase Price (Per Unit)"
+msgstr "Precio de compra (por unidad)"
+
+#. module: pmp_landed_costs
+#: code:addons/pmp_landed_costs/models/stock_landed_costs.py:66
+#, python-format
+msgid "Not all the products have HS Code: %s"
+msgstr "No todos los productos tienen HS Code: %s"

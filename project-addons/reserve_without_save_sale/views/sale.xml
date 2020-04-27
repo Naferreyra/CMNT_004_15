@@ -27,7 +27,7 @@
             </button>
             <button name="print_quotation" position="after">
                 <button name="print_quotation" string="Print" type="object" states="reserve" class="o_sale_print"/>
-                <button name="action_quotation_send" string="Send by Email" type="object" states="reserve"/>
+                <button name="action_quotation_send" string="Send by Email" type="object" states="reserve,done"/>
             </button>
 
             <button name="%(stock_reserve_sale.action_sale_stock_reserve)d" position="replace">

@@ -163,10 +163,11 @@ class ProductProduct(models.Model):
 
     def compute_date_next_incoming(self):
         moves = self.env['stock.move'].search(
-            [('product_id', '=', self.id), ('purchase_line_id', '!=', False), ('state', 'not in', ['cancel','done']),('location_dest_id.usage', 'like', 'internal')]).sorted(
-            key=lambda m: m.date_expected and m.date_reliability)
+            [('product_id', '=', self.id), ('purchase_line_id', '!=', False), ('state', 'not in', ['cancel','done']),
+             ('location_dest_id.usage', 'like', 'internal'),('picking_id','!=',False)],
+            limit=1, order="date_expected asc")
         if moves:
-            return moves[0].date_expected
+            return moves.date_expected
         return False
 
 
