@@ -1224,3 +1224,8 @@ msgstr "Categoría padre del producto"
 #: model:ir.model.fields,field_description:custom_account.field_sale_report_partner_shipping_id
 msgid "Shipping Address"
 msgstr "Dirección de envío"
+
+#. module: custom_account
+#: model:ir.model.fields,field_description:custom_account.field_account_analytic_line_reference
+msgid "Reference"
+msgstr "Referencia"

@@ -1086,3 +1086,8 @@ msgstr "Categoria principale del prodotto"
 #: model:ir.model.fields,field_description:custom_account.field_sale_report_partner_shipping_id
 msgid "Shipping Address"
 msgstr "Indirizzo di spedizione"
+
+#. module: custom_account
+#: model:ir.model.fields,field_description:custom_account.field_account_analytic_line_reference
+msgid "Reference"
+msgstr "Riferimento"
