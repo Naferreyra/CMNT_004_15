@@ -28,6 +28,7 @@
              'report/account_invoice_report_view.xml',
              'security/ir.model.access.csv',
              'views/stock_view.xml',
+             'views/account_analytic.xml',
              'views/account_payment.xml',
              'views/purchase_view.xml',
              'report/sale_report_view.xml',
