@@ -1081,3 +1081,8 @@ msgstr "Fornitore principale"
 #: model:ir.ui.view,arch_db:custom_account.account_invoice_report_add_filters
 msgid "Parent product category"
 msgstr "Categoria principale del prodotto"
+
+#. module: custom_account
+#: model:ir.model.fields,field_description:custom_account.field_sale_report_partner_shipping_id
+msgid "Shipping Address"
+msgstr "Indirizzo di spedizione"

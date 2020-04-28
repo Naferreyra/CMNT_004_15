@@ -14,7 +14,7 @@
         'views/middleware_view.xml', 'views/res_users.xml',
         'views/product_view.xml', 'views/product_brand.xml',
         'views/claim_line_view.xml', 'wizard/middleware_wizard_view.xml',
-        'security/ir.model.access.csv'
+        'security/ir.model.access.csv', 'data/parameters.xml'
     ],
     'installable': True
 }

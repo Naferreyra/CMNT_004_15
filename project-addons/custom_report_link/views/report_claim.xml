@@ -39,11 +39,11 @@
                         </div>
                         <span t-if="claim.name=='rma'">
                             <div class="pull-right"
-                                 style="width: 8.4in; height: 0.08in; margin-top: -2.2%; background-color: #da1f2e;"/>
+                                 style="width: 8.2in; height: 0.08in; margin-top: -2.2%; background-color: #da1f2e;"/>
                         </span>
                         <span t-if="claim.name=='return'">
                             <div class="pull-right"
-                                 style="width: 7.7in; height: 0.08in; margin-top: -2.2%; background-color: #da1f2e;"/>
+                                 style="width: 7.3in; height: 0.08in; margin-top: -2.2%; background-color: #da1f2e;"/>
                         </span>
                         <br/>
                         <br/>

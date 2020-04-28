@@ -21,6 +21,8 @@ class SaleOrderLine(models.Model):
     product_tags = fields.Char(compute="_compute_product_tags", string='Tags')
     web_discount = fields.Boolean()
     accumulated_promo = fields.Boolean(default=False)
+    original_line_id = fields.Many2one('sale.order.line', "Original line", ondelete='cascade')
+    promo_qty_split = fields.Integer(help="It is the minimum quantity of product for which this promo is applied")
 
 
 class SaleOrder(models.Model):

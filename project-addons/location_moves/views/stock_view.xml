@@ -9,10 +9,6 @@
                 <field name="location_usage" invisible="1"/>
                 <field name="picking_type_code" invisible="1"/>
                 <field name="picking_id" invisible="1"/>
-                <button name="%(location_moves.act_quality_move_wzd)d"
-                    string="Quality move" type="action"
-                    attrs="{'invisible': ['|','|','|',('state', 'not in', ['draft','waiting','confirmed','assigned','partially_available']),('picking_id', '=', False),('picking_type_code', '!=', 'incoming'),('location_usage', 'not in', ['supplier', 'production'])]}"
-                    groups="stock.group_stock_user"/>
             </field>
         </field>
     </record>
@@ -27,10 +23,6 @@
                 <field name="location_usage" invisible="1"/>
                 <field name="picking_type_code" invisible="1"/>
                 <field name="picking_id" invisible="1"/>
-                <button name="%(location_moves.act_quality_move_wzd)d"
-                    string="Quality move" type="action"
-                    attrs="{'invisible': ['|','|','|',('state', 'not in', ['draft','waiting','confirmed','assigned','partially_available']),('picking_id', '=', False),('picking_type_code', '!=', 'incoming'),('location_usage', 'not in', ['supplier', 'production'])]}"
-                    groups="stock.group_stock_user"/>
             </field>
         </field>
     </record>
@@ -43,10 +35,6 @@
             <field name="state" position="after">
                 <field name="location_usage" invisible="1"/>
                 <field name="picking_type_code" invisible="1"/>
-                <button name="%(location_moves.act_quality_move_wzd)d"
-                    string="Quality move" type="action"
-                    attrs="{'invisible': ['|','|','|',('state', 'not in', ['draft','waiting','confirmed','assigned','partially_available']),('picking_id', '=', False),('picking_type_code', '!=', 'incoming'),('location_usage', 'not in', ['supplier', 'production'])]}"
-                    groups="stock.group_stock_user"/>
             </field>
         </field>
     </record>

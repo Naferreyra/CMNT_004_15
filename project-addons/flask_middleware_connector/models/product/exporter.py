@@ -72,9 +72,6 @@ class ProductProductExporter(Component):
             'producttagproductrel', partner_record_id)
 
 
-
-
-
 class ProductProductAdapter(Component):
 
     _name = 'product.general.adapter'
@@ -92,7 +89,8 @@ class ProductCategoryExporter(Component):
     def update(self, binding, mode):
         vals = {"name": binding.with_context({'lang': 'es_ES'}).name,
                 "parent_id": binding.parent_id.id,
-                "odoo_id": binding.id}
+                "odoo_id": binding.id
+                }
         if mode == "insert":
             return self.backend_adapter.insert(vals)
         else:

@@ -1,6 +1,7 @@
 # Copyright 2019 Omar Castiñeira, Comunitea Servicios Tecnológicos S.L.
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 from odoo import models, fields, api, _, exceptions
+import numpy
 
 
 class AccountMoveLine(models.Model):
@@ -219,7 +220,7 @@ class AccountInvoice(models.Model):
         res = super().invoice_validate()
         for inv in self:
             for line in inv.invoice_line_ids:
-                line.write({'cost_unit': line.product_id.standard_price_2})
+                line.write({'cost_unit': (line.move_line_ids and (numpy.average(line.move_line_ids.mapped('price_unit')) * -1)) or line.product_id.standard_price_2})
         return res
 
     @api.model

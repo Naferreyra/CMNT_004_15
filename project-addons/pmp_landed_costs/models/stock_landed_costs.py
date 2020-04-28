@@ -150,7 +150,7 @@ class StockLandedCost(models.Model):
                 'cost_purchase': (move.purchase_line_id.price_subtotal/move.purchase_line_id.product_qty) * move.product_qty,
                 'weight': move.product_id.weight * move.product_qty,
                 'volume': move.product_id.volume * move.product_qty,
-                'tariff': round(move.purchase_line_id.price_subtotal *
+                'tariff': round((move.purchase_line_id.price_subtotal/move.purchase_line_id.product_qty) * move.product_qty *
                                 (move.product_id.tariff/100), 4)
             }
             lines.append(vals)

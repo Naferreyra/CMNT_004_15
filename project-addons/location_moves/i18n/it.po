@@ -241,15 +241,6 @@ msgid "Quality -> Cooked"
 msgstr "Qualità -> Cucinato"
 
 #. module: location_moves
-#: model:ir.actions.act_window,name:location_moves.act_quality_move_wzd
-#: model:ir.ui.view,arch_db:location_moves.quality_move_wzd_form
-#: model:ir.ui.view,arch_db:location_moves.view_move_picking_tree_add_quality_btn
-#: model:ir.ui.view,arch_db:location_moves.view_move_tree_add_quality_btn
-#: model:ir.ui.view,arch_db:location_moves.view_move_tree_receipt_picking_add_quality_btn
-msgid "Quality move"
-msgstr "Qualità mossa"
-
-#. module: location_moves
 #: model:stock.location,name:location_moves.stock_location_sat
 msgid "SAT"
 msgstr "RMA"

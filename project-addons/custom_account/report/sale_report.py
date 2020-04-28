@@ -14,11 +14,12 @@ class SaleReport(models.Model):
     main_supplier = fields.Many2one('res.partner', 'Main supplier')
     partner_vat = fields.Char("Partner VAT")
     partner_category = fields.Many2many(related='partner_id.category_id')
+    partner_shipping_id = fields.Many2one('res.partner', string='Shipping Address')
 
     def _select(self):
         select_str = (", t.product_brand_id as brand_id, pc.parent_id as "
                       "parent_category_id, rp.ref as partner_ref, rp.vat as partner_vat , cs.name as "
-                      "state_name, t.manufacturer as main_supplier")
+                      "state_name, t.manufacturer as main_supplier, s.partner_shipping_id as partner_shipping_id")
         return super()._select() + select_str
 
     def _from(self):
@@ -29,5 +30,5 @@ class SaleReport(models.Model):
 
     def _group_by(self):
         group_by_str = """, t.product_brand_id, rp.ref, pc.parent_id, cs.name,
-                          t.manufacturer, rp.vat"""
+                          t.manufacturer, rp.vat, s.partner_shipping_id"""
         return super()._group_by() + group_by_str

@@ -10,3 +10,4 @@ from . import res_partner
 from . import product
 from . import rappel
 from . import rma
+from . import translation

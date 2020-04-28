@@ -27,6 +27,6 @@
     'website': 'www.pexego.es',
     "depends": ['stock', 'purchase_picking'],
     "data": ['data/stock_data.xml', 'wizard/location_moves_view.xml',
-             'wizard/quality_move_view.xml', "views/stock_view.xml"],
+             "views/stock_view.xml"],
     "installable": True
 }

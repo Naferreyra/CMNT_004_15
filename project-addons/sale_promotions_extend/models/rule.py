@@ -259,9 +259,7 @@ class PromotionsRulesActions(models.Model):
                     num_lines = int(qty / qty_a) * (qty_a - qty_b)
                     if qty - qty_a >= 0:
                         self.create_y_line_axb(
-                            order, order_line.price_unit,
-                            order_line.discount, order_line.sequence,
-                            num_lines, order_line.product_id)
+                            order, order_line,num_lines)
                         promo_products.append(order_line.product_id.id)
         return {}
 
@@ -283,20 +281,23 @@ class PromotionsRulesActions(models.Model):
         }
         return order_line.write(vals)
 
-    def create_y_line_axb(self, order, price_unit, discount,
-                          sequence, quantity, product_id):
+    def create_y_line_axb(self, order, order_line, quantity):
+        product_id=order_line.product_id
         vals = {
             'order_id': order.id,
-            'sequence': sequence,
+            'sequence': order_line.sequence,
             'product_id': self.env.ref('commercial_rules.product_discount').id,
             'name': '%s (%s)' % (
                      product_id.default_code,
                      self.promotion.line_description),
-            'price_unit': -price_unit,
-            'discount': discount,
+            'price_unit': -order_line.price_unit,
+            'discount': order_line.discount,
             'promotion_line': True,
             'product_uom_qty': quantity,
-            'product_uom': product_id.uom_id.id
+            'product_uom': product_id.uom_id.id,
+            'original_line_id': order_line.id,
+            'promo_qty_split': eval(self.arguments.split(",")[0])
+
         }
         self.create_line(vals)
         return True
