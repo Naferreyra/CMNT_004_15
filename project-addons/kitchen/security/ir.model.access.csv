@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_customization,access_customization,model_kitchen_customization,base.group_user,1,1,1,1
+access_customization_line,access_customization_line,model_kitchen_customization_line,base.group_user,1,1,1,1
+access_customization_type,access_customization_type,model_customization_type,base.group_user,1,0,0,0
+access_customization_type_advanced,access_customization_type_advanced,model_customization_type,kitchen.group_kitchen,1,1,1,1

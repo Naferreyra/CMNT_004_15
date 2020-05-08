@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="add_create_customization_button" model="ir.ui.view">
+        <field name="name">sale.order.form.customization.button</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <header position="inside">
+                <button name="%(kitchen.create_customization)d" string="Create customization" type="action"
+                            attrs="{'invisible': [('state','!=','reserve')]}"
+                            class="oe_highlight"/>
+            </header>
+            <xpath expr="//button[@name='action_view_invoice']" position="before">
+                <button type="object" name="action_view_customizations" string="Customizations"
+                                class="oe_stat_button"
+                                icon="fa-paint-brush">
+                            <field name="customization_count" widget="statinfo" string="Customization info"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+</odoo>

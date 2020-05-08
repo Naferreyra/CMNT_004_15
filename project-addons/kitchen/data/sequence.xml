@@ -1,0 +1,14 @@
+<odoo noupdate="1">
+    <data>
+
+        <record id="seq_kitchen_customization" model="ir.sequence">
+            <field name="name">Kitchen customization</field>
+            <field name="code">customization.name</field>
+            <field name="prefix">PER</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+            <field name="active" eval="True"/>
+        </record>
+
+    </data>
+</odoo>

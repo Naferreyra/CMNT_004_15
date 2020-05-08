@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="send_mail_to_commercials_customization_done" model="mail.template">
+        <field name="name">Notify customization done</field>
+        <field name="email_from">${'odoo_team@visiotechsecurity.com'}</field>
+        <field name="email_cc">${ctx['email_cc']}</field>
+        <field name="subject">Customization ${object.name} done</field>
+        <field name="email_to">${ctx['email_to']}</field>
+        <field name="model_id" ref="model_kitchen_customization"/>
+        <field name="lang">${ctx['lang']}</field>
+        <field name="body_html"><![CDATA[
+            <p>Customization <strong>${object.name}</strong> has been completed.</p>
+            <p>The information of this customization is the following:</p>
+            <ul>
+                <li>Partner: <strong>${object.partner_id.name | safe}</strong></li>
+                <li>Order: <strong>${object.order_id.name | safe}</strong></li>
+                <li>Erase logo: <strong>${object.erase_logo}</strong></li>
+                <li>Type:
+                    <ul>
+                    % for type in object.type_ids:
+                        <li>${type.name}</li>
+                    % endfor
+                    </ul>
+                </li>
+                <li>Products and quantities: <strong>${object.products_qty_format} </li>
+                <li>Responsible for customization: <strong>${object.user} </li>
+            </ul>
+            <p>Please check your order <strong>${object.order_id.name | safe}</strong>. You can now proceed it.</p>
+            <p>Best regards.</p>
+         ]]>
+        </field>
+    </record>
+
+    <record id="send_mail_to_kitchen_customization_sent" model="mail.template">
+        <field name="name">Notify customization sent</field>
+        <field name="email_from">${'odoo_team@visiotechsecurity.com'}</field>
+        <field name="subject">Customization request ${object.name} - ${object.partner_id.name | safe}</field>
+        <field name="email_to">${'cocina@visiotechsecurity.com'}</field>
+        <field name="model_id" ref="model_kitchen_customization"/>
+        <field name="lang">${ctx['lang']}</field>
+        <field name="body_html"><![CDATA[
+            <p>Good morning,</p>
+            <p>There is a new customization request <strong>${object.name}</strong> The information of this request is the following:</p>
+            <ul>
+                <li>Customization name: <strong>${object.name}</strong></li>
+                <li>Commercial: <strong>${object.commercial_id.name}</strong></li>
+                <li>Partner: <strong>${object.partner_id.name | safe}</strong></li>
+                <li>Order: <strong>${object.order_id.name | safe}</strong></li>
+                <li>Erase logo: <strong>${object.erase_logo}</strong></li>
+                <li>Type:
+                    <ul>
+                    % for type in object.type_ids:
+                        <li>${type.name}</li>
+                    % endfor
+                    </ul>
+                </li>
+                <li>Request: <strong>${object.products_qty_format} </li>
+                <li>Comments: <strong>${object.comments | safe}</strong></li>
+            </ul>
+            <p>Best regards.</p>
+         ]]>
+        </field>
+    </record>
+</odoo>

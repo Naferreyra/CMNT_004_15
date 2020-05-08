@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="mark_as_received_view" model="ir.ui.view">
+        <field name="name">kitchen.customization.received.form</field>
+        <field name="model">kitchen.customization.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Mark as received">
+                <group>
+                    <field name="date_planned"/>
+                    <field name="user"/>
+                    <footer>
+                        <button string="Create" name="mark_received_action" type="object" class="oe_highlight"/>
+                        <button string="Cancel" special="cancel"/>
+                    </footer>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="mark_as_received" model="ir.actions.act_window">
+        <field name="name">Mark as received</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">kitchen.customization.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="mark_as_received_view"/>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

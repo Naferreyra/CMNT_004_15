@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="create_customization_wizard" model="ir.ui.view">
+        <field name="name">create.customization.wizard.form</field>
+        <field name="model">customization.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Create customization">
+                <group>
+                    <field name="erase_logo"/>
+                    <field name="type_ids" widget="many2many_tags"/>
+                    <field name="notify_users" widget="many2many_tags"/>
+                    <field name="order_id" invisible="1"/>
+                    <field name="add_all"/>
+                </group>
+
+                <field name="customization_line">
+                    <tree string="Customization Lines" create="false" delete="false" editable="top">
+                        <field name="product_id"/>
+                        <field name="product_qty"/>
+                        <field name="qty"/>
+                        <field name="only_erase_logo"/>
+                    </tree>
+                </field>
+                <group>
+                    <field name="comments"/>
+                </group>
+                <footer>
+                    <button string="Create" name="action_create" type="object" class="oe_highlight"/>
+                    <button string="Cancel" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="create_customization" model="ir.actions.act_window">
+        <field name="name">Create customization</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">customization.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="create_customization_wizard"/>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

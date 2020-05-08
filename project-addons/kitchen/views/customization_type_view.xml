@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <menuitem id="customization_config" name="Configuration" parent="kitchen_menu" sequence="9"
+              groups="kitchen.group_kitchen"/>
+    <record id="customization_type_list_view" model="ir.ui.view">
+        <field name="name">customization.type.list</field>
+        <field name="model">customization.type</field>
+        <field name="arch" type="xml">
+            <tree string="Customization Type">
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="customization_type_action_form" model="ir.actions.act_window">
+        <field name="name">Customization Type</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">customization.type</field>
+        <field name="view_type">form</field>
+        <field name="view_id" ref="customization_type_list_view"/>
+    </record>
+    <menuitem action="customization_type_action_form"
+              groups="kitchen.group_kitchen"
+              id="menu_customization_type_action_form"
+              parent="kitchen.customization_config" sequence="1"/>
+
+
+</odoo>

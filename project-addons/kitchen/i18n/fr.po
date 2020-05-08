@@ -1,0 +1,346 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#       * Kitchen
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 11.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-05-04 15:37+0000\n"
+"PO-Revision-Date: 2020-05-04 15:37+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: kitchen
+#: model:ir.ui.menu,name:kitchen.kitchen_menu
+#: model:ir.actions.act_window,name:kitchen.action_show_customizations_commercials
+#: model:ir.actions.act_window,name:kitchen.action_show_customizations_kitchen
+msgid "Kitchen"
+msgstr "Cuisine"
+
+#. module: kitchen
+#: model:ir.ui.view,arch_db:kitchen.create_customization_wizard
+#: model:ir.actions.act_window,name:kitchen.create_customization
+msgid "Create customization"
+msgstr "Créer une personnalisation"
+
+#. module: kitchen
+#: model:ir.ui.view,arch_db:kitchen.mark_as_received_view
+#: model:ir.actions.act_window,name:kitchen.mark_as_received
+msgid "Mark as received"
+msgstr "Marquer comme reçu"
+
+#. module: kitchen
+#: model:ir.model.fields,field_description:kitchen.field_kitchen_customization_date_customization
+msgid "Order Date"
+msgstr "Date de commande"
+
+#. module: kitchen
+#: model:ir.model.fields,field_description:kitchen.field_kitchen_customization_name
+msgid "Name"
+msgstr "Nom"
+
+#. module: kitchen
+#: model:ir.model.fields,field_description:kitchen.field_kitchen_customization_commercial_id
+msgid "Commercial"
+msgstr "Commercial"
+
+#. module: kitchen
+#: model:ir.model.fields,field_description:kitchen.field_kitchen_customization_order_id
+msgid "Order"
+msgstr "Commander"
+
+#. module: kitchen
+#: model:ir.model.fields,field_description:kitchen.field_kitchen_customization_partner_id
+msgid "Partner"
+msgstr "Client"
+
+#. module: kitchen
+#: model:ir.model.fields,field_description:kitchen.field_kitchen_customization_products_qty_format
+msgid "Products and Quantities"
+msgstr "Produits et quantités"
+
+#. module: kitchen
+#: model:ir.model.fields,field_description:kitchen.field_customization_wizard_type_ids
+#: model:ir.model.fields,field_description:kitchen.field_kitchen_customization_type_ids
+msgid "Type"
+msgstr "Type"
+
+#. module: kitchen
+#: model:ir.model.fields,field_description:kitchen.field_customization_wizard_erase_logo
+#: model:ir.model.fields,field_description:kitchen.field_kitchen_customization_erase_logo
+msgid "Erase Logo"
+msgstr "Supprimer le logo"
+
+#. module: kitchen
+#: model:ir.model.fields,field_description:kitchen.field_kitchen_customization_line_only_erase_logo
+#: model:ir.model.fields,field_description:kitchen.field_customization_line_only_erase_logo
+msgid "Only Erase Logo"
+msgstr "Effacer uniquement le logo"
+
+#. module: kitchen
+#: model:ir.model.fields,field_description:kitchen.field_kitchen_customization_user
+#: model:ir.model.fields,field_description:kitchen.field_kitchen_customization_wizard_user
+msgid "User"
+msgstr "Utilisateur"
+
+#. module: kitchen
+#: model:ir.model.fields,field_description:kitchen.field_kitchen_customization_date_planned
+#: model:ir.model.fields,field_description:kitchen.field_customization_wizard_date_planned
+msgid "Date Planned"
+msgstr "Date prévue"
+
+#. module: kitchen
+#: model:ir.model.fields,field_description:kitchen.field_kitchen_customization_status
+msgid "Customization Status"
+msgstr "Statut"
+
+#. module: kitchen
+#: model:ir.ui.view,arch_db:kitchen.kitchen_customization_tree
+#: model:ir.ui.view,arch_db:kitchen.view_kitchen_customizations_filter
+#: model:ir.ui.view,arch_db:kitchen.kitchen_customization_form
+#: model:ir.ui.view,arch_db:kitchen.create_customization_wizard
+msgid "Kitchen Customization"
+msgstr "Personnalisation"
+
+#. module: kitchen
+#: selection:kitchen.customization,state:0
+msgid "Draft"
+msgstr "Nouveau"
+
+#. module: kitchen
+#: selection:kitchen.customization,state:0
+msgid "Sent"
+msgstr "Expédié"
+
+#. module: kitchen
+#: selection:kitchen.customization,state:0
+msgid "In Progress"
+msgstr "En cours"
+
+#. module: kitchen
+#: selection:kitchen.customization,state:0
+msgid "Done"
+msgstr "Terminé"
+
+#. module: kitchen
+#: model:ir.model.fields,field_description:kitchen.field_customization_wizard_add_all
+msgid "Add All"
+msgstr "Ajouter tout"
+
+#. module: kitchen
+#: model:ir.model.fields,field_description:kitchen.field_customization_wizard_comments
+#: model:ir.model.fields,field_description:kitchen.field_kitchen_customization_comments
+msgid "Comments"
+msgstr "Rétroaction"
+
+#. module: kitchen
+#: model:ir.model.fields,field_description:kitchen.field_kitchen_customization_line_product_id
+#: model:ir.model.fields,field_description:kitchen.field_customization_line_product_id
+msgid "Product"
+msgstr "Produit"
+
+#. module: kitchen
+#: model:ir.model.fields,field_description:kitchen.field_customization_line_product_qty
+msgid "Quantity Available"
+msgstr "Quantité disponible"
+
+#. module: kitchen
+#: model:ir.model.fields,field_description:kitchen.field_customization_line_qty
+msgid "Selected quantity"
+msgstr "Quantité choisie"
+
+#. module: kitchen
+#: model:ir.model.fields,field_description:kitchen.field_customization_wizard_notify_users
+#: model:ir.model.fields,field_description:kitchen.field_kitchen_customization_notify_users
+msgid "Notify Users"
+msgstr "Utilisateurs à notifier"
+
+#. module: kitchen
+#: model:ir.ui.view,arch_db:kitchen.add_create_customization_button
+msgid "Create customization"
+msgstr "Créer une personnalisation"
+
+#. module: kitchen
+#: model:ir.ui.view,arch_db:kitchen.add_create_customization_button
+msgid "Customizations"
+msgstr "Personnalisations"
+
+#. module: kitchen
+#: model:ir.ui.view,arch_db:kitchen.kitchen_customization_form
+msgid "Confirm"
+msgstr "Confirmer"
+
+#. module: kitchen
+#: model:ir.ui.view,arch_db:kitchen.kitchen_customization_form
+msgid "Cancel"
+msgstr "Annuler"
+
+#. module: kitchen
+#: model:ir.ui.view,arch_db:kitchen.kitchen_customization_form
+msgid "Draft"
+msgstr "Nouveau"
+
+#. module: kitchen
+#: model:ir.ui.view,arch_db:kitchen.kitchen_customization_form
+msgid "Done"
+msgstr "Terminé"
+
+#. module: kitchen
+#: model:ir.ui.view,arch_db:kitchen.kitchen_customization_form
+msgid "Received"
+msgstr "Reçu"
+
+#. module: kitchen
+#: model:ir.ui.view,arch_db:kitchen.kitchen_customization_form
+msgid "Products"
+msgstr "Produits"
+
+#. module: kitchen
+#: model:ir.ui.view,arch_db:kitchen.view_kitchen_customizations_filter
+msgid "My Orders"
+msgstr "Mes personnalisations"
+
+#. module: kitchen
+#: model:ir.ui.view,arch_db:kitchen.view_kitchen_customizations_filter
+msgid "My pending orders"
+msgstr "Mes personnalisations en attente"
+
+#. module: kitchen
+#: model:ir.ui.view,arch_db:kitchen.view_kitchen_customizations_filter
+msgid "Pending"
+msgstr "En attente"
+
+#. module: kitchen
+#: model:ir.ui.view,arch_db:kitchen.create_customization_wizard
+#: model:ir.ui.view,arch_db:kitchen.mark_as_received_view
+msgid "Create"
+msgstr "Créer"
+
+#. module: kitchen
+#: model:ir.ui.view,arch_db:kitchen.create_customization_wizard
+#: model:ir.ui.view,arch_db:kitchen.mark_as_received_view
+msgid "Cancel"
+msgstr "Annuler"
+
+#. module: kitchen
+#: code:addons/kitchen/models/kitchen_customization.py:42
+msgid "(ONLY LOGO)"
+msgstr "(SEUL LOGO)"
+
+#. module: kitchen
+#: code:addons/kitchen/models/kitchen_customization.py:60
+msgid "Please add some products before confirming the customization request"
+msgstr "Veuillez ajouter un produit avant de confirmer la demande de personnalisation"
+
+#. module: kitchen
+#: code:addons/kitchen/models/kitchen_customization.py:62
+msgid "You can't create a customization with a quantity of less than one of a product"
+msgstr "Vous ne pouvez pas créer une personnalisation de ce produit avec une quantité inférieure à un"
+
+#. module: kitchen
+#: code:addons/kitchen/models/kitchen_customization.py:76
+msgid "The order contains customized products"
+msgstr "La commande contient des produits personnalisés"
+
+#. module: kitchen
+#: code:addons/kitchen/models/sale_order.py:20
+msgid "You can't transfer an order with pending customizations"
+msgstr "Vous ne pouvez pas transférer une commande avec des personnalisations en attente"
+
+#. module: kitchen
+#: code:addons/kitchen/models/stock_picking.py:17
+msgid "This picking has been created from an order with customized products"
+msgstr "Ce bon de livraison a été créé à partir d'une commande avec des produits personnalisés"
+
+#. module: kitchen
+#: code:addons/kitchen/wizard/create_customization_wizard.py:75
+msgid "You can't create a customization with a quantity of less than zero of this product: %s"
+msgstr "Vous ne pouvez pas créer une personnalisation de ce produit avec une quantité inférieure à zéro : %s"
+
+#. module: kitchen
+#: code:addons/kitchen/wizard/create_customization_wizard.py:77
+msgid "You can't create a customization with a bigger quantity of the product than what appears in the order: %s"
+msgstr "Vous ne pouvez pas créer une personnalisation avec une quantité supérieure à celle du produit dans la commande: %s"
+
+#. module: kitchen
+#: code:addons/kitchen/wizard/create_customization_wizard.py:100
+msgid "You cannot create an empty customization"
+msgstr "Vous ne pouvez pas créer une personnalisation vide"
+
+#. module: kitchen
+#: model:mail.template,body_html:kitchen.send_mail_to_commercials_customization_done
+msgid "<p>Customization <strong>${object.name}</strong> has been completed.</p>\n"
+"            <p>The information of this customization is as follows:</p>\n"
+"            <ul>\n"
+"                <li>Partner: <strong>${object.partner_id.name | safe}</strong></li>\n"
+"                <li>Order: <strong>${object.order_id.name | safe}</strong></li>\n"
+"                <li>Erase logo: <strong>${object.erase_logo}</strong></li>\n"
+"                <li>Type:\n"
+"                    <ul>\n"
+"                    % for type in object.type_ids:\n"
+"                        <li>${type.name}</li>\n"
+"                    % endfor\n"
+"                    </ul>\n"
+"                </li>\n"
+"                <li>Products and quantities: <strong>${object.products_qty_format} </li>\n"
+"                <li>Responsible for customization: <strong>${object.user} </li>\n"
+"            </ul>\n"
+"            <p>Please check your order <strong>${object.order_id.name | safe}</strong>. You can now proceed it.</p>\n"
+"            <p>Best regards.</p>"
+msgstr "<p>La Personalización <strong>${object.name}</strong> ha terminado.</p>\n"
+"            <p>Les informations de personnalisation sont les suivantes:</p>\n"
+"            <ul>\n"
+"                <li>Client: <strong>${object.partner_id.name | safe}</strong></li>\n"
+"                <li>Commande: <strong>${object.order_id.name | safe}</strong></li>\n"
+"                <li>Supprimer le logo: <strong>${object.erase_logo}</strong></li>\n"
+"                <li>Type:\n"
+"                    <ul>\n"
+"                    % for type in object.type_ids:\n"
+"                        <li>${type.name}</li>\n"
+"                    % endfor\n"
+"                    </ul>\n"
+"                </li>\n"
+"                <li>Produits et quantités: <strong>${object.products_qty_format} </li>\n"
+"                <li>Responsable de la personnalisation: <strong>${object.user} </li>\n"
+"            </ul>\n"
+"            <p>Veuillez vérifier votre commande <strong>${object.order_id.name | safe}</strong>. Vous pouvez désormais la valider.</p>\n"
+"            <p>Saludos.</p>"
+
+#. module: kitchen
+#: model:mail.template,subject:kitchen.send_mail_to_commercials_customization_done
+msgid "Customization ${object.name} done"
+msgstr "La personnalisation ${object.name} est terminée."
+
+#. module: kitchen
+#: model:ir.ui.menu,name:kitchen.kitchen_view
+msgid "Kitchen View"
+msgstr "vue de la cuisine"
+
+#. module: kitchen
+#: model:ir.ui.menu,name:kitchen.commercial_view
+msgid "Commercial View"
+msgstr "Vue commerciale"
+
+#. module: kitchen
+#: model:ir.ui.menu,name:kitchen.customizations_menu
+msgid "Customizations"
+msgstr "Personnalisation"
+
+#. module: kitchen
+#: model:ir.ui.menu,name:kitchen.customization_config
+msgid "Configuration"
+msgstr "Configuration"
+
+#. module: kitchen
+#: model:ir.ui.menu,name:kitchen.menu_customization_type_action_form
+#: model:ir.actions.act_window,name:kitchen.customization_type_action_form
+#: model:ir.ui.view,arch_db:kitchen.customization_type_list_view
+msgid "Customization Type"
+msgstr "Type de personnalisation"
+
+

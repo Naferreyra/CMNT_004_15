@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_show_customizations_commercials" model="ir.actions.act_window">
+        <field name="name">Kitchen</field>
+        <field name="res_model">kitchen.customization</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field eval="False" name="view_id"/>
+        <field name="view_kitchen_customizations_filter"/>
+        <field name="context">{
+            'search_default_my_kitchen_customization_pending_filter': 1
+            }
+        </field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Click to create a New Customization
+            </p>
+        </field>
+    </record>
+    <record id="action_show_customizations_kitchen" model="ir.actions.act_window">
+        <field name="name">Kitchen</field>
+        <field name="res_model">kitchen.customization</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field eval="False" name="view_id"/>
+        <field name="view_kitchen_customizations_filter"/>
+        <field name="context">{
+            'search_default_pending_filter': 1
+            }
+        </field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Click to create a New Customization
+            </p>
+        </field>
+    </record>
+    <menuitem id="kitchen_menu" name="Kitchen" web_icon="kitchen,static/cocina.png"
+              sequence="4" action="action_show_customizations_commercials" groups="base.group_user"/>
+
+    <menuitem id="customizations_menu" name="Customizations" sequence="1"
+              parent="kitchen_menu" groups="kitchen.group_kitchen"/>
+
+    <menuitem id="commercial_view" name="Commercial View" sequence="1" action="action_show_customizations_commercials"
+                groups="base.group_user" string="Commercial View" parent="customizations_menu"/>
+    <menuitem id="kitchen_view" name="Kitchen View" string="Kitchen View" sequence="2" action="action_show_customizations_kitchen"
+                    groups="kitchen.group_kitchen" parent="customizations_menu"/>
+
+    <record id="kitchen_customization_form" model="ir.ui.view">
+        <field name="name">kitchen.customization.form</field>
+        <field name="model">kitchen.customization</field>
+        <field name="arch" type="xml">
+            <form string="Kitchen Customization">
+                <header>
+                    <field name="state" widget="statusbar" readonly="1"
+                           statusbar_visible="draft,sent,in_progress,done"/>
+                    <button name="action_confirm" string="Confirm" type="object"
+                            attrs="{'invisible': [('state','!=','draft')]}"
+                            class="oe_highlight"/>
+                    <button name="%(kitchen.mark_as_received)d" string="Received" type="action"
+                            attrs="{'invisible': [('state','!=','sent')]}"
+                            class="oe_highlight" groups="kitchen.group_kitchen"/>
+                    <button name="action_done" string="Done" type="object"
+                            attrs="{'invisible': [('state','!=','in_progress')]}"
+                            class="oe_highlight" groups="kitchen.group_kitchen"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                            attrs="{'invisible': [('state','!=','draft')]}"/>
+                    <button name="action_draft" string="Draft" type="object"
+                            attrs="{'invisible': [('state','!=','cancel')]}"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label string="Kitchen Customization"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="is_manager" invisible="1"/>
+                            <field name="order_id"
+                                   attrs="{'readonly': [('state', '!=', 'draft')],'required': [('is_manager','=',False)]}"/>
+                            <field name="partner_id"
+                                   attrs="{'readonly': [('state', '!=', 'draft')],'required': [('is_manager','=',False)]}"/>
+                            <field name="commercial_id" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="notify_users" widget="many2many_tags"/>
+                            <field name="user"/>
+                        </group>
+                        <group>
+                            <field name="erase_logo" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="type_ids" widget="many2many_tags"
+                                   attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="date_planned" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Products">
+                            <field name="customization_line"
+                                   attrs="{'readonly': [('state', '!=', 'draft')]}">
+                                <tree string="Customization Lines" editable="bottom">
+                                    <field name="product_id"/>
+                                    <field name="product_qty"/>
+                                    <field name="only_erase_logo"/>
+                                    <field name="state" invisible="1"/>
+                                </tree>
+
+                            </field>
+                        </page>
+                    </notebook>
+                    <group>
+                        <field name="comments" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="kitchen_customization_tree" model="ir.ui.view">
+        <field name="name">kitchen.customization.tree</field>
+        <field name="model">kitchen.customization</field>
+        <field name="arch" type="xml">
+            <tree string="Kitchen customization" default_order="date_customization asc">
+                <field name="date_customization"/>
+                <field name="name"/>
+                <field name="commercial_id"/>
+                <field name="order_id"/>
+                <field name="partner_id"/>
+                <field name="products_qty_format" string="Products and Quantities"/>
+                <field name="type_ids"/>
+                <field name="erase_logo"/>
+                <field name="user"/>
+                <field name="date_planned"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+    <record id="view_kitchen_customizations_filter" model="ir.ui.view">
+        <field name="name">kitchen.customization.list.select</field>
+        <field name="model">kitchen.customization</field>
+        <field name="arch" type="xml">
+            <search string="Kitchen customization">
+                <filter string="My Orders" domain="[('commercial_id','=',uid)]" name="my_kitchen_customization_filter"/>
+                <filter string="Pending" domain="[('state','in',('sent','in_progress'))]" name="pending_filter"/>
+                <filter string="My pending orders"
+                        domain="[('commercial_id','=',uid),('state','in',('sent','in_progress'))]"
+                        name="my_kitchen_customization_pending_filter"/>
+
+            </search>
+        </field>
+    </record>
+
+
+</odoo>
+
