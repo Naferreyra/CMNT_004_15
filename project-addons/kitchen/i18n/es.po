@@ -83,6 +83,11 @@ msgid "Only Erase Logo"
 msgstr "Solo Borrar Logo"
 
 #. module: kitchen
+#: model:ir.model.fields,field_description:kitchen.field_kitchen_customization_line_product_qty
+msgid "Product Qty"
+msgstr "Cantidad"
+
+#. module: kitchen
 #: model:ir.model.fields,field_description:kitchen.field_kitchen_customization_user
 #: model:ir.model.fields,field_description:kitchen.field_kitchen_customization_wizard_user
 msgid "User"
@@ -390,9 +395,15 @@ msgid "Customization Type"
 msgstr "Tipo de personalización"
 
 #. module: kitchen
-#: model:ir.actions.act_window,name:kitchen.action_show_customizations_commercials
-#: model:ir.actions.act_window,name:kitchen.action_show_customizations_kitchen
-msgid "Click to create a New Customization"
-msgstr "Click aquí para crear una nueva personalización"
+#: model:ir.actions.act_window,help:kitchen.action_show_customizations_commercials
+#: model:ir.actions.act_window,help:kitchen.action_show_customizations_kitchen
+msgid "<p class="oe_view_nocontent_create">\n"
+"                Click to create a New Customization\n"
+"            </p>"
+msgstr "<p class="oe_view_nocontent_create">\n"
+"                Click aquí para crear una nueva personalización\n"
+"            </p>"
+
+
 
 

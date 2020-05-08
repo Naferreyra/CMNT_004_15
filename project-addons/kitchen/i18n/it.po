@@ -330,3 +330,8 @@ msgstr "Configurazione"
 msgid "Customization Type"
 msgstr "Tipo di personalizzazione"
 
+#. module: kitchen
+#: model:ir.model.fields,field_description:kitchen.field_kitchen_customization_line_product_qty
+msgid "Product Qty"
+msgstr "Qtà prodotto"
+
