@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo noupdate="1">
-    <record id="margin_lock_limit" model="ir.config_parameter">
+    <record id="translations_to_export" model="ir.config_parameter">
         <field name="key">translations.to.export</field>
         <field name="value"></field>
     </record>

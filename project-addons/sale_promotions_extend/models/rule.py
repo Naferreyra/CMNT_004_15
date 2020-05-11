@@ -295,7 +295,7 @@ class PromotionsRulesActions(models.Model):
             'promotion_line': True,
             'product_uom_qty': quantity,
             'product_uom': product_id.uom_id.id,
-            'original_line_id': order_line.id,
+            'original_line_id_promo': order_line.id,
             'promo_qty_split': eval(self.arguments.split(",")[0])
 
         }
