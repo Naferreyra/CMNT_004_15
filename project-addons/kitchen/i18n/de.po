@@ -258,17 +258,17 @@ msgid "This picking has been created from an order with customized products"
 msgstr "Dieser Lieferschein wurde aus einer Bestellung mit personalisierten Produkten erstellt"
 
 #. module: kitchen
-#: code:addons/kitchen/wizard/create_customization_wizard.py:77
+#: code:addons/kitchen/wizard/create_customization_wizard.py:94
 msgid "You can't create a customization with a quantity of less than zero of this product: %s"
 msgstr "Sie können keine Anpassung mit einer Menge von weniger als null dieses Produkts erstellen: %s"
 
 #. module: kitchen
-#: code:addons/kitchen/wizard/create_customization_wizard.py:79
+#: code:addons/kitchen/wizard/create_customization_wizard.py:97
 msgid "You can't create a customization with a bigger quantity of the product than what appears in the order: %s"
 msgstr "Sie können keine Personalisierung mit mehr Menge erstellen, als das Produkt in der Bestellung hat: %s"
 
 #. module: kitchen
-#: code:addons/kitchen/wizard/create_customization_wizard.py:100
+#: code:addons/kitchen/wizard/create_customization_wizard.py:118
 msgid "You cannot create an empty customization"
 msgstr "Sie können keine leere Personalisierung erstellen"
 
