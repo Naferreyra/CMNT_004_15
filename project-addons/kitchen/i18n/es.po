@@ -379,6 +379,7 @@ msgstr "Vista de comercial"
 
 #. module: kitchen
 #: model:ir.ui.menu,name:kitchen.customizations_menu
+#: model:ir.model.fields,field_description:kitchen.field_sale_order_customization_count
 msgid "Customizations"
 msgstr "Personalizaciones"
 
