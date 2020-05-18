@@ -21,7 +21,10 @@ class SaleOrder(models.Model):
         return super(SaleOrder, self).action_confirm()
 
     def action_view_customizations(self):
-        action = self.env.ref('kitchen.action_show_customizations').read()[0]
+        if self.env.user.has_group('kitchen.group_kitchen'):
+            action = self.env.ref('kitchen.action_show_customizations_kitchen').read()[0]
+        else:
+            action = self.env.ref('kitchen.action_show_customizations_commercials').read()[0]
         if len(self.customization_ids) > 0:
             action['domain'] = [('id', 'in', self.customization_ids.ids)]
             action['context'] = [('id', 'in', self.customization_ids.ids)]
