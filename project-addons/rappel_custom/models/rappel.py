@@ -23,6 +23,7 @@ class Rappel(models.Model):
     partner_add_conditions = fields.Char('Add partner conditions')
     company_id = fields.Many2one('res.company', string='Company',
                                  default=lambda self: self.env['res.company']._company_default_get())
+    exclude_partner_categories = fields.Many2many('res.partner.category')
 
     def get_products(self):
         product_obj = self.env['product.product']
@@ -69,12 +70,10 @@ class Rappel(models.Model):
             pricelist_ids = tuple(rappel.pricelist_ids.ids)
             product_rappel = rappel.product_id
             # Clientes que ya pertenecen al rappel:
-            partner_rappel_list = tuple(partner_rappel_obj.
-                                        search([('rappel_id', '=', rappel.id),
+            partner_rappel_list = partner_rappel_obj.search([('rappel_id', '=', rappel.id),
                                                 ('date_start', '<=', now_str),
                                                 '|', ('date_end', '=', False),
-                                                ('date_end', '>=', now_str)]).
-                                        mapped('partner_id.id'))
+                                                ('date_end', '>=', now_str)]).mapped('partner_id.id')
 
             # Clientes que deberian pertenecer al rappel:
             partner_filter = []
@@ -88,7 +87,6 @@ class Rappel(models.Model):
                             ('res_id', '!=', False)])
 
                 partner_filter.extend(["('id', 'in', [int(x.res_id.split(',')[1]) for x in properties])"])
-
             if rappel.partner_add_conditions:
                 # Rappels que depende de otros parámetros del cliente
                 partner_filter.extend([rappel.partner_add_conditions])
@@ -104,13 +102,16 @@ class Rappel(models.Model):
                 partner_filter.extend(["('prospective', '=', False), ('active', '=', True), "
                                        "('is_company', '=', True), ('parent_id', '=', False)"])
                 partner_filter = ', '.join(partner_filter)
-                partner_to_check = tuple(eval("self.env['res.partner'].search([" + partner_filter + "])").ids)
+                partner_to_check = eval("self.env['res.partner'].search([" + partner_filter + "])")
             else:
-                partner_to_check = tuple()
+                partner_to_check = self.env['res.partner']
+
+            if rappel.exclude_partner_categories:
+                partner_to_check=partner_to_check.filtered(lambda p: all([x not in p.category_id.ids for x in rappel.exclude_partner_categories.ids]))
 
             # Clientes a los que ya no les corresponde el rappel (cumplen las condiciones anteriores)
             #      - Se actualiza fecha fin con la fecha actual
-            remove_partners = set(partner_rappel_list) - set(partner_to_check)
+            remove_partners = set(partner_rappel_list) - set(partner_to_check.ids)
             if remove_partners:
                 vals = {'date_end': yesterday_str}
                 partner_to_update = partner_rappel_obj.search([('rappel_id', '=', rappel.id),
@@ -124,7 +125,7 @@ class Rappel(models.Model):
             #  el rappel:
             #      - Una para liquidar en el mes actual
             #      - Otra que empiece en fecha 1 del mes siguiente
-            add_partners = set(partner_to_check) - set(partner_rappel_list)
+            add_partners = set(partner_to_check.ids) - set(partner_rappel_list)
             if add_partners:
                 new_line1 = {'rappel_id': rappel.id,
                              'periodicity': 'monthly',

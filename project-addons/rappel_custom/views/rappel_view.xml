@@ -35,6 +35,7 @@
                     <field name="discount_voucher" groups="base.group_system"/>
                     <field name="company_id" groups="base.group_system"/>
                     <field name="partner_add_conditions" groups="base.group_system"/>
+                    <field name="exclude_partner_categories" widget="many2many_tags" groups="base.group_system"/>
                     <field name="pricelist_ids" groups="base.group_system"
                            attrs="{'invisible':[('discount_voucher','=', False)]}"/>
                 </field>

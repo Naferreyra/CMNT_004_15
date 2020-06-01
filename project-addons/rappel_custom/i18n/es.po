@@ -193,3 +193,8 @@ msgstr "<html>\n"
 "                        </div>\n"
 "</body>\n"
 "</html>"
+
+#. module: rappel_custom
+#: model:ir.model.fields,field_description:rappel_custom.field_rappel_exclude_partner_categories
+msgid "Exclude Partner Categories"
+msgstr "Excluir Categorías de Cliente"
