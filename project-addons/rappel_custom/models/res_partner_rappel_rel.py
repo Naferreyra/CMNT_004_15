@@ -33,49 +33,39 @@ class ResPartnerRappelRel(models.Model):
     def _get_invoices(self, period, products):
         super()._get_invoices(period, products)
         company_id = self.rappel_id.company_id.id
-        invoices = self.env['account.invoice'].search(
-            [('type', '=', 'out_invoice'),
-             ('date_invoice', '>=', period[0]),
+        domain =[('date_invoice', '>=', period[0]),
              ('date_invoice', '<=', period[1]),
              ('state', 'in', ['open', 'paid']),
              ('commercial_partner_id', '=', self.partner_id.id),
-             ('company_id', '=', company_id)])
-        refunds = self.env['account.invoice'].search(
-            [('type', '=', 'out_refund'),
-             ('date_invoice', '>=', period[0]),
-             ('date_invoice', '<=', period[1]),
-             ('state', 'in', ['open', 'paid']),
-             ('commercial_partner_id', '=', self.partner_id.id),
-             ('company_id', '=', company_id)])
-
+             ('company_id', '=', company_id)]
+        invoices = self.env['account.invoice'].search(domain + [('type', '=', 'out_invoice')])
+        refunds = self.env['account.invoice'].search(domain + [('type', '=', 'out_refund')])
+        domain_lines = [('no_rappel', '=', False)]
+        # Si el rappel es un vale ahorro
+        # comprobar que la línea tiene un descuento de 50%
+        if self.rappel_id.discount_voucher:
+            domain_lines += [('discount','=',50)]
         # Si el rappel afecta al catalago entero,
         # no hacer la comprobacion por producto
-        if self.rappel_id.global_application:
-            refund_lines = self.env['account.invoice.line'].search(
-                [('invoice_id', 'in', [x.id for x in refunds]),
-                 ('no_rappel', '=', False)])
-            invoice_lines = self.env['account.invoice.line'].search(
-                [('invoice_id', 'in', [x.id for x in invoices]),
-                 ('no_rappel', '=', False)])
-        else:
-            refund_lines = self.env['account.invoice.line'].search(
-                [('invoice_id', 'in', [x.id for x in refunds]),
-                 ('product_id', 'in', products),
-                 ('no_rappel', '=', False)])
-            invoice_lines = self.env['account.invoice.line'].search(
-                [('invoice_id', 'in', [x.id for x in invoices]),
-                 ('product_id', 'in', products),
-                 ('no_rappel', '=', False)])
+        if not self.rappel_id.global_application:
+            domain_lines += [('product_id', 'in', products)]
+
+        refund_lines = self.env['account.invoice.line'].search(domain_lines +
+                [('invoice_id', 'in', [x.id for x in refunds])])
+        invoice_lines = self.env['account.invoice.line'].search(domain_lines +
+                [('invoice_id', 'in', [x.id for x in invoices])])
 
         return invoice_lines, refund_lines
 
     def _calculate_pending_to_invoice(self):
         products = self.rappel_id.get_products()
-        order_lines = self.env['sale.order.line'].search(
-            [('order_id.partner_id', 'child_of', self.partner_id.id),
+        domain=[('order_id.partner_id', 'child_of', self.partner_id.id),
                 ('order_id.state', '=', 'sale'),
                 ('product_id', 'in', products),
-                ('qty_delivered', '>', 0)])
+                ('qty_delivered', '>', 0)]
+        if self.rappel_id.discount_voucher:
+            domain += [('discount','=',50)]
+        order_lines = self.env['sale.order.line'].search(domain)
         order_lines = order_lines.filtered(
             lambda r: r.qty_delivered > r.qty_invoiced)
         return sum(
