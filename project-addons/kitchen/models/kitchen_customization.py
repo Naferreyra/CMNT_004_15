@@ -58,7 +58,7 @@ class KitchenCustomization(models.Model):
     def action_confirm(self):
         if not self.customization_line:
             raise exceptions.UserError(_('Please add some products before confirming the customization request'))
-        if any(self.customization_line.mapped('product_qty')<=0):
+        if any(self.customization_line.filtered(lambda l: l.product_qty <=0)):
             raise exceptions.UserError(_("You can't create a customization with a quantity of less than one of a product"))
         self.state = 'sent'
         template = self.env.ref('kitchen.send_mail_to_kitchen_customization_sent')
