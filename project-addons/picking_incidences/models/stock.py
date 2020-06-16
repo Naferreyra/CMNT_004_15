@@ -217,6 +217,7 @@ class StockPicking(models.Model):
                 bck = self._create_backorder_incidences(new_moves)
                 bck.write({'move_type': 'one'})
                 self.action_assign()
+                pick.move_lines.write({'state': 'assigned'})
             self.message_post(body=_("User %s accepted confirmed qties.") %
                               self.env.user.name)
 

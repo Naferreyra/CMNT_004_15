@@ -211,7 +211,8 @@ class StockDeposit(models.Model):
                  'commercial': deposit.user_id.id,
                  'location_id': deposit.move_id.location_dest_id.id,
                  'location_dest_id': deposit_loss_loc.id,
-                 'group_id': group_id.id})
+                 'group_id': group_id.id,
+                 'not_sync': True})
             values = {
                 'product_id': deposit.product_id.id,
                 'product_uom_qty': deposit.product_uom_qty,
@@ -227,7 +228,7 @@ class StockDeposit(models.Model):
             }
             move = move_obj.create(values)
             move._action_confirm()
-            move._force_assign()
-            move._action_done()
+            picking.action_assign()
+            picking.action_done()
             deposit.write({'state': 'loss', 'loss_move_id': move.id})
 

@@ -31,8 +31,16 @@ class ProcurementGroup(models.Model):
         pick_ids = self.env["stock.picking"].\
             search([("picking_type_id", "=",
                      self.env.ref('stock.picking_type_internal').id),
-                    ("state", "=", "assigned")])
-        for pick in pick_ids:
-            pick.action_done()
+                    ("state", "in", ("assigned", "confirmed", "partially_available"))])
+        for pick_assign in pick_ids.filtered(
+                lambda l: l.state == "assigned"):
+            pick_assign.action_done()
+        for pick_partially in pick_ids.filtered(
+                lambda l: l.state in ("confirmed", "partially_available")):
+            pick_partially.move_type = 'direct'
+            if pick_partially.state == "partially_available":
+                pick_partially.action_copy_reserv_qty()
+                pick_partially.action_accept_confirmed_qty()
+
         if use_new_cursor:
             self.env.cr.commit()

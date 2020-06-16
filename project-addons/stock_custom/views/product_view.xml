@@ -3,6 +3,38 @@
      License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
 
 <odoo>
+    <record id="view_stock_graph" model="ir.ui.view">
+        <field name="name">stock.inventory.graph</field>
+        <field name="model">stock.inventory.line</field>
+        <field name="arch" type="xml">
+            <graph string="Stock Analysis" type="bar" interval="day">
+                <field name="product_id" type="row"/>
+                <field name="product_qty" type="measure"/>
+            </graph>
+        </field>
+    </record>
+    <record id="stock_inventory_line_search" model="ir.ui.view">
+        <field name="name">stock.inventory.line.search</field>
+        <field name="model">stock.inventory.line</field>
+        <field name="inherit_id" ref="stock.stock_inventory_line_search"/>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <filter string="Day" domain="[]" context="{'group_by': 'create_date:day'}" />
+                <filter string="Month" domain="[]" context="{'group_by': 'create_date:month'}" />
+                <filter string="Year" domain="[]" context="{'group_by': 'create_date:year'}" />
+                <filter name="last_60_days" string="Last 60 days" domain="[('create_date', '&gt;=', ((context_today()-datetime.timedelta(days=60)).strftime('%Y-%m-%d')))]"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="product_graphic_stock_grouped" model="ir.actions.act_window">
+        <field name="name">Stock Graphic</field>
+        <field name="res_model">stock.inventory.line</field>
+        <field name="view_mode">graph</field>
+        <field name="view_id" ref="view_stock_graph"/>
+        <field name="search_view" ref="stock_inventory_line_search"/>
+        <field name="context">{'search_default_last_60_days': 1}</field>
+    </record>
 
     <record id="product_form_view_move_button" model="ir.ui.view">
         <field name="name">product.product.form</field>
@@ -14,6 +46,11 @@
                     string="Stock moves" type="object" icon="fa-cubes" attrs="{'invisible':[('type', '=', 'service')]}"/>
                 <button class="oe_inline oe_stat_button" name="action_view_moves_dates"
                     string="Stock moves dates" type="object" icon="fa-calendar" attrs="{'invisible':[('type', '=', 'service')]}"/>
+                <button class="oe_inline oe_stat_button" type="action" name="%(product_graphic_stock_grouped)d"
+                    string="Stock Graphic"
+                    icon="fa-bar-chart"
+                    context="{'search_default_product_id': active_id, 'group_by':'create_date:day'}"
+                    attrs="{'invisible': [('type', '=', 'service')]}"/>
                 <button string="Product Moves"
                             type="object"
                             name= "action_view_stock_move_lines"
@@ -21,21 +58,6 @@
                             class="oe_stat_button" icon="fa-arrows-v"
                             groups="stock_custom.group_comercial_ext"/>
             </xpath>
-            <notebook position="inside">
-                <page string="Stock graphic" attrs="{'invisible': [('type','!=','product')]}">
-                    <group string="Filters" class="oe_inline">
-                        <field name="date_start" />
-                        <field name="date_end" />
-                        <field name="period" />
-                        <field name="analysis_type" />
-                        <button name="action_create_graph" type="object" string="Refresh graph" />
-                        <label colspan="4" string="(By default, the graph shows the analysis per month of the daily stock average of the last 6 months)" />
-                    </group>
-                    <group string="Stock graphic">
-                        <field name="stock_graphic" widget="'image'" readonly="1" />
-                    </group>
-                </page>
-            </notebook>
         </field>
     </record>
 
@@ -87,6 +109,7 @@
                 <attribute name="filter_domain"></attribute>
             </field>
             <filter name="services" position="after">
+                <filter string="Main supplier not contains outlet" name="main_supplier_outlet" domain="[('seller_id.name','not ilike','outlet')]"/>
                 <filter string="New Category" name="categ_new" domain="[('categ_id.name','like','NUEVOS')]"/>
                 <filter string="One month ago" name="one_month_ago" domain="[('date_first_incoming','>=',(datetime.datetime.now() - datetime.timedelta(days=31)).strftime('%Y-%m-%d'))]"/>
             </filter>
@@ -155,4 +178,46 @@
     <menuitem id="first_incoming_date_menu" name="First incoming date" string="First incoming date"
               action="product_date_first_incoming_action"
               parent="purchase.menu_purchase_control" sequence="7"/>
+
+    <record id="product_stock_catalog_update" model="ir.ui.view">
+        <field name="name">product.stock.catalog.update</field>
+        <field name="model">product.product</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="id"/>
+                <field name="seller_id"/>
+                <field name="code"/>
+                <field name="qty_in_production"/>
+                <field name="incoming_qty"/>
+                <field name="qty_available_wo_wh"/>
+                <field name="qty_available"/>
+                <field name="virtual_stock_conservative"/>
+                <field name="last_sixty_days_sales"/>
+                <field name="biggest_sale_qty"/>
+                <field name="remaining_days_sale"/>
+                <field name="qty_available_input_loc"/>
+                <field name="qty_available_external"/>
+                <field name="average_margin"/>
+                <field name="standard_price"/>
+                <field name="last_purchase_price"/>
+                <field name="last_purchase_date"/>
+                <field name="replacement_id"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+    <record id="product_stock_catalog_update_action" model="ir.actions.act_window">
+        <field name="name">Stock catalog Update</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">product.product</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="product_add_tags_search"/>
+        <field name="view_id" ref="product_stock_catalog_update"/>
+        <field name="domain">[('custom', '=', False),('type', '!=', 'service')]</field>
+        <field name="context">{'search_default_main_supplier_outlet':1}</field>
+    </record>
+
+    <menuitem id="product_stock_catalog_update_menu" name="product_stock_catalog_update_menu" string="Stock catalog Update"
+              action="product_stock_catalog_update_action"
+              parent="purchase.menu_procurement_management" sequence="100"/>
 </odoo>

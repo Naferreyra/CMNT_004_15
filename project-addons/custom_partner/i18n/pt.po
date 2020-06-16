@@ -22,7 +22,13 @@ msgid "We would also like to inform you of the following invoices which will bec
 msgstr "Aproveitamos para informar-lhe acerca dos vencimentos  durante os próximos 6 dias"
 
 #. module: custom_partner
-#: code:addons/custom_partner/partner.py:437
+#: code:addons/custom_partner/partner.py:463
 #, python-format
-msgid "The e-mail format is incorrect: "
-msgstr "O formato do e-mail está incorreto: "
+msgid '[Partner "%s"] The e-mail format is incorrect: '
+msgstr '[Parceiro "%s"] O formato do e-mail está incorreto: '
+
+#. module: custom_partner
+#: code:addons/custom_partner/partner.py:472
+#, python-format
+msgid ' "%s" (Accounting email)'
+msgstr ' "%s" (Email de contabilidade)'

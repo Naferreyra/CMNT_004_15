@@ -615,3 +615,9 @@ msgstr "Aplicar promociones"
 #: model:ir.model.fields,field_description:sale_promotions_extend.field_promos_rules_line_description
 msgid "Description in lines"
 msgstr "Descripción en líneas"
+
+#. modules: sale_promotions_extend
+#: selection:promos.rules.actions,action_type:0
+#, python-format
+msgid "Products free per unit"
+msgstr "Productos gratis por unidad"

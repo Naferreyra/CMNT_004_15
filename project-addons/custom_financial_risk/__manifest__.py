@@ -14,7 +14,8 @@
     ],
     'data': [
         'views/account.xml',
-        'views/res_partner.xml'
+        'views/res_partner.xml',
+        'wizard/update_risk.xml'
     ],
     'installable': True,
 }

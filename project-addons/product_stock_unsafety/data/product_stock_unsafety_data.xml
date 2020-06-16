@@ -38,5 +38,10 @@
             <field name="value"></field>
         </record>
 
+        <record id="joking_brand_excluded" model="ir.config_parameter">
+            <field name="key">joking.brand.excluded</field>
+            <field name="value"></field>
+        </record>
+
     </data>
 </odoo>

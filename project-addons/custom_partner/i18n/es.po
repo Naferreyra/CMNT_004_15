@@ -103,10 +103,16 @@ msgid "Amount not due"
 msgstr "Importe no vencido"
 
 #. module: custom_partner
-#: code:addons/custom_partner/partner.py:437
+#: code:addons/custom_partner/partner.py:463
 #, python-format
-msgid "The e-mail format is incorrect: "
-msgstr "El formato del e-mail es incorrecto: "
+msgid '[Partner "%s"] The e-mail format is incorrect: '
+msgstr '[Cliente "%s"] El formato del e-mail es incorrecto: '
+
+#. module: custom_partner
+#: code:addons/custom_partner/partner.py:472
+#, python-format
+msgid ' "%s" (Accounting email)'
+msgstr ' "%s" (Correo contabilidad)'
 
 #. module: custom_partner
 #: code:addons/custom_partner/partner.py:277

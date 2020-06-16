@@ -101,6 +101,9 @@ class SaleOrder(models.Model):
     def onchange_partner_id(self):
         # Load the favorite shipping address
         super().onchange_partner_id()
+        if self.opportunity_id and self.opportunity_id.partner_id.parent_id:
+            self.partner_id = self.opportunity_id.partner_id.commercial_partner_id
+            self.partner_shipping_id = self.opportunity_id.partner_id
         for child in self.partner_id.child_ids:
             if child.default_shipping_address:
                 self.partner_shipping_id = child.id

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <record id="update_partner_risk" model="ir.ui.view">
+        <field name="name">update.partner.risk.wizard</field>
+        <field name="model">update.partner.risk</field>
+        <field name="arch" type="xml">
+            <form string="Update Partner Risk">
+                <group>
+                    <field name="partner_ids" widget="many2many_tags"/>
+                    <field name="new_risk"/>
+                </group>
+
+                <footer>
+                    <button string="Update" class="btn-primary" name="action_update_risk" type="object"/>
+                    <button string="Cancel" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="update_partner_risk_action" model="ir.actions.act_window">
+        <field name="name">Update Partner Risk</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">update.partner.risk</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="update_partner_risk"/>
+        <field name="target">new</field>
+    </record>
+
+
+    <menuitem
+            name="Update Partner Risk"
+            parent="account_credit_control.base_credit_control_menu"
+            id="update_partner_risk_menu"
+            sequence="100"
+            action="update_partner_risk_action"
+            groups="account_credit_control.group_account_credit_control_manager,account_credit_control.group_account_credit_control_user"
+    />
+
+</odoo>

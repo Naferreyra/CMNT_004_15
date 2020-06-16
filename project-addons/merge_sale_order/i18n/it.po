@@ -1,0 +1,94 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#       * merge_sale_order
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 8.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-05-28 13:08+0000\n"
+"PO-Revision-Date: 2020-05-28 13:08+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+
+#. module: merge_sale_order
+#: code:addons/merge_sale_order/wizard/merge_sale_order_wizard.py:41
+#, python-format
+msgid "Please select at least two sale orders"
+msgstr "Seleziona almeno due ordini di vendita"
+
+#. module: merge_sale_order
+#: code:addons/merge_sale_order/wizard/merge_sale_order_wizard.py:43
+#, python-format
+msgid "Please select Sale orders which are in Quotation or Reserve state"
+msgstr "Seleziona gli ordini in stato Preventivo o Riservato"
+
+#. module: merge_sale_order
+#: code:addons/merge_sale_order/wizard/merge_sale_order_wizard.py:46
+#, python-format
+msgid "Please select Sale orders whose Customers are the same"
+msgstr "Seleziona gli ordini di vendita i cui clienti sono uguali"
+
+#. module: merge_sale_order
+#: code:addons/merge_sale_order/wizard/merge_sale_order_wizard.py:49
+#, python-format
+msgid "Please select Sale orders whose shipping addresses are the same"
+msgstr "Seleziona gli ordini di vendita i cui indirizzi di spedizione sono gli stessi"
+
+#. module: merge_sale_order
+#: code:addons/merge_sale_order/wizard/merge_sale_order_wizard.py:52
+#, python-format
+msgid "Please select Sale orders whose invoice addresses are same"
+msgstr "Seleziona gli ordini di vendita i cui indirizzi di fatturazione sono gli stessi"
+
+#. module: merge_sale_order
+#: selection:merge.sale.order,merge_type:0
+msgid "Create new order and cancel all selected sale orders"
+msgstr "Crea un nuovo ordine e annulla tutti gli ordini di vendita selezionati"
+
+#. module: merge_sale_order
+#: selection:merge.sale.order,merge_type:0
+msgid "Create new order and delete all selected sale orders"
+msgstr "Crea un nuovo ordine ed elimina tutti gli ordini di vendita selezionati"
+
+#. module: merge_sale_order
+#: selection:merge.sale.order,merge_type:0
+msgid "Merge order on existing selected order and cancel others"
+msgstr "Unisci ordine sull'ordine selezionato esistente e cancellane altri"
+
+#. module: merge_sale_order
+#: selection:merge.sale.order,merge_type:0
+msgid "Merge order on existing selected order and delete others"
+msgstr "Unisci ordine sull'ordine selezionato esistente ed eliminane altri"
+
+#. module: merge_sale_order
+#: model:ir.model.fields,field_description:merge_sale_order.field_merge_sale_order_merge_type
+msgid "Merge Type"
+msgstr "Unisci tipo"
+
+#. module: merge_sale_order
+#: model:ir.model.fields,field_description:merge_sale_order.field_merge_sale_order_sale_order_id
+msgid "Sale Order"
+msgstr "Ordine di vendita"
+
+#. module: merge_sale_order
+#: model:ir.actions.act_window,name:merge_sale_order.action_view_merge_sale_line
+#: model:ir.ui.view,arch_db:merge_sale_order.view_merge_sale_line
+msgid "Merge Orders"
+msgstr "Unisci ordini"
+
+#. module: merge_sale_order
+#: model:ir.ui.view,arch_db:merge_sale_order.view_merge_sale_line
+msgid "Cancel"
+msgstr "Annulla"
+
+#. module: merge_sale_order
+#: code:addons/merge_sale_order/wizard/merge_sale_order_wizard.py:118
+#, python-format
+msgid "This order has been created by merging these orders: %s"
+msgstr "Questo ordine è stato creato unendo questi ordini: %s"

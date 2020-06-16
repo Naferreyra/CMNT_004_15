@@ -27,28 +27,14 @@ class StockContainer(models.Model):
     _order = 'write_date desc'
 
     @api.multi
-    def write(self,vals):
-        res=super(StockContainer,self).write(vals)
-        if vals.get('date_expected'):
-            for container in self:
-                for move in container.move_ids:
-                    move.write({'date_expected': container.date_expected})
-        return res
-
-    @api.multi
     def _set_date_expected(self):
-        picking_ids = []
         for container in self:
             if container.move_ids:
-                for move in container.move_ids:
-                    if move.picking_id:
-                        if move.picking_id not in picking_ids:
-                            picking_ids.append(move.picking_id)
                 date_expected = container.date_expected
-                for picking in picking_ids:
-                    new_vals = {'scheduled_date': date_expected}
-                    picking.write(new_vals)
-
+                container.move_ids.write({'date_expected': date_expected})
+                picking_ids = container.move_ids.mapped('picking_id')
+                if picking_ids:
+                    picking_ids.write({'scheduled_date': date_expected})
         return True
 
     @api.multi

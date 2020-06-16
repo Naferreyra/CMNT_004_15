@@ -531,3 +531,46 @@ msgstr "Nome posizione destinazione"
 #: model:ir.model.fields,field_description:stock_custom.field_stock_picking_report_product_pricelist
 msgid "Pricelist"
 msgstr "Listino di Vendita"
+
+#. module: stock_custom
+#: model:ir.actions.act_window,name:stock_custom.product_graphic_stock_grouped
+#: model:ir.ui.view,arch_db:stock_custom.product_form_view_move_button
+msgid "Stock Graphic"
+msgstr "Grafica d'archivio"
+
+#. module: stock_custom
+#: model:ir.ui.view,arch_db:stock_custom.stock_inventory_line_search
+msgid "Year"
+msgstr "Anno"
+
+#. module: stock_custom
+#: model:ir.ui.view,arch_db:stock_custom.stock_inventory_line_search
+msgid "Month"
+msgstr "Mese"
+
+#. module: stock_custom
+#: model:ir.ui.view,arch_db:stock_custom.stock_inventory_line_search
+msgid "Day"
+msgstr "Giorno"
+
+#. module: stock_custom
+#: model:ir.ui.view,arch_db:stock_custom.stock_inventory_line_search
+msgid "Last 60 days"
+msgstr "Ultimi 60 giorni"
+
+#. module: stock_custom
+#: model:ir.model.fields,field_description:stock_custom.field_stock_move_parent_partner
+msgid "Partner"
+msgstr "Cliente"
+
+
+#. module: stock_custom
+#: model:ir.ui.menu,name:stock_custom.product_stock_catalog_update_menu
+#: model:ir.actions.act_window,name:stock_custom.product_stock_catalog_update_action
+msgid "Stock Catalog"
+msgstr "Catalogo azionario"
+
+#. module: stock_custom
+#: model:ir.ui.view,arch_db:stock_custom.product_add_tags_search
+msgid "Main supplier not contains outlet"
+msgstr "Fornitore principale non contiene outlet"

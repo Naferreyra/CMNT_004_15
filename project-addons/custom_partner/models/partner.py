@@ -311,8 +311,6 @@ class ResPartner(models.Model):
     @api.multi
     def _get_average_margin(self):
         for partner in self:
-            # import ipdb
-            # ipdb.set_trace()
             if partner.customer:
                 margin_avg = 0.0
                 total_price = 0.0
@@ -330,16 +328,10 @@ class ResPartner(models.Model):
                      ('date_invoice', '>=', start_date),
                      ('date_invoice', '<=', final_date)])
 
-                invoices_line = self.env['account.invoice.line'].search(
-                    [('invoice_id', 'in', invoices.ids)])
-
-                for i_line in invoices_line:
-                    lines = self.env['sale.order.line'].search([('invoice_lines', 'in', [i_line.id])], limit=1)
-                    order_line = lines and lines[0] or False
-                    if order_line:
-                        o_line_data = order_line.read(['purchase_price'])[0]
+                for i_line in invoices.mapped('invoice_line_ids'):
+                    if i_line.sale_line_ids:
                         total_price += i_line.quantity * i_line.price_unit * ((100.0 - i_line.discount) / 100)
-                        total_cost += i_line.quantity * o_line_data['purchase_price']
+                        total_cost += i_line.quantity * i_line.cost_unit
 
                 if total_price:
                     margin_avg = (1 - total_cost / total_price) * 100.0
@@ -371,8 +363,7 @@ class ResPartner(models.Model):
                                                     domain=[('full_reconcile_id', '=', False),
                                                             ('account_id.internal_type', '=', 'payable'),
                                                             ('move_id.state', '!=', 'draft')])
-    created_by_web=fields.Boolean("Created by web", default=lambda self: self.env['ir.config_parameter'].sudo().get_param('web.user.buyer')==self.env.user.login)
-
+    created_by_web = fields.Boolean("Created by web", default=lambda self: self.env['ir.config_parameter'].sudo().get_param('web.user.buyer') == self.env.user.login)
 
     @api.model
     def _commercial_fields(self):
@@ -454,21 +445,29 @@ class ResPartner(models.Model):
 
     def check_email(self, email):
         any_char="^\s\t\r\n\(\)\<\>\,\:\;\[\]Çç\%\&@á-źÁ-Ź"
-        if not re.match('^(['+any_char+']+@['+any_char+'\.]+(\.['+any_char+'\.]+)+;?)+$', email) and email!="-" and email!=".":
-            message = _('The e-mail format is incorrect: ')
-            raise exceptions.ValidationError(message+email)
+        return not re.match('^(['+any_char+']+@['+any_char+'\.]+(\.['+any_char+'\.]+)+;?)+$', email) and email!="-" and email!="."
 
     @api.constrains('email', 'email2', 'email_web')
     def check_emails(self):
         email = self.email
         email2 = self.email2
         email_web = self.email_web
+        message = _('[Partner "%s"] The e-mail format is incorrect: ') %self.name
         if email:
-            self.check_email(email)
+            not_correct = self.check_email(email)
+            if not_correct:
+                message += ' "%s" (Email)' % email
+                raise exceptions.ValidationError(message)
         if email2:
-            self.check_email(email2)
+            not_correct = self.check_email(email2)
+            if not_correct:
+                message += _(' "%s" (Accounting email)') % email2
+                raise exceptions.ValidationError(message)
         if email_web:
-            self.check_email(email_web)
+            not_correct = self.check_email(email_web)
+            if not_correct:
+                message += ' "%s" (Email Web)' % email_web
+                raise exceptions.ValidationError(message)
     @api.multi
     def name_get(self):
         res = []

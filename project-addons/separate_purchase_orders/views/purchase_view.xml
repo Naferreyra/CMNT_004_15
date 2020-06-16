@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="purchase_order_form_custom" model="ir.ui.view">
+        <field name="name">purchase.order.form.custom</field>
+        <field name="model">purchase.order</field>
+        <field name="arch" type="xml">
+            <form string="Purchase Order">
+                <header>
+                    <field name="state" widget="statusbar" statusbar_visible="purchase_order" readonly="1"/>
+                    <button name="%(separate_purchase_orders.separate_purchase_orders)d" string="Separate" type="action"
+                            attrs="{'invisible': [('state','!=','purchase_order')]}"
+                            class="oe_highlight"/>
+
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button type="object" name="action_view_purchase_orders_custom"
+                                class="oe_stat_button"
+                                icon="fa-shopping-basket">
+                            <field name="purchase_count_custom" widget="statinfo" string="Purchase orders"/>
+                        </button>
+
+                        <button type="object"
+                                name="action_view_picking_custom"
+                                class="oe_stat_button"
+                                icon="fa-truck">
+                            <field name="picking_count_custom" widget="statinfo" string="Shipment"
+                                   help="Incoming Shipments"/>
+                        </button>
+                        <button type="object" name="action_view_invoice_custom"
+                                class="oe_stat_button"
+                                icon="fa-pencil-square-o">
+                            <field name="invoice_count_custom" widget="statinfo" string="Vendor Bills"/>
+                        </button>
+
+                    </div>
+                    <div class="oe_title">
+                        <label string="Purchase Order"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="partner_id"
+                                   context="{'search_default_supplier':1, 'default_supplier':1, 'default_customer':0}"
+                                   domain="[('supplier','=',True)]"/>
+                            <field name="partner_ref"/>
+                            <field name="currency_id" groups="base.group_multi_currency"/>
+                            <field name="is_shipped" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="date_order"/>
+                            <field name="origin" attrs="{'invisible': [('origin','=',False)]}"/>
+                            <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
+                            <field name="completed_purchase"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Products">
+                            <field name="order_line" attrs="{'readonly': [('state', 'in', ('done', 'cancel'))]}">
+                                <tree string="Purchase Order Lines" editable="bottom">
+                                    <field name="currency_id" invisible="1"/>
+                                    <field name="state" invisible="1"/>
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="date_planned" invisible="1"/>
+                                    <field name="product_id"
+                                           context="{'partner_id':parent.partner_id, 'quantity':product_qty,'uom':product_uom, 'company_id': parent.company_id}"
+                                    />
+                                    <field name="name"/>
+                                    <field name="move_dest_ids" invisible="1"/>
+                                    <field name="product_qty"/>
+                                    <field name="production_qty"/>
+                                    <field name="split_qty"/>
+                                    <field name="shipment_qty"/>
+                                    <field name="qty_received_custom"/>
+                                    <field name="qty_invoiced_custom"/>
+                                    <field name="product_uom" groups="product.group_uom"
+                                           attrs="{'readonly': [('state', 'in', ('purchase', 'done', 'cancel'))]}"
+                                           force_save="1"/>
+                                    <field name="price_unit"/>
+                                    <field name="taxes_id" widget="many2many_tags"
+                                           domain="[('type_tax_use','=','purchase')]"
+                                           context="{'default_type_tax_use': 'purchase'}"
+                                           options="{'no_create': True}"/>
+                                    <field name="price_subtotal" widget="monetary"/>
+                                </tree>
+
+                            </field>
+                            <group class="oe_subtotal_footer oe_right">
+                                <field name="amount_untaxed" widget="monetary"
+                                       options="{'currency_field': 'currency_id'}"/>
+                                <field name="amount_tax" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                <div class="oe_subtotal_footer_separator oe_inline">
+                                    <label for="amount_total"/>
+                                </div>
+                                <field name="amount_total" nolabel="1" class="oe_subtotal_footer_separator"
+                                       widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="purchase_order_tree_custom" model="ir.ui.view">
+        <field name="name">purchase.order.tree.custom</field>
+        <field name="model">purchase.order</field>
+        <field name="arch" type="xml">
+            <tree string="Purchase Order">
+                <field name="name" string="Reference"/>
+                <field name="date_order"/>
+                <field name="partner_id"/>
+                <field name="partner_ref"/>
+                <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
+                <field name="origin"/>
+                <field name="amount_untaxed" sum="Total Untaxed amount" string="Untaxed" widget="monetary"/>
+                <field name="amount_total" sum="Total amount" widget="monetary"/>
+                <field name="currency_id" invisible="1"/>
+                <field name="state"/>
+                <field name="invoice_status" invisible="not context.get('show_purchase', True)"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_open_purchase_orders_in_purchase_order_state" model="ir.actions.act_window">
+        <field name="name">Purchase orders to split</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">purchase.order</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+                                      (0, 0, {'view_mode': 'tree', 'view_id': ref('purchase_order_tree_custom')}),
+                                      (0, 0, {'view_mode': 'form', 'view_id': ref('purchase_order_form_custom')}),
+                                      (0, 0, {'view_mode': 'graph', 'view_id': ref('purchase.purchase_order_graph')}),
+                                      (0, 0, {'view_mode': 'pivot', 'view_id': ref('purchase.purchase_order_pivot')})]"/>
+        <field name="context">{'default_state':'purchase_order'}</field>
+        <field name="domain">[('state','=','purchase_order')]</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Click to create a request for purchase order in state purchase order
+            </p>
+        </field>
+    </record>
+
+
+    <menuitem
+            action="action_open_purchase_orders_in_purchase_order_state" id="menu_purchase_order_state" name="Purchase orders to split"
+            parent="purchase.menu_procurement_management" sequence="-1" groups="stock.group_stock_user"/>
+
+
+    <record id="purchase_order_form_date_planned_edit" model="ir.ui.view">
+        <field name="name">purchase.order.form.date.planned.edit</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <field name="company_id" position="after">
+                <field name="parent_id" readonly="1" force_save="1" attrs="{'invisible':[('parent_id','=',False)]}"/>
+            </field>
+        </field>
+
+    </record>
+
+    <record id="purchase.purchase_form_action" model="ir.actions.act_window">
+        <field name="domain">[('state','not in',('draft','sent', 'confirmed','purchase_order'))]</field>
+    </record>
+
+
+</odoo>

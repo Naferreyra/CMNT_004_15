@@ -1,34 +1,12 @@
 # © 2016 Comunitea
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
-import seaborn as sns
-import pandas as pd
-from matplotlib import pyplot as plt
 from odoo import api, fields, models, _, exceptions
-from io import BytesIO
-from datetime import datetime, date
-from dateutil.relativedelta import relativedelta
-import time
-import base64
-import matplotlib
-matplotlib.use('Agg')
 
 
 class ProductTemplate(models.Model):
 
     _inherit = 'product.template'
-    date_start = fields.Date(
-        "Start date",
-        default=lambda *a: (datetime.now() - relativedelta(months=6)).strftime(
-            '%Y-%m-%d'))
-    date_end = fields.Date("End Date", default=fields.Date.today)
-    period = fields.Selection([('week', 'Week'),
-                               ('month', 'Month'),
-                               ('year', 'Year')],
-                              'Time Period', default='month')
-    analysis_type = fields.Selection([('average', 'Average'),
-                                      ('end_of_period', 'End of period')],
-                                     'Type of analysis', default='average')
-    stock_graphic = fields.Binary("Graph")
+
     name = fields.Char(translate=False)
     description_sale = fields.Text(translate=False)
 
@@ -54,173 +32,6 @@ class ProductProduct(models.Model):
 
     ref_visiotech = fields.Char('Visiotech reference')
 
-    @api.model
-    def _last_day_of_period(self, _date):
-        if self.period == 'week':
-            period_end = (
-                date(_date.year, _date.month, _date.day) +
-                relativedelta(weeks=1))
-        elif self.period == 'year':
-            period_end = (date(_date.year, 1, 1) + relativedelta(years=1))
-        else:
-            period_end = (
-                date(_date.year, _date.month, 1) +
-                relativedelta(months=1))
-        return period_end + relativedelta(days=-1)
-
-    def _get_periods(self):
-        """
-        :return: A list of tuples with the first and last date
-        """
-        periods = []
-        end_date = fields.Date.from_string(self.date_end)
-        start_date = fields.Date.from_string(self.date_start)
-
-        date_aux = start_date
-        while date_aux < end_date:
-            end_period = self._last_day_of_period(date_aux)
-            period = (date_aux, end_period)
-            periods.append(period)
-            date_aux = end_period + relativedelta(days=1)
-
-        return periods
-
-    def _get_stock_data(self):
-        """
-          :return: A list of tuples with the total of stock grouped
-        """
-        data = []
-        # LOCATIONS = REAL + EXTERNAL STOCK
-        locations = [self.env.ref("stock.stock_location_stock").id,
-                     self.env.ref("location_moves.stock_location_external").id]
-
-        for period in self._get_periods():
-            start_period = period[0].strftime('%Y-%m-%d')
-            end_period_aux = period[1]
-            end_period = end_period_aux.strftime('%Y-%m-%d')
-            end_period_seconds = time.mktime(end_period_aux.timetuple())
-            total_stock = 0
-            if self.analysis_type == 'average':
-                for loc in locations:
-                    stock_data = self.env['stock.inventory.line'].read_group(
-                        [('product_id', '=', self.id),
-                         ('create_date', '>=', start_period),
-                         ('create_date', '<=', end_period),
-                         ('inventory_id.name', 'like', 'VSTOCK Diario%'),
-                         ('location_id', '=', loc)],
-                        ['inventory_id', 'product_qty'],
-                        ['inventory_id'])
-                    total = 0
-                    if stock_data:
-                        for product_stock in stock_data:
-                            total += product_stock['product_qty']
-                        total /= len(stock_data)
-                    total_stock += total
-
-                if total_stock:
-                    data.append([end_period_seconds, round(total_stock)])
-            else:
-                for loc in locations:
-                    stock_data = self.env['stock.inventory.line'].read_group(
-                        [('product_id', '=', self.id),
-                         ('create_date', '>=', start_period),
-                         ('create_date', '<=', end_period),
-                         ('inventory_id.name', 'like', 'VSTOCK Diario%'),
-                         ('location_id', '=', loc)],
-                        ['inventory_id', 'product_qty'],
-                        ['inventory_id'], limit=1, orderby='inventory_id DESC')
-                    if stock_data:
-                        total_stock += stock_data[0]['product_qty']
-
-                if total_stock:
-                    data.append([end_period_seconds, total_stock])
-        return data
-
-    def action_create_graph(self):
-        for product in self:
-            if not product.date_start and not product.date_end and not \
-                        product.period and not product.analysis_type:
-                now = datetime.now()
-                product.date_start = (now - relativedelta(months=6)).strftime(
-                    '%Y-%m-%d')
-                product.date_end = now
-                product.period = 'month'
-                product.analysis_type = 'average'
-            elif not product.date_start or not product.date_end or not \
-                    product.period or not product.analysis_type:
-                raise exceptions.UserError(_('You must set all filter values'))
-            elif product.date_end < product.date_start:
-                raise exceptions.UserError(
-                    _('End date cannot be smaller than start date'))
-            product.run_scheduler_graphic()
-
-    def run_scheduler_graphic(self):
-        """
-            Generate the graphs of stock and link it to the partner
-        """
-        self.ensure_one()
-        period_filter = self.period
-        if period_filter == 'week':
-            format_xlabel = "%y-W%W"
-        elif period_filter == 'year':
-            format_xlabel = "%Y"
-        else:
-            format_xlabel = "%m-%y"
-
-        def int_to_date(x):
-            return datetime(
-                time.localtime(x).tm_year, time.localtime(x).tm_mon,
-                time.localtime(x).tm_mday).strftime(format_xlabel)
-
-        data = self._get_stock_data()
-        if data:
-            # Get data
-            df = pd.DataFrame()
-            df['Date'] = list(range(len(data)))
-            df['Stock'] = [x[1] for x in data]
-
-            min_stock = min(df['Stock'])
-            max_stock = max(df['Stock'])
-            if min_stock != max_stock:
-                margin_y = (max_stock - min_stock) / 30
-                offset_axis = (max_stock - min_stock) / 10
-            else:
-                margin_y = max_stock / 100
-                offset_axis = max_stock / 10
-            margin_x = 0
-
-            # Create plot with points
-            sns.despine()
-            sns.set_style("darkgrid", {"axes.labelcolor": "#363737",
-                                       "ytick.color": "#59656d",
-                                       "xtick.color": "#59656d"})
-            sns_plot = sns.lmplot('Date', 'Stock', data=df, fit_reg=False,
-                                  height=5, aspect=1.7,
-                                  scatter_kws={"color": "#A61D34", "s": 30})
-
-            # Draw a line plot to join all points
-            sns_plot.map(plt.plot, "Date", "Stock", marker="o",
-                         ms=4, color='#A61D34')
-            plt.xticks(list(range(len(data))),
-                       [int_to_date(x[0]) for x in data])
-            [sns_plot.ax.text(p[0] - margin_x, p[1] + margin_y,
-                              '%d' % int(p[1]), color='grey',
-                              fontsize=9, ha="center")
-             for p in zip(sns_plot.ax.get_xticks(), df['Stock'])]
-
-            # Set axis config
-            plt.ylim(min_stock - offset_axis, max_stock + offset_axis)
-            sns_plot.set_xticklabels(rotation=30)
-
-            # Create the graphic with the data
-            io = BytesIO()
-            sns_plot.savefig(io, format='png')
-            io.seek(0)
-            img_data = base64.b64encode(io.getvalue())
-            plt.close()
-            self.write({'stock_graphic': img_data})
-
-        return
 
     def action_view_moves(self):
         return {
@@ -235,6 +46,7 @@ class ProductProduct(models.Model):
             'res_model': 'stock.move',
             'type': 'ir.actions.act_window',
         }
+
     def action_view_moves_dates(self):
         return {
             'domain': "[('product_id','=', " + str(self.id) + ")]",
@@ -246,7 +58,6 @@ class ProductProduct(models.Model):
             'res_model': 'stock.move',
             'type': 'ir.actions.act_window',
         }
-
 
     def get_stock_new(self):
         category_id = self.env['product.category'].search(
@@ -300,18 +111,18 @@ class ProductProduct(models.Model):
 
     @api.multi
     def set_product_last_purchase(self, order_id=False):
-        res= super().set_product_last_purchase(order_id)
-        PurchaseOrderLine = self.env['purchase.order.line']
+        res = super().set_product_last_purchase(order_id)
+        purchaseOrderLine = self.env['purchase.order.line']
         if not self.check_access_rights('write', raise_exception=False):
             return
         for product in self:
             currency_purchase_id = product.env.user.company_id.currency_id.id
             if order_id:
-                lines = PurchaseOrderLine.search([
+                lines = purchaseOrderLine.search([
                     ('order_id', '=', order_id),
                     ('product_id', '=', product.id)], limit=1)
             else:
-                lines = PurchaseOrderLine.search(
+                lines = purchaseOrderLine.search(
                     [('product_id', '=', product.id),
                      ('state', 'in', ['purchase', 'done'])]).sorted(
                     key=lambda l: l.order_id.date_order, reverse=True)

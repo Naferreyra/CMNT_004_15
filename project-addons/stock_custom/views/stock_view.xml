@@ -59,6 +59,7 @@
         <field name="arch" type="xml">
             <field name="location_dest_id" position="after">
                 <field name="user_id"/>
+                <field name="parent_partner"/>
                 <field name="string_availability_info"/>
                 <field name="real_stock"/>
             </field>

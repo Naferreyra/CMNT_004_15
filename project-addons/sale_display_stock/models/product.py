@@ -60,10 +60,7 @@ class ProductTemplate(models.Model):
                                                        ('purchase_line_id', '!=', False),
                                                        ('picking_id', '=', False),
                                                        ('state', '!=', 'cancel')])
-                qty = 0.0
-                for move in moves:
-                    qty += move.product_uom_qty
-                product.qty_in_production = qty
+                product.qty_in_production = sum(moves.mapped('product_uom_qty')) or 0.0
             else:
                 product.qty_in_production = 0.0
 
@@ -79,8 +76,8 @@ class ProductTemplate(models.Model):
                             subproduct_quantity_next = subproduct.product_qty
                             if subproduct_quantity_next:
                                 subproduct_stock_next = \
-                                    subproduct.product_id.qty_available - \
-                                    subproduct.product_id.outgoing_qty
+                                    subproduct.product_id.qty_available - subproduct.product_id.outgoing_picking_reserved_qty - \
+                                    subproduct.product_id.reservation_count
                                 pack_stock_next = math.\
                                     floor(subproduct_stock_next /
                                           subproduct_quantity_next)
@@ -93,10 +90,10 @@ class ProductTemplate(models.Model):
                         product.virtual_stock_conservative = pack_stock
                     else:
                         product.virtual_stock_conservative = \
-                            product.qty_available - product.outgoing_qty
+                            product.qty_available - product.outgoing_picking_reserved_qty - product.reservation_count
             else:
                 product.virtual_stock_conservative = \
-                    product.qty_available - product.outgoing_qty
+                    product.qty_available - product.outgoing_picking_reserved_qty - product.reservation_count
 
     @api.multi
     def _get_avail_conservative(self):
@@ -110,8 +107,8 @@ class ProductTemplate(models.Model):
                             subproduct_quantity_next = subproduct.product_qty
                             if subproduct_quantity_next:
                                 subproduct_stock_next = \
-                                    subproduct.product_id.qty_available - \
-                                    subproduct.product_id.outgoing_qty - \
+                                    subproduct.product_id.qty_available - subproduct.product_id.outgoing_picking_reserved_qty - \
+                                    subproduct.product_id.reservation_count - \
                                     subproduct.product_id.qty_available_wo_wh - \
                                     subproduct.product_id.qty_available_input_loc
                                 pack_stock_next = math.\
@@ -126,12 +123,12 @@ class ProductTemplate(models.Model):
                         product.virtual_available_wo_incoming = pack_stock
                     else:
                         product.virtual_available_wo_incoming = \
-                            product.qty_available - product.outgoing_qty - \
+                            product.virtual_stock_conservative - \
                             product.qty_available_wo_wh - \
                             product.qty_available_input_loc
             else:
                 product.virtual_available_wo_incoming = \
-                    product.qty_available - product.outgoing_qty - \
+                    product.virtual_stock_conservative - \
                     product.qty_available_wo_wh - \
                     product.qty_available_input_loc
 
@@ -163,15 +160,13 @@ class ProductTemplate(models.Model):
 
     @api.multi
     def _get_outgoing_picking_qty(self):
+        picking_types_ids = [item['id'] for item in self.env['stock.picking.type'].search_read([('code','=','outgoing')],['id'])]
         for product in self:
-            moves = self.env['stock.move'].search(
-                [('product_id', 'in', product.product_variant_ids.ids),
-                 ('state', 'in', ('confirmed', 'assigned',
-                                  'partially_available')),
-                 ('picking_id.picking_type_code', '=', 'outgoing'),
-                 ('group_id.sale_id', '!=', False)])
-            product.outgoing_picking_reserved_qty = sum(moves.mapped(
-                'product_uom_qty'))
+            domain=[('product_id', 'in', product.product_variant_ids.ids),
+                    ('state', 'in', ('confirmed', 'assigned',
+                                  'partially_available', 'waiting')),
+                    ('picking_id', '!=', False), ('sale_line_id', '!=', False),('picking_type_id', 'in', picking_types_ids)]
+            product.outgoing_picking_reserved_qty= sum(item['product_uom_qty'] for item in self.env['stock.move'].search_read(domain,['product_uom_qty']))
 
     @api.multi
     def _get_stock_italy(self):
@@ -200,8 +195,8 @@ class ProductProduct(models.Model):
                             subproduct_quantity_next = subproduct.product_qty
                             if subproduct_quantity_next:
                                 subproduct_stock_next = \
-                                    subproduct.product_id.qty_available - \
-                                    subproduct.product_id.outgoing_qty
+                                    subproduct.product_id.qty_available - subproduct.product_id.outgoing_picking_reserved_qty - \
+                                    subproduct.product_id.reservation_count
                                 pack_stock_next = math.\
                                     floor(subproduct_stock_next /
                                           subproduct_quantity_next)
@@ -214,7 +209,7 @@ class ProductProduct(models.Model):
                         product.virtual_stock_conservative = pack_stock
                     else:
                         product.virtual_stock_conservative = \
-                            product.qty_available - product.outgoing_qty
+                            product.qty_available - product.outgoing_picking_reserved_qty - product.reservation_count
             else:
                 product.virtual_stock_conservative = \
-                    product.qty_available - product.outgoing_qty
+                    product.qty_available - product.outgoing_picking_reserved_qty - product.reservation_count
