@@ -20,7 +20,7 @@
             </field>
         </record>
 
-        <record id="sort_view_order_line_tree" model="ir.ui.view">
+        <!--record id="sort_view_order_line_tree" model="ir.ui.view">
             <field name="name">sale.order.line.tree.sort</field>
             <field name="model">sale.order.line</field>
             <field name="inherit_id" ref="sale.view_order_line_tree"/>
@@ -32,7 +32,7 @@
                     <field name="product_uom_qty" string="Qty"/>
                 </field>
             </field>
-        </record>
+        </record-->
 
         <record id="view_order_line_tree_add_display_stock" model="ir.ui.view">
             <field name="name">sale.order.line.tree.add.display.stock</field>
