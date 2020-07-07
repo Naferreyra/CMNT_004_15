@@ -213,6 +213,11 @@ class StockMove(models.Model):
 
     @api.multi
     def write(self,vals):
+        if len(vals) > 1 and 'product_uom_qty' in vals and vals['product_uom_qty'] == self.product_uom_qty:
+            # This is the case when the user modifies the price of the
+            # sale order line, in this case product_uom_qty is also write
+            # and that put the state "partially_available" on the reserve
+            del vals['product_uom_qty']
         res = super(StockMove, self).write(vals)
         for move in self:
             if move.purchase_line_id and move.product_id.date_first_incoming_reliability!='1.received' and (vals.get('date_expected') or vals.get('state') =='cancel' or vals.get('picking_id')==False):
