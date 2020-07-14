@@ -21,19 +21,19 @@
 from openerp import models, fields
 
 
-class sale_report(models.Model):
+class SaleReport(models.Model):
     _inherit = 'sale.report'
 
     tag_id = fields.Many2one('product.tag', 'Tag')
 
     def _select(self):
         select_str = """, ptr.tag_id as tag_id"""
-        return super(sale_report, self)._select() + select_str
+        return super(SaleReport, self)._select() + select_str
 
     def _from(self):
         from_str = """ left join product_tag_rel ptr on (ptr.product_id=l.product_id) """
-        return super(sale_report, self)._from() + from_str
+        return super(SaleReport, self)._from() + from_str
 
     def _group_by(self):
         group_by_str = """, ptr.tag_id"""
-        return super(sale_report, self)._group_by() + group_by_str
+        return super(SaleReport, self)._group_by() + group_by_str

@@ -19,6 +19,7 @@
 ##############################################################################
 
 from . import models
+from . import report
+
 # TODO: de momento no se migra:
 # from . import wizard
-# import report

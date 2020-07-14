@@ -861,7 +861,7 @@ msgstr "Esquema"
 
 #. module: custom_account
 #: model:ir.model.fields,field_description:custom_account.field_res_partner_email2
-msgid "Second Email"
+msgid "Accounting email"
 msgstr "Correo Contabilidad"
 
 #. module: custom_account
@@ -1224,3 +1224,49 @@ msgstr "Categoría padre del producto"
 #: model:ir.model.fields,field_description:custom_account.field_sale_report_partner_shipping_id
 msgid "Shipping Address"
 msgstr "Dirección de envío"
+
+#. module: custom_account
+#: model:ir.model.fields,field_description:custom_account.field_account_bank_statement_line_ignored_reason
+#: model:ir.model.fields,field_description:custom_account.field_ignore_statement_line_wzd_reason
+msgid "Reason"
+msgstr "Motivo"
+
+#. module: custom_account
+#: code:addons/custom_account/models/account_bank_statement.py:38
+#, python-format
+msgid "There is no old statement to link"
+msgstr "No hay ningun extracto al que vincular"
+
+#. module: custom_account
+#: model:ir.ui.view,arch_db:custom_account.ignore_statement_line_wdz_view
+#: model:ir.ui.view,arch_db:custom_account.bank_statement_ignore_form_inherit
+msgid "Ignore"
+msgstr "Ignorar"
+
+#. module: custom_account
+#: model:ir.ui.view,arch_db:custom_account.view_bank_statement_line_ignored
+msgid "Unignore"
+msgstr "Designorar"
+
+#. module: custom_account
+#: model:ir.ui.view,arch_db:custom_account.ignore_statement_line_wdz_view
+msgid "Cancel"
+msgstr "Cancelar"
+
+#. module: custom_account
+#: model:ir.actions.act_window,name:custom_account.action_ignore_statement_line
+#: code:addons/custom_account/models/account_bank_statement.py:16
+msgid "Ignore Statement Line"
+msgstr "Ignorar extracto bancario"
+
+#. module: custom_account
+#: model:ir.actions.act_window,name:custom_account.ignored_statements_action
+#: model:ir.ui.menu,name:custom_account.ignored_statements_menu
+msgid "Ignored Bank Statement Lines"
+msgstr "Extractos bancarios ignorados"
+
+#. module: custom_account
+#: model:ir.model.fields,field_description:custom_account.field_account_bank_statement_line_old_journal_id
+#: model:ir.ui.view,arch_db:custom_account.ignored_statements_search
+msgid "Old Journal"
+msgstr "Antiguo Diario"

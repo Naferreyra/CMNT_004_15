@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="payment_mode_add_blocked_form" model="ir.ui.view">
+        <field name="name">payment.mode.form</field>
+        <field name="model">account.payment.mode</field>
+        <field name="inherit_id" ref="account_payment_mode.account_payment_mode_form"/>
+        <field name="arch" type="xml">
+            <field name="payment_method_id" position="after">
+                <field name="fatturapa_pm_id"/>
+            </field>
+        </field>
+    </record>
+</odoo>

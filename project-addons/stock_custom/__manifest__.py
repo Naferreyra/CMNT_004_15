@@ -13,6 +13,7 @@
                 'stock_reserve_sale', 'product_brand', 'sale_customer_discount',
                 'product_stock_unsafety', 'stock', 'stock_landed_costs', 'stock_account'],
     'data': ['views/ir_attachment_view.xml',
+             'data/groups.xml',
              'security/stock_custom_security.xml',
              'stock_custom_report.xml',
              'report/stock_report.xml',
@@ -22,7 +23,6 @@
              'views/sale_view.xml',
              'views/email_template.xml',
              'security/ir.model.access.csv',
-             'data/groups.xml',
              'data/parameters.xml'],
     'installable': True
 }

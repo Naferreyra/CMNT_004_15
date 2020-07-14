@@ -1249,14 +1249,6 @@ BIC: CAIXESBBXXX
                     <div t-field="o.partner_id"
                          t-options="{'widget': 'contact', 'fields': ['address', 'name', 'phone', 'fax', 'email']}"/>
                 </div>
-                <div class="col-xs-4"
-                     t-if="o.move_lines and o.move_lines[0].partner_id and o.move_lines[0].partner_id.id != o.partner_id.id">
-                    <span>
-                        <strong>Delivery Address:</strong>
-                    </span>
-                    <div t-field="o.move_lines[0].partner_id"
-                         t-options="{'widget': 'contact', 'fields': ['address', 'name', 'phone', 'fax', 'email'], 'no_marker': true}"/>
-                </div>
                 <div t-if="o.picking_type_id.code != 'internal' and (not o.move_lines or not o.move_lines[0].partner_id) and o.picking_type_id.warehouse_id.partner_id">
                     <span>
                         <strong>Warehouse Address:</strong>
@@ -1716,14 +1708,6 @@ SWIFT/BIC: BESCPTPL
                     </span>
                     <div t-field="o.partner_id"
                          t-field-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;, &quot;phone&quot;, &quot;fax&quot;, &quot;email&quot;]}"/>
-                </div>
-                <div class="col-xs-4"
-                     t-if="o.move_lines and o.move_lines[0].partner_id and o.move_lines[0].partner_id.id != o.partner_id.id">
-                    <span>
-                        <strong>Delivery Address:</strong>
-                    </span>
-                    <div t-field="o.move_lines[0].partner_id"
-                         t-field-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;, &quot;phone&quot;, &quot;fax&quot;, &quot;email&quot;], &quot;no_marker&quot;: true}"/>
                 </div>
                 <div t-if="o.picking_type_id.code != 'internal' and (not o.move_lines or not o.move_lines[0].partner_id) and o.picking_type_id.warehouse_id.partner_id">
                     <span>

@@ -8,7 +8,7 @@
             <field name="arch" type="xml">
                 <field name="pricelist_id" position="after">
                     <field name="transporter_id" attrs="{'readonly': [('state', 'not in', ['draft', 'sent', 'reserve'])]}"/>
-                    <field name="service_id"/>
+                    <field name="service_id" attrs="{'readonly': [('state', 'not in', ['draft', 'sent', 'reserve'])]}"/>
                 </field>
             </field>
         </record>

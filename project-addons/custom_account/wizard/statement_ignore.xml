@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="ignore_statement_line_wdz_view" model="ir.ui.view">
+        <field name="name">ignore.statement.line.wzd.form</field>
+        <field name="model">ignore.statement.line.wzd</field>
+        <field name="arch" type="xml">
+            <form string="Ignore statement line">
+                <group>
+                    <field name="reason"/>
+                </group>
+                <footer>
+                    <button string="Ignore" class="btn-primary" name="action_ignore" type="object"/>
+                    <button string="Cancel" class="btn-default" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <act_window name="Ignore Statement Line"
+        res_model="ignore.statement.line.wzd"
+        src_model="account.bank.statement.line"
+        view_id="ignore_statement_line_wdz_view"
+        view_mode="form"
+        target="new"
+        id="action_ignore_statement_line"/>
+</odoo>

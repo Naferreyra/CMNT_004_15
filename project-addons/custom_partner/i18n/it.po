@@ -456,11 +456,16 @@ msgid "Partial reconciliation"
 msgstr "Riconciliazione parziale"
 
 #. module: custom_partner
-#: code:addons/custom_partner/partner.py:437
+#: code:addons/custom_partner/partner.py:463
 #, python-format
-msgid "The e-mail format is incorrect: "
-msgstr "Il formato email non è corretto: "
+msgid '[Partner "%s"] The e-mail format is incorrect: '
+msgstr '[Cliente "%s"] Il formato email non è corretto: '
 
+#. module: custom_partner
+#: code:addons/custom_partner/partner.py:472
+#, python-format
+msgid ' "%s" (Accounting email)'
+msgstr ' "%s" (Email di contabilità)'
 
 #. module: custom_partner
 #: code:addons/custom_partner/partner.py:519

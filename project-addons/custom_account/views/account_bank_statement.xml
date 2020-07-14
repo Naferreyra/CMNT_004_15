@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="bank_statement_ignore_form_inherit" model="ir.ui.view">
+        <field name="name">bank.statement.ignore.form.inherit</field>
+        <field name="model">account.bank.statement</field>
+        <field name="inherit_id" ref="account.view_bank_statement_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='bank_account_id']" position="after">
+                <field name="state" invisible="1"/>
+                <button name="action_launch_ignore" attrs="{'invisible': ['|',('journal_entry_ids', '!=', []), ('state', '=', 'confirm')]}" string="Ignore" type="object" icon="fa fa-close text-danger"/>
+            </xpath>
+        </field>
+    </record>
+
+        <record id="view_bank_statement_line_ignored" model="ir.ui.view" >
+        <field name="name">Ignored Bank Statement Lines</field>
+        <field name="model">account.bank.statement.line</field>
+        <field name="arch" type="xml">
+            <tree string="Ignored Bank Statement Lines" name="ignored_lines" create="false">
+                <field name="journal_entry_ids" invisible="1"/>
+                <field name="date" attrs="{'readonly' : [('journal_entry_ids', '!=', [])] }"/>
+                <field name="name" attrs="{'readonly' : [('journal_entry_ids', '!=', [])] }"/>
+                <field name="old_journal_id"/>
+                <field name="partner_id" domain="['|',('parent_id','=',False),('is_company','=',True)]"
+                     context="{'default_supplier': 1}"
+                     attrs="{'readonly' : [('journal_entry_ids', '!=', [])] }"/>
+                <field name="ref" attrs="{'readonly' : [('journal_entry_ids', '!=', [])] }" groups="base.group_no_one"/>
+                <field name="amount" attrs="{'readonly' : [('journal_entry_ids', '!=', [])] }"/>
+                <field name="journal_currency_id" invisible="1"/>
+                <field name="amount_currency" invisible="1" attrs="{'readonly' : [('journal_entry_ids', '!=', [])] }"/>
+                <field name="currency_id" options="{'no_create': True}" invisible="1" attrs="{'readonly' : [('journal_entry_ids', '!=', [])] }"/>
+                <field name="bank_account_id" invisible="1" attrs="{'readonly' : [('journal_entry_ids', '!=', [])] }"
+                    domain="['|', ('partner_id', '=', partner_id), ('partner_id', '=', False)]"/>
+                <field name="state" invisible="1"/>
+                <field name="statement_id" invisible="1"/>
+                <field name="ignored_reason" attrs="{'invisible': [('statement_id', '!=', False)]}"/>
+                <button name="action_unignore" attrs="{'invisible': [('statement_id', '!=', False)]}" string="Unignore" type="object" icon="fa fa-reply text-warning"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="ignored_statements_search" model="ir.ui.view">
+        <field name="name">ignored.statements.search</field>
+        <field name="model">account.bank.statement.line</field>
+        <field name="arch" type="xml">
+            <search string="Ignored Bank Statement Lines">
+                <group string="Group By" name="groupby">
+                    <filter name="old_journal" string="Old Journal" context="{'group_by': 'old_journal_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="ignored_statements_action" model="ir.actions.act_window">
+        <field name="name">Ignored Bank Statement Lines</field>
+        <field name="res_model">account.bank.statement.line</field>
+        <field name="view_mode">tree</field>
+        <field name="domain">[('statement_id', '=', False)]</field>
+        <field name="view_id" ref="view_bank_statement_line_ignored"/>
+        <field name="search_view_id" ref="ignored_statements_search"/>
+    </record>
+
+    <menuitem id="ignored_statements_menu"
+        parent="account_payment_order.payment_root"
+        action="ignored_statements_action"
+        sequence="50"
+        />
+</odoo>

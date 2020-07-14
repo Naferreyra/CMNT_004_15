@@ -115,7 +115,9 @@ class PromotionsRulesActions(models.Model):
             ('prod_fixed_price_tag',
              _('Fixed price on Product Tag')),
             ('prod_fixed_price',
-             _('Fixed price on Product'))
+             _('Fixed price on Product')),
+            ('prod_free_per_unit',
+             _('Products free per unit'))
             ])
 
     def on_change(self):
@@ -152,6 +154,10 @@ class PromotionsRulesActions(models.Model):
         elif self.action_type == 'prod_fixed_price':
             self.product_code = 'product_reference'
             self.arguments = '0.00'
+
+        elif self.action_type == 'prod_free_per_unit':
+            self.product_code = '"product_reference",..."'
+            self.arguments = '{"product":qty, ...}'
 
         return super().on_change()
 
@@ -300,6 +306,24 @@ class PromotionsRulesActions(models.Model):
 
         }
         self.create_line(vals)
+        return True
+
+    def action_prod_free_per_unit(self, order):
+        """
+        Action for: Get Product for free per unit
+        """
+        product_obj = self.env['product.product']
+        # Get Product
+        products_code = eval(self.product_code)
+        products = product_obj.search([('default_code', 'in', products_code)])
+        if not products:
+            raise UserError(_("No product with the code % s") % products_code)
+        for line in order.order_line.filtered(lambda l: l.product_id in products):
+            promo_products = eval(self.arguments)
+            for product, qty in promo_products.items():
+                prod = product_obj.search([('default_code', '=', product)])
+                self.create_y_line(order, qty * line.product_qty, prod.id)
+
         return True
 
 

@@ -77,6 +77,8 @@ class Product(SyncModel):
     sale_in_groups_of = FloatField(default=1.0)
     replacement_id = IntegerField()
     date_next_incoming = DateTimeField(formats=['%Y-%m-%d %H:%M:%S'])
+    weight = FloatField(default=0.0)
+    volume = FloatField(default=0.0)
 
     def __unicode__(self):
         return self.name

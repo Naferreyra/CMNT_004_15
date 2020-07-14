@@ -182,7 +182,7 @@ class AccountInvoice(models.Model):
         self.ensure_one()
         payments = self.env['account.move.line']
         if self.type == "out_invoice" and self.sale_order_ids:
-            payments = self.sale_order_ids.mapped('payment_line_ids')
+            payments = self.sale_order_ids.mapped('payment_line_ids').filtered(lambda l: not l.reconciled)
         return payments
 
     @api.multi
@@ -219,8 +219,24 @@ class AccountInvoice(models.Model):
     def invoice_validate(self):
         res = super().invoice_validate()
         for inv in self:
-            for line in inv.invoice_line_ids:
-                line.write({'cost_unit': (line.move_line_ids and (numpy.average(line.move_line_ids.mapped('price_unit')) * -1)) or line.product_id.standard_price_2})
+            if not inv.claim_id:
+                for line in inv.invoice_line_ids:
+                    cost = line.product_id.standard_price_2
+                    if line.move_line_ids:
+                        if line.product_id.bom_ids and line.product_id.bom_ids[0].type == 'phantom':
+                            # We need to multiply by qty when te product is pack, because the product in the
+                            # stock_move is just the component
+                            cost = 0.0
+                            for move in line.move_line_ids:
+                                cost += move.price_unit * (move.product_qty/line.quantity) * -1
+                        else:
+                            cost = numpy.average(line.move_line_ids.mapped('price_unit')) * -1
+                    line.write({'cost_unit': cost or line.product_id.standard_price_2})
+            else:
+                for line in inv.invoice_line_ids:
+                    if not line.cost_unit:
+                        # We choose the standard_price and not the 2 because is the one used in the picking
+                        line.write({'cost_unit': line.product_id.standard_price})
         return res
 
     @api.model

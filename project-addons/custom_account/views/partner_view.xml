@@ -25,7 +25,7 @@
                         <field name="date" string="Created date" readonly="True"/>
                         <field name="lang" attrs="{'required': [('is_company', '=', True),('customer', '=', True),('dropship', '=', False),('prospective', '=', False)]}"/>
                         <field name="web" attrs="{'invisible': [('is_company', '!=', True)]}"/>
-                        <field name="email_web" attrs="{'invisible': [('web', '!=', True),('dropship', '=', True)], 'required': [('web', '=', True),('dropship', '=', False),('is_company', '=', True)]}"/>
+                        <field name="email_web" attrs="{'invisible': [('web', '!=', True)], 'required': [('web', '=', True),('is_company', '=', True)]}"/>
                     </group>
                 </xpath>
                 <field name="ref" position="attributes">

@@ -60,3 +60,41 @@ msgstr "Totale quantità circolante"
 msgid "Total amount of circulating accounts"
 msgstr "Quantità totale dei conti circolanti"
 
+#. module: custom_financial_risk
+#: model:ir.model.fields,field_description:custom_financial_risk.field_update_partner_risk_new_risk
+msgid "New Risk"
+msgstr "Nuovo rischio"
+
+#. module: custom_financial_risk
+#: model:ir.model.fields,field_description:custom_financial_risk.field_update_partner_risk_partner_ids
+msgid "Partners to update risk"
+msgstr "Partner per l'aggiornamento del rischio"
+
+#. module: custom_financial_risk
+#: model:ir.actions.act_window,name:custom_financial_risk.update_partner_risk_action
+#: model:ir.ui.menu,name:custom_financial_risk.update_partner_risk_menu
+#: model:ir.ui.view,arch_db:custom_financial_risk.update_partner_risk
+msgid "Update Partner Risk"
+msgstr "Aggiorna rischio partner"
+
+#. module: custom_financial_risk
+#: model:ir.ui.view,arch_db:custom_financial_risk.update_partner_risk
+msgid "Update"
+msgstr "Aggiornare"
+
+#. module: custom_financial_risk
+#: model:ir.ui.view,arch_db:custom_financial_risk.update_partner_risk
+msgid "Cancel"
+msgstr "Annulla"
+
+#. module: custom_financial_risk
+#: code:addons/custom_financial_risk/wizard/update_risk.py:39
+#, python-format
+msgid "It has not been possible to change the payment mode to transfer and the payment term to prepaid because they do not have a sales team: %s"
+msgstr "Non è stato possibile aggiornare la modalità o il termine di pagamento perché non dispongono di un team di vendita: %s"
+
+#. module: custom_financial_risk
+#: model:ir.model.fields,help:custom_financial_risk.field_update_partner_risk_new_risk
+msgid "If this field is 0, the payment mode will be bank transfer and payment term will be prepaid"
+msgstr "Se questo campo è 0, la modalità di pagamento sarà il bonifico bancario e il termine di pagamento sarà prepagato"
+

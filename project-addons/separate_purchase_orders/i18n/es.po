@@ -1,0 +1,131 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#   * separate_purchase_orders
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 11.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-04-08 16:24+0000\n"
+"PO-Revision-Date:  2020-04-08 16:24+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: separate_purchase_orders
+#: model:ir.model.fields,field_description:separate_purchase_orders.field_separate_orders_wizard_date_planned
+msgid "Date planned"
+msgstr "Fecha prevista"
+
+#. module: separate_purchase_orders
+#: model:ir.model.fields,field_description:separate_purchase_orders.field_purchase_order_parent_id
+msgid "Parent"
+msgstr "Pedido padre"
+
+#. module: separate_purchase_orders
+#: model:ir.model.fields,field_description:separate_purchase_orders.field_purchase_order_completed_purchase
+msgid "Purchase completed"
+msgstr "Pedido completado"
+
+#. module: separate_purchase_orders
+#: model:ir.model.fields,field_description:separate_purchase_orders.field_purchase_order_line_production_qty
+#: model:ir.model.fields,field_description:separate_purchase_orders.field_order_line_details_production_qty
+msgid "Production Quantity"
+msgstr "Cantidad en fabricación"
+
+#. module: separate_purchase_orders
+#: model:ir.model.fields,field_description:separate_purchase_orders.field_purchase_order_line_split_qty
+msgid "Split Quantity"
+msgstr "Cantidad separada"
+
+#. module: separate_purchase_orders
+#: model:ir.model.fields,field_description:separate_purchase_orders.field_purchase_order_line_shipment_qty
+msgid "Shipment Quantity"
+msgstr "Cantidad enviada"
+
+#. module: separate_purchase_orders
+#: model:ir.model.fields,field_description:separate_purchase_orders.field_purchase_order_line_qty_received_custom
+msgid "Received Quantity"
+msgstr "Cantidad recibida"
+
+#. module: separate_purchase_orders
+#: model:ir.model.fields,field_description:separate_purchase_orders.field_purchase_order_line_qty_invoiced_custom
+msgid "Invoiced Quantity"
+msgstr "Cantidad facturada"
+
+#. module: separate_purchase_orders
+#: model:ir.ui.view,arch_db:separate_purchase_orders.purchase_order_form_custom
+msgid "Products"
+msgstr "Productos"
+
+#. module: separate_purchase_orders
+#: model:ir.ui.view,arch_db:separate_purchase_orders.purchase_order_form_custom
+msgid "Purchase Order"
+msgstr "Pedido de compra"
+
+#. module: separate_purchase_orders
+#: selection:purchase.order,state:0
+msgid "Purchase Order State"
+msgstr "Orden de compra"
+
+#. module: separate_purchase_orders
+#: model:ir.ui.view,arch_db:separate_purchase_orders.purchase_order_form_custom
+msgid "Separate"
+msgstr "Separar"
+
+#. module: separate_purchase_orders
+#: model:ir.ui.view,arch_db:separate_purchase_orders.purchase_order_form_custom
+msgid "Shipment"
+msgstr "Albaranes"
+
+#. module: separate_purchase_orders
+#: model:ir.ui.view,arch_db:separate_purchase_orders.purchase_order_form_custom
+msgid "Vendor Bills"
+msgstr "Facturas"
+
+#. module: separate_purchase_orders
+#: model:ir.ui.view,arch_db:separate_purchase_orders.purchase_order_form_custom
+msgid "Purchase orders"
+msgstr "Pedidos"
+
+#. module: separate_purchase_orders
+#: model:ir.actions.act_window,name:separate_purchase_orders.action_open_purchase_orders_in_purchase_order_state
+#: model:ir.ui.menu,name: separate_purchase_orders.menu_purchase_order_state
+msgid "Purchase orders to split"
+msgstr "Órdenes de compra"
+
+#. module: separate_purchase_orders
+#: code:addons/separate_purchase_orders/models/purchase.py:109
+msgid "You cannot modify the product quantity below the confirmed product quantity"
+msgstr "No puedes modificar las cantidades por debajo de las confirmadas"
+
+#. module: separate_purchase_orders
+#: code:addons/separate_purchase_orders/models/purchase.py:111
+msgid "You cannot modify the product because there are confirmed quantities"
+msgstr "No puedes modificar el producto porque hay cantidades confirmadas"
+
+#. module: separate_purchase_orders
+#: code:addons/separate_purchase_orders/models/purchase.py:114
+msgid "You cannot modify the product quantity over the production_qty"
+msgstr "No puedes modificar las cantidades por encima de las que están en fabricación en el pedido padre"
+
+#. module: separate_purchase_orders
+#: code:addons/separate_purchase_orders/models/purchase.py:114
+msgid "You cannot delete a line that has confirmed quantities"
+msgstr "No puedes eliminar una linea que tiene cantidades confirmadas"
+
+#. module: separate_purchase_orders
+#: model:ir.ui.view,arch_db:separate_purchase_orders.separate_orders
+msgid "Separate orders"
+msgstr "Separar pedidos"
+
+#. module: separate_purchase_orders
+#: model:ir.model.fields,field_description:separate_purchase_orders.field_separate_orders_wizard_add_all
+msgid "Add All"
+msgstr "Añadir todo"
+
+
+

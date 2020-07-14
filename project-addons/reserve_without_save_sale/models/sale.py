@@ -111,7 +111,7 @@ class SaleOrderLine(models.Model):
                     if reserve_to_delete:
                         reserve_to_delete.unlink()
                 elif line.reservation_ids:
-                    line.reservation_ids.unlink()
+                    line.reservation_ids.filtered(lambda r: r.unique_js_id != temp_unique_js_id).unlink()
                 new_reserv = self.env['stock.reservation'].search(
                     [('unique_js_id', '=', temp_unique_js_id)])
                 if new_reserv:

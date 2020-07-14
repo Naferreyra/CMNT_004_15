@@ -42,7 +42,7 @@ class Partner(models.Model):
         else:
             self.is_accounting = False
 
-    email2 = fields.Char('Second Email')
+    email2 = fields.Char('Accounting email')
     not_send_following_email = fields.Boolean()
     unreconciled_purchase_aml_ids = fields.\
         One2many('account.move.line', 'partner_id',

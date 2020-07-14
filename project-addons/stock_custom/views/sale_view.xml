@@ -29,4 +29,21 @@
     </record>
 
 
+    <record id="action_sale_report_uniview_projects" model="ir.actions.act_window">
+        <field name="name">Sales Analysis 2 - Uniview and Projects</field>
+        <field name="res_model">sale.report</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">pivot,graph</field>
+        <field name="search_view_id" ref="sale.view_order_product_search"/>
+        <field name="domain">['|','|',('partner_id.category_id.name', 'ilike', 'proy'),('partner_id.category_id.name', 'ilike', 'grandes'),('brand_id.code','ilike','uniview')]</field>
+        <field name="context">{'search_default_Sales':1, 'group_by_no_leaf':1,'group_by':[]}</field>
+    </record>
+
+    <menuitem id="menu_sale_report_uniview_projects"
+            name="Sales Analysis 2 - Uniview and Projects"
+            action="action_sale_report_uniview_projects"
+            parent="sale.menu_sale_report"
+            sequence="1"/>
+
+
 </odoo>

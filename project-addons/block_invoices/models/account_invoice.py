@@ -49,3 +49,6 @@ class AccountInvoice(models.Model):
         values = super()._prepare_refund(invoice, date_invoice, date, description, journal_id)
         values.update({'allow_confirm_blocked': self.allow_confirm_blocked})
         return values
+
+    def action_invoice_open(self):
+        return super(AccountInvoice, self.with_context({'bypass_risk':True})).action_invoice_open()

@@ -37,7 +37,7 @@ class PickingListener(Component):
                 picking_products = self.env['stock.move'].search([('picking_id', '=', picking.id)])
                 for product in picking_products:
                     product.with_delay(priority=1, eta=120).export_pickingproduct()
-            elif 'state' in fields and record.state == 'cancel' \
+            elif record.state == 'cancel' \
                     or 'not_sync' in fields and record.not_sync \
                     or 'company_id' in fields and record.company_id != 1:
                 picking_products = self.env['stock.move'].search([('picking_id', '=', picking.id)])

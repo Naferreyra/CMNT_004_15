@@ -18,6 +18,8 @@ class AccountInvoiceReport(models.Model):
                                  readonly=True)
     manufacturer = fields.Char('Product Manufacturer')
     parent_product_categ_id = fields.Many2one('product.category','Parent product category')
+    tag_ids = fields. \
+        Many2many(related='product_id.tag_ids')
 
     def _select(self):
         select_str = super()._select()
