@@ -11,10 +11,6 @@ class StockPickingExporter(Component):
     _usage = 'record.exporter'
 
     def update(self, binding, mode):
-        picking_report_action = self.env.ref(
-            'custom_report_link.report_picking_custom_action')
-        result = picking_report_action.render_qweb_pdf(res_ids=binding.id)
-        result_encode = base64.b64encode(result[0])
         name = binding.name.replace("\\", "/")
         vals = {
                 "odoo_id": binding.id,
@@ -27,7 +23,7 @@ class StockPickingExporter(Component):
                 "carrier_tracking_ref": binding.carrier_tracking_ref or "",
                 "origin": binding.origin,
                 "state": binding.state,
-                "pdf_file_data": result_encode or "",
+                "pdf_file_data": "",
                 "dropship": binding.partner_id.dropship,
                 }
         if mode == "insert":

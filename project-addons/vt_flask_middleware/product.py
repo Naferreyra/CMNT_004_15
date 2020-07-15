@@ -79,6 +79,7 @@ class Product(SyncModel):
     date_next_incoming = DateTimeField(formats=['%Y-%m-%d %H:%M:%S'])
     weight = FloatField(default=0.0)
     volume = FloatField(default=0.0)
+    cost_price = FloatField(default=0.0)
 
     def __unicode__(self):
         return self.name

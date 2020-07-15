@@ -83,7 +83,7 @@ class ProductListener(Component):
             "last_sixty_days_sales", "joking_index", "sale_ok", "barcode",
             "description_sale", "manufacturer_pref", "standard_price", "type",
             "discontinued", "state", "item_ids", "sale_in_groups_of", "replacement_id",
-            "weight", "volume"
+            "weight", "volume", "standard_price_2_inc"
         ]
         for field in up_fields:
             if field in fields:

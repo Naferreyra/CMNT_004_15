@@ -1,8 +1,4 @@
-# -*- coding: utf-8 -*-
 ##############################################################################
-#
-#    Copyright (C) 2014 Pexego Sistemas Informáticos All Rights Reserved
-#    $Jesús Ventosinos Mayor <jesus@pexego.es>$
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as published
@@ -18,11 +14,4 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
-from odoo import models, fields
-
-
-class SaleReport(models.Model):
-    _inherit = 'sale.report'
-
-    tag_id = fields. \
-        Many2many(related='product_id.tag_ids')
+from . import sale
