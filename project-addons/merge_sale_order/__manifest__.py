@@ -9,7 +9,8 @@
     'depends': [
         'sale_management',
         'sale',
-        'reserve_without_save_sale'
+        'reserve_without_save_sale',
+        'prepaid_order_discount'        
     ],
 
     'data': [

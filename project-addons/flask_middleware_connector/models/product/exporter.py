@@ -42,7 +42,10 @@ class ProductProductExporter(Component):
             'state': binding.state,
             'sale_in_groups_of': binding.sale_in_groups_of,
             'replacement_id': binding.replacement_id.id,
-            'date_next_incoming':binding.compute_date_next_incoming()
+            'date_next_incoming': binding.compute_date_next_incoming(),
+            'weight': binding.weight,
+            'volume': binding.volume,
+            'cost_price': binding.standard_price_2_inc
         }
         if binding.show_stock_outside:
             vals['external_stock'] = binding.qty_available_external

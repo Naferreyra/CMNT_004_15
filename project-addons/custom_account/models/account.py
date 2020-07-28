@@ -182,7 +182,7 @@ class AccountInvoice(models.Model):
         self.ensure_one()
         payments = self.env['account.move.line']
         if self.type == "out_invoice" and self.sale_order_ids:
-            payments = self.sale_order_ids.mapped('payment_line_ids')
+            payments = self.sale_order_ids.mapped('payment_line_ids').filtered(lambda l: not l.reconciled)
         return payments
 
     @api.multi

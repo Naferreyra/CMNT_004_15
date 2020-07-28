@@ -20,6 +20,7 @@
                 <field name="journal_entry_ids" invisible="1"/>
                 <field name="date" attrs="{'readonly' : [('journal_entry_ids', '!=', [])] }"/>
                 <field name="name" attrs="{'readonly' : [('journal_entry_ids', '!=', [])] }"/>
+                <field name="old_journal_id"/>
                 <field name="partner_id" domain="['|',('parent_id','=',False),('is_company','=',True)]"
                      context="{'default_supplier': 1}"
                      attrs="{'readonly' : [('journal_entry_ids', '!=', [])] }"/>
@@ -38,12 +39,25 @@
         </field>
     </record>
 
+    <record id="ignored_statements_search" model="ir.ui.view">
+        <field name="name">ignored.statements.search</field>
+        <field name="model">account.bank.statement.line</field>
+        <field name="arch" type="xml">
+            <search string="Ignored Bank Statement Lines">
+                <group string="Group By" name="groupby">
+                    <filter name="old_journal" string="Old Journal" context="{'group_by': 'old_journal_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
     <record id="ignored_statements_action" model="ir.actions.act_window">
         <field name="name">Ignored Bank Statement Lines</field>
         <field name="res_model">account.bank.statement.line</field>
         <field name="view_mode">tree</field>
         <field name="domain">[('statement_id', '=', False)]</field>
         <field name="view_id" ref="view_bank_statement_line_ignored"/>
+        <field name="search_view_id" ref="ignored_statements_search"/>
     </record>
 
     <menuitem id="ignored_statements_menu"

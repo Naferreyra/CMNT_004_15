@@ -67,6 +67,12 @@ class PurchaseOrder(models.Model):
             action = {'type': 'ir.actions.act_window_close'}
         return action
 
+    @api.model
+    def create(self,vals):
+        if self._context.get("default_state",False)=="purchase_order":
+            vals["name"] = self.env['ir.sequence'].next_by_code('split.purchase.orders.name') or 'New'
+        return super(PurchaseOrder, self).create(vals)
+
 
 class PurchaseOrderLine(models.Model):
     _inherit = 'purchase.order.line'
@@ -87,7 +93,7 @@ class PurchaseOrderLine(models.Model):
                 purchase_line.qty_invoiced_custom = sum(purchase_order_lines.mapped('qty_invoiced'))
                 move_without_picking_ids = purchase_order_lines.mapped('move_ids').filtered(lambda m,
                                                                                                    line=purchase_line: not m.picking_id and m.purchase_line_id.parent_id.id == line.id and m.state!='cancel')
-                purchase_line.split_qty =sum (purchase_order_lines.filtered(lambda l: l.state=='draft').mapped('product_qty'))
+                purchase_line.split_qty = sum (purchase_order_lines.filtered(lambda l: l.state=='draft').mapped('product_qty'))
                 if move_without_picking_ids:
                     purchase_line.split_qty += sum(move_without_picking_ids.mapped("product_uom_qty"))
             purchase_line.production_qty = purchase_line.product_qty - purchase_line.split_qty - purchase_line.shipment_qty - purchase_line.qty_received_custom

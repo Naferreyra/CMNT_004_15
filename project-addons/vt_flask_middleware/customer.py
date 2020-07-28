@@ -55,6 +55,7 @@ class Customer(SyncModel):
     prospective = BooleanField(default=False)
     phone1 = CharField(max_length=40, null=True)
     phone2 = CharField(max_length=40, null=True)
+    is_prepaid_payment_term = BooleanField(default=False)
 
     MOD_NAME = 'customer'
 

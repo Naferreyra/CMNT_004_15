@@ -23,28 +23,34 @@ msgid "Please select at least two sale orders"
 msgstr "Seleziona almeno due ordini di vendita"
 
 #. module: merge_sale_order
-#: code:addons/merge_sale_order/wizard/merge_sale_order_wizard.py:43
+#: code:addons/merge_sale_order/wizard/merge_sale_order_wizard.py:48
 #, python-format
 msgid "Please select Sale orders which are in Quotation or Reserve state"
 msgstr "Seleziona gli ordini in stato Preventivo o Riservato"
 
 #. module: merge_sale_order
-#: code:addons/merge_sale_order/wizard/merge_sale_order_wizard.py:46
+#: code:addons/merge_sale_order/wizard/merge_sale_order_wizard.py:50
 #, python-format
 msgid "Please select Sale orders whose Customers are the same"
 msgstr "Seleziona gli ordini di vendita i cui clienti sono uguali"
 
 #. module: merge_sale_order
-#: code:addons/merge_sale_order/wizard/merge_sale_order_wizard.py:49
+#: code:addons/merge_sale_order/wizard/merge_sale_order_wizard.py:52
 #, python-format
 msgid "Please select Sale orders whose shipping addresses are the same"
 msgstr "Seleziona gli ordini di vendita i cui indirizzi di spedizione sono gli stessi"
 
 #. module: merge_sale_order
-#: code:addons/merge_sale_order/wizard/merge_sale_order_wizard.py:52
+#: code:addons/merge_sale_order/wizard/merge_sale_order_wizard.py:54
 #, python-format
 msgid "Please select Sale orders whose invoice addresses are same"
 msgstr "Seleziona gli ordini di vendita i cui indirizzi di fatturazione sono gli stessi"
+
+#. module: merge_sale_order
+#: code:addons/merge_sale_order/wizard/merge_sale_order_wizard.py:56
+#, python-format
+msgid "Please all selected orders must have the same prepaid option"
+msgstr "Per favore, tutti gli ordini selezionati devono avere la stessa opzione prepagata"
 
 #. module: merge_sale_order
 #: selection:merge.sale.order,merge_type:0

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="benefit_months" model="ir.config_parameter">
+        <field name="key">benefit.months</field>
+        <field name="value">6</field>
+    </record>
+</odoo>

@@ -1,10 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <record model="ir.ui.view" id="crm_claim_rma_form_view3">
+        <field name="name">CRM - Claim product return Form</field>
+        <field name="model">crm.claim</field>
+        <field name="inherit_id" ref="crm_claim_rma.crm_claim_rma_form_view2"/>
+        <field name="arch" type="xml">
+            <field name="rma_cost" position="before">
+                <field name="location"/>
+            </field>
+        </field>
+    </record>
+
     <record id="crm_claim_rma_scanner" model="ir.actions.act_window">
         <field name="name">Scanning RMAs</field>
         <field name="res_model">barcode.action</field>
-        <field name="context">{'default_model': 'crm.claim', 'default_method': 'find_claim_by_number_using_barcode'}</field>
+        <field name="context">{'default_model': 'crm.claim',
+            'default_method': 'find_claim_by_number_using_barcode',
+            'default_state': 'waiting',
+            'default_status': 'Scan RMA'}</field>
         <field name="view_mode">form</field>
         <field name="view_type">form</field>
         <field name="target">new</field>
@@ -13,4 +27,15 @@
     <menuitem id="menu_find_rmas" name="Scan RMAs"
         action="crm_claim_rma_scanner"
         parent="crm_claim_rma.menu_sat"/>
+
+    <record model="ir.ui.view" id="crm_case_claims_tree_view_add_location">
+        <field name="name">Add.location</field>
+        <field name="model">crm.claim</field>
+        <field name="inherit_id" ref="crm_claim_rma_custom.crm_case_claims_tree_view_received"/>
+        <field name="arch" type="xml">
+            <field name="bool_category_id" position="before">
+                <field name="location"/>
+            </field>
+        </field>
+    </record>
 </odoo>

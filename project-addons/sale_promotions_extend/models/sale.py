@@ -23,6 +23,7 @@ class SaleOrderLine(models.Model):
     accumulated_promo = fields.Boolean(default=False)
     original_line_id_promo = fields.Many2one('sale.order.line', "Original line", ondelete='cascade')
     promo_qty_split = fields.Integer(help="It is the minimum quantity of product for which this promo is applied")
+    old_discount = fields.Float(copy=False)
 
 
 class SaleOrder(models.Model):

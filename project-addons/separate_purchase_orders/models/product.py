@@ -16,3 +16,19 @@ class ProductTemplate(models.Model):
                     qty += order_line.production_qty
                 product.qty_in_production += qty
         return res
+
+class ProductProduct(models.Model):
+    _inherit = 'product.product'
+
+    @api.multi
+    def _split_purchase_count(self):
+        domain = [
+            ('order_id.state', '=', 'purchase_order'),
+            ('product_id', 'in', self.mapped('id')),
+        ]
+        PurchaseOrderLines = self.env['purchase.order.line'].search(domain)
+        for product in self:
+            product.split_purchase_count = len(
+                PurchaseOrderLines.filtered(lambda r: r.product_id == product).mapped('order_id'))
+
+    split_purchase_count = fields.Integer(compute='_split_purchase_count')

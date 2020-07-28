@@ -82,7 +82,7 @@ class SaleOrder(models.Model):
                         margin += (line.price_unit * line.product_uom_qty) * ((100.0 - line.discount) / 100.0)
                     sale_price += line.price_subtotal or 0.0
                     purchase_price += line.product_id.standard_price_2_inc or 0.0
-            if sale_price:
+            if sale_price > 0:
                 if sale_price < purchase_price:
                     margin_adj = round((margin * 100) / purchase_price, 2)
                 else:

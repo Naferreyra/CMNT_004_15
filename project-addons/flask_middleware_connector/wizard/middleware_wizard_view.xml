@@ -10,12 +10,12 @@
                     <field name="mode_export"/>
                     <field name="start_date" attrs="{'invisible': [('type_export', 'not in', ('order', 'pickings', 'rmas', 'invoices'))], 'required': [('type_export', 'in', ('order', 'pickings', 'rmas', 'invoices'))]}"/>
                     <field name="finish_date" attrs="{'invisible': [('type_export', 'not in', ('order', 'pickings', 'rmas', 'invoices'))], 'required': [('type_export', 'in', ('order', 'pickings', 'rmas', 'invoices'))]}"/>
-                    <field name="model_ids"/>
+                    <field name="model_ids" attrs="{'invisible': [('type_export', '=', 'translation')]}"/>
+                    <field name="model_names" attrs="{'invisible': [('type_export', '!=', 'translation')], 'required': [('type_export', '=', 'translation')]}"/>
                 </group>
                 <footer>
                     <button name="do_export" type="object"
                         string="Start" class="oe_highlight"/>
-                    or
                     <button string="Cancel" class="oe_link" special="cancel"/>
                 </footer>
             </form>

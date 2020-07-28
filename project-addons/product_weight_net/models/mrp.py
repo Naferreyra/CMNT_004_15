@@ -4,6 +4,7 @@ from odoo import api, fields, models
 class MrpBom(models.Model):
 
     _inherit = 'mrp.bom'
+    type = fields.Selection(default='phantom')
 
     @api.multi
     def write(self, values):

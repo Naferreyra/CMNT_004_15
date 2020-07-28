@@ -93,8 +93,14 @@ msgstr "Pedidos"
 
 #. module: separate_purchase_orders
 #: model:ir.actions.act_window,name:separate_purchase_orders.action_open_purchase_orders_in_purchase_order_state
-#: model:ir.ui.menu,name: separate_purchase_orders.menu_purchase_order_state
+#: model:ir.ui.menu,name:separate_purchase_orders.menu_purchase_order_state
+#: model:ir.actions.act_window,name:separate_purchase_orders.action_split_purchase_line_product_tree_2
 msgid "Purchase orders to split"
+msgstr "Órdenes de compra"
+
+#. module: separate_purchase_orders
+#: model:ir.ui.view,arch_db:separate_purchase_orders.view_product_product_split_purchase_buttons_from
+msgid "Split purchases"
 msgstr "Órdenes de compra"
 
 #. module: separate_purchase_orders

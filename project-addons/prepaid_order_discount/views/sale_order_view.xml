@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="sale_order_prepaid_discount" model="ir.ui.view">
+            <field name="name">sale.order.prepaid.discount</field>
+            <field name="inherit_id" ref="sale_promotions_extend.sale_order_no_promos"/>
+            <field name="model">sale.order</field>
+            <field name="arch" type="xml">
+                <field name="no_promos" position="after">
+                    <field name="prepaid_option"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="view_sale_prepaid_discount" model="ir.ui.view">
+            <field name="name">sale.order.promo.form</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="commercial_rules.view_sale_promo_form"/>
+            <field name="arch" type="xml">
+                <button name="apply_commercial_rules" position="after">
+                    <button name="calculate_prepaid_discount" type="object" class="btn-primary"
+                            string="Calculate prepaid"
+                            attrs="{'invisible': ['|', ('prepaid_option', '=', False),
+                                                       ('state', 'not in', ['draft', 'sent', 'reserve'])]}"/>
+                    <button name="cancel_prepaid_option" type="object"
+                            string="Cancel prepaid"
+                            attrs="{'invisible': ['|', ('prepaid_option', '=', False),
+                                                       ('state', 'not in', ['draft', 'sent', 'reserve'])]}"/>
+                </button>
+            </field>
+        </record>
+
+        <record id="view_sale_prepaid_discount_readonly" model="ir.ui.view">
+        <field name="name">sale.order.prepaid.discount</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']/tree//field[@name='price_unit']" position="attributes">
+                <attribute name="attrs">{'readonly': [('product_id', '=', %(prepaid_order_discount.prepaid_discount_product)d)]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree//field[@name='discount']" position="attributes">
+                <attribute name="attrs">{'readonly': [('product_id', '=', %(prepaid_order_discount.prepaid_discount_product)d)]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree//field[@name='product_uom_qty']" position="attributes">
+                <attribute name="attrs">{'readonly': [('product_id', '=', %(prepaid_order_discount.prepaid_discount_product)d)]}</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    </data>
+</odoo>
