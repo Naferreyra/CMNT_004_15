@@ -24,8 +24,9 @@ class KitchenCustomization(models.Model):
 
     state = fields.Selection([
         ('draft', 'New'),
+        ('waiting','Waiting Availability'),
         ('sent', 'Sent'),
-        ('in_progress', 'In progress'),
+        ('in_progress', 'In Progress'),
         ('done', 'Done'),
         ('cancel', 'Cancelled')
     ], string='Customization Status', readonly=True, copy=False, index=True, track_visibility='onchange',
@@ -82,6 +83,22 @@ class KitchenCustomization(models.Model):
     def action_draft(self):
         self.state = 'draft'
 
+    reservation_status = fields.Selection([
+        ('waiting', 'Waiting Availability'),
+        ('to customize', 'Fully Reserved')
+    ], string='Reservation Status', compute='_compute_reservation_status', store=True, default='to customize')
+
+    @api.depends('customization_line.reservation_status')
+    def _compute_reservation_status(self):
+        for customization in self:
+            customization.reservation_status = "waiting"
+            if customization.customization_line and all([x.reservation_status != "waiting" for x in customization.customization_line]):
+                customization.reservation_status = "to customize"
+                #TODO Confirmar la personalización cuando todas las líneas están "Para personalizar.
+                # Ahora mismo falla al enviar el mail (última instrucción del action_confirm), pero no
+                # sé la razón."
+                #customization.action_confirm()
+
 
 
 class KitchenCustomizationLine(models.Model):
@@ -94,6 +111,7 @@ class KitchenCustomizationLine(models.Model):
     sale_line_id = fields.Many2one('sale.order.line')
     state = fields.Selection([
         ('draft', 'New'),
+        ('waiting', 'Waiting Availability'),
         ('sent', 'Sent'),
         ('in_progress', 'In progress'),
         ('done', 'Done'),
@@ -101,3 +119,23 @@ class KitchenCustomizationLine(models.Model):
     ], related='customization_id.state', string='status', readonly=True, copy=False, store=True,
         default='draft')
     only_erase_logo = fields.Boolean()
+
+    reserved_qty = fields.Float(compute="_compute_reserved_qty", store=True)
+
+    @api.depends('sale_line_id.move_ids.move_line_ids.product_id', 'sale_line_id.move_ids.move_line_ids.product_uom_id', 'sale_line_id.move_ids.move_line_ids.product_uom_qty')
+    def _compute_reserved_qty(self):
+        for line in self:
+            line.reserved_qty = sum(line.sale_line_id.move_ids.mapped('reserved_availability')) if line.sale_line_id and line.sale_line_id.move_ids else 0
+
+    reservation_status = fields.Selection([
+        ('waiting', 'Waiting Availability'),
+        ('to customize', 'Fully Reserved')
+    ], string='Reservation Status', compute='_compute_reservation_status', store=True,
+        default='waiting')
+
+    @api.depends('reserved_qty')
+    def _compute_reservation_status(self):
+        for line in self:
+            line.reservation_status="waiting"
+            if line.reserved_qty >= line.product_qty and line.state == "waiting":
+                line.reservation_status = "to customize"

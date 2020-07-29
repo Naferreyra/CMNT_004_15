@@ -13,6 +13,7 @@ class CustomizationLine(models.TransientModel):
     sale_line_id = fields.Many2one('sale.order.line')
     only_erase_logo = fields.Boolean()
     max_qty = fields.Float()
+    qty_reserved = fields.Float()
 
 
 class CustomizationWizard(models.TransientModel):
@@ -32,27 +33,29 @@ class CustomizationWizard(models.TransientModel):
 
             qty_done = sum(self.env['kitchen.customization.line'].search(
                 [('sale_line_id', '=', line.id), ('state', '!=', 'cancel')]).mapped('product_qty'))
+            moves = line.move_ids.filtered(lambda mv: 'cancel' != mv.state)
+            qty = 0
+            pack = self.env['mrp.bom']._bom_find(product=line.product_id)
+            if pack and pack.type == 'phantom':
+                reserved_available = {}
+                for move in moves:
+                    avail = move.product_id.uom_id._compute_quantity(
+                        move.reserved_availability,
+                        move.product_uom,
+                        round=False)
+                    pack_lines = pack.bom_line_ids.filtered(lambda l, m=move: l.product_id == m.product_id)
+                    div_qty = 1
+                    if pack_lines:
+                        pack_lines_value = sum(pack_lines.mapped('product_qty'))
+                        div_qty = pack_lines_value if pack_lines_value > 0 else 1
+                    reserved_available[move.id] = avail // div_qty
+                if moves:
+                    qty = min(reserved_available.values())
+            else:
+                qty = sum(moves.mapped('reserved_availability'))
+            new_line["qty_reserved"]=qty
+
             if customize_all == 'False':
-                moves = line.move_ids.filtered(lambda mv: 'cancel' != mv.state)
-                qty = 0
-                pack = self.env['mrp.bom']._bom_find(product=line.product_id)
-                if pack and pack.type == 'phantom':
-                    reserved_available = {}
-                    for move in moves:
-                        avail = move.product_id.uom_id._compute_quantity(
-                            move.reserved_availability,
-                            move.product_uom,
-                            round=False)
-                        pack_lines = pack.bom_line_ids.filtered(lambda l, m=move: l.product_id == m.product_id)
-                        div_qty = 1
-                        if pack_lines:
-                            pack_lines_value = sum(pack_lines.mapped('product_qty'))
-                            div_qty = pack_lines_value if pack_lines_value > 0 else 1
-                        reserved_available[move.id] = avail // div_qty
-                    if moves:
-                        qty = min(reserved_available.values())
-                else:
-                    qty = sum(moves.mapped('product_uom_qty'))
                 if qty > 0:
                     new_line.update({'product_qty': qty - qty_done,
                                      'max_qty': qty - qty_done})
@@ -103,9 +106,15 @@ class CustomizationWizard(models.TransientModel):
                     'sale_line_id': line.sale_line_id.id,
                     'only_erase_logo': line.only_erase_logo
                 }
+                if line.qty_reserved < qty:
+                    customization.state = "waiting"
+                    new_line["state"] = "waiting"
                 lines += self.env['kitchen.customization.line'].create(new_line)
         if lines:
-            customization.action_confirm()
+            for line in lines:
+                line.sale_line_id.reservation_ids.date_validity=False
+            if customization.state!='waiting':
+                customization.action_confirm()
             return {
                 'view_type': 'form',
                 'view_mode': 'form',

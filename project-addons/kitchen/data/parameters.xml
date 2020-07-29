@@ -2,6 +2,6 @@
 <odoo noupdate="1">
       <record id="allow_all_products_to_customize" model="ir.config_parameter">
          <field name="key">all.products.customize</field>
-         <field name="value">False</field>
+         <field name="value">True</field>
       </record>
 </odoo>

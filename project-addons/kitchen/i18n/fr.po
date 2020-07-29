@@ -128,6 +128,11 @@ msgid "Done"
 msgstr "Terminé"
 
 #. module: kitchen
+#: selection:kitchen.customization,state:0
+msgid "Waiting Availability"
+msgstr "En attente de disponibilité"
+
+#. module: kitchen
 #: model:ir.model.fields,field_description:kitchen.field_customization_wizard_add_all
 msgid "Add All"
 msgstr "Ajouter tout"
@@ -228,22 +233,22 @@ msgid "Cancel"
 msgstr "Annuler"
 
 #. module: kitchen
-#: code:addons/kitchen/models/kitchen_customization.py:42
+#: code:addons/kitchen/models/kitchen_customization.py:43
 msgid "(ONLY LOGO)"
 msgstr "(SEUL LOGO)"
 
 #. module: kitchen
-#: code:addons/kitchen/models/kitchen_customization.py:60
+#: code:addons/kitchen/models/kitchen_customization.py:61
 msgid "Please add some products before confirming the customization request"
 msgstr "Veuillez ajouter un produit avant de confirmer la demande de personnalisation"
 
 #. module: kitchen
-#: code:addons/kitchen/models/kitchen_customization.py:62
+#: code:addons/kitchen/models/kitchen_customization.py:63
 msgid "You can't create a customization with a quantity of less than one of a product"
 msgstr "Vous ne pouvez pas créer une personnalisation de ce produit avec une quantité inférieure à un"
 
 #. module: kitchen
-#: code:addons/kitchen/models/kitchen_customization.py:76
+#: code:addons/kitchen/models/kitchen_customization.py:77
 msgid "The order contains customized products"
 msgstr "La commande contient des produits personnalisés"
 
@@ -258,17 +263,17 @@ msgid "This picking has been created from an order with customized products"
 msgstr "Ce bon de livraison a été créé à partir d'une commande avec des produits personnalisés"
 
 #. module: kitchen
-#: code:addons/kitchen/wizard/create_customization_wizard.py:94
+#: code:addons/kitchen/wizard/create_customization_wizard.py:97
 msgid "You can't create a customization with a quantity of less than zero of this product: %s"
 msgstr "Vous ne pouvez pas créer une personnalisation de ce produit avec une quantité inférieure à zéro : %s"
 
 #. module: kitchen
-#: code:addons/kitchen/wizard/create_customization_wizard.py:97
+#: code:addons/kitchen/wizard/create_customization_wizard.py:100
 msgid "You can't create a customization with a bigger quantity of the product than what appears in the order: %s"
 msgstr "Vous ne pouvez pas créer une personnalisation avec une quantité supérieure à celle du produit dans la commande: %s"
 
 #. module: kitchen
-#: code:addons/kitchen/wizard/create_customization_wizard.py:118
+#: code:addons/kitchen/wizard/create_customization_wizard.py:127
 msgid "You cannot create an empty customization"
 msgstr "Vous ne pouvez pas créer une personnalisation vide"
 
