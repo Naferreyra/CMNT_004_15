@@ -26,7 +26,7 @@
     'author': 'Comunitea Servicios Tecnologicos',
     'website': 'www.comunitea.com',
     "depends": ["base", "product", "mrp_repair", "sale", "account",
-                "stock_reserve_sale", "sale_customer_discount"],
+                "stock_reserve_sale", "sale_customer_discount", "prepaid_order_discount"],
 
     "data": ["views/shipping_balance_view.xml",
               "wizard/shipping_balance_wizard.xml",

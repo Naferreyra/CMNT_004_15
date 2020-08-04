@@ -172,16 +172,6 @@
             </field>
         </record>
 
-        <record id="res_partner_view_delete_email" model="ir.ui.view">
-            <field name="name">res.partner.view.delete.email</field>
-            <field name="model">res.partner</field>
-            <field name="inherit_id" ref="mail_tracking.view_partner_form" />
-            <field name="arch" type="xml">
-                <field name="email_score" position="replace"/>
-                    <field name="email_bounced" position="replace"/>
-            </field>
-        </record>
-
         <record id="view_partner_warning_form_add_global_data" model="ir.ui.view">
             <field name="name">res.partner.warning.form.inherit.global.data</field>
             <field name="model">res.partner</field>
@@ -588,5 +578,18 @@
                 </button>
             </field>
         </record>
+
+    <record id="fidelity_risk_view" model="ir.ui.view">
+        <field name="name">res.partner.form.fidelity_risk</field>
+        <field name="model">res.partner</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="partner_risk_insurance.view_partner_form"/>
+        <field name="arch" type="xml">
+            <field name="insurance_credit_limit" position="after">
+                <field name="fidelity_credit_limit_include" groups="custom_partner.group_fidelity_credit_limit"/>
+                <field name="fidelity_credit_limit" readonly="1" attrs="{'invisible': [('fidelity_credit_limit_include','=', False)]}"/>
+            </field>
+        </field>
+    </record>
 
 </odoo>

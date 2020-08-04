@@ -101,8 +101,8 @@ class ProductListener(Component):
                 pack.product_tmpl_id.product_variant_ids.with_delay(priority=2, eta=30).update_product()
 
         if 'tag_ids' in fields:
-            record.with_delay(priority=5, eta=60).unlink_product_tag_rel()
-            record.with_delay(priority=2, eta=120).export_product_tag_rel()
+            record.with_delay(priority=1, eta=30).unlink_product_tag_rel()
+            record.with_delay(priority=2, eta=60).export_product_tag_rel()
 
     def on_record_unlink(self, record):
         record.with_delay().unlink_product()
@@ -333,15 +333,15 @@ class ProductTagsListener(Component):
         record.with_delay(priority=1, eta=60).export_product_tag()
         if 'product_ids' in fields:
             for product in record.product_ids:
-                product.with_delay(priority=5, eta=60).unlink_product_tag_rel()
-                product.with_delay(priority=2, eta=120).export_product_tag_rel()
+                product.with_delay(priority=1, eta=30).unlink_product_tag_rel()
+                product.with_delay(priority=2, eta=60).export_product_tag_rel()
 
     def on_record_write(self, record, fields=None):
         record.with_delay(priority=2, eta=120).update_product_tag()
         if 'product_ids' in fields:
             for product in record.product_ids:
-                product.with_delay(priority=5, eta=60).unlink_product_tag_rel()
-                product.with_delay(priority=2, eta=120).export_product_tag_rel()
+                product.with_delay(priority=1, eta=30).unlink_product_tag_rel()
+                product.with_delay(priority=2, eta=60).export_product_tag_rel()
 
     def on_record_unlink(self, record):
         record.with_delay(priority=3, eta=120).unlink_product_tag()

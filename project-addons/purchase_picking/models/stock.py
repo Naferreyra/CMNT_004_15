@@ -41,15 +41,11 @@ class StockContainer(models.Model):
     @api.depends('move_ids.picking_id.scheduled_date')
     def _get_date_expected(self):
         for container in self:
-            min_date = False
             if container.move_ids:
-                for move in container.move_ids:
-                    if move.picking_id:
-                        if not min_date or min_date < move.picking_id.scheduled_date:
-                            min_date = move.picking_id.scheduled_date
-                if min_date:
-                    container.date_expected = min_date
-                    container.move_ids.write({'date_expected': min_date})
+                max_date = max(container.move_ids.mapped('date_expected') or fields.Date.today())
+                if max_date:
+                    container.date_expected = max_date
+                    container.move_ids.write({'date_expected': max_date})
             if not container.date_expected:
                 container.date_expected = fields.Date.today()
 

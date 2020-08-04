@@ -52,6 +52,7 @@
                         <group>
                             <field name="date_order"/>
                             <field name="origin" attrs="{'invisible': [('origin','=',False)]}"/>
+                            <field name="remark"/>
                             <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
                             <field name="completed_purchase"/>
                         </group>
@@ -151,7 +152,8 @@
 
 
     <menuitem
-            action="action_open_purchase_orders_in_purchase_order_state" id="menu_purchase_order_state" name="Purchase orders to split"
+            action="action_open_purchase_orders_in_purchase_order_state" id="menu_purchase_order_state"
+            name="Purchase orders to split"
             parent="purchase.menu_procurement_management" sequence="-1" groups="stock.group_stock_user"/>
 
 
@@ -169,6 +171,29 @@
 
     <record id="purchase.purchase_form_action" model="ir.actions.act_window">
         <field name="domain">[('state','not in',('draft','sent', 'confirmed','purchase_order'))]</field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_split_purchase_line_product_tree_2">
+        <field name="context">{}</field>
+        <field name="domain">[('product_id.id','in',active_ids), ('order_id.state', '=', 'purchase_order')]</field>
+        <field name="name">Purchase orders to split</field>
+        <field name="res_model">purchase.order.line</field>
+        <field name="view_id" ref="purchase.purchase_order_line_tree"/>
+    </record>
+
+    <record id="view_product_product_split_purchase_buttons_from" model="ir.ui.view">
+        <field name="name">product.product.purchase.button.inherit</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_normal_form_view"/>
+        <field name="groups_id" eval="[(4, ref('purchase.group_purchase_user'))]"/>
+        <field name="arch" type="xml">
+            <button name="toggle_active" position="before">
+                <button class="oe_stat_button" name="%(action_split_purchase_line_product_tree_2)d"
+                        type="action" icon="fa-shopping-basket">
+                    <field string="Split purchases" name="split_purchase_count" widget="statinfo"/>
+                </button>
+            </button>
+        </field>
     </record>
 
 

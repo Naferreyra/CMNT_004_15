@@ -21,7 +21,7 @@ class CrmClaim(models.Model):
                 if claim.stage_id.name != "Pendiente de recibir":
                     message = _("The {} is already received").format(claim.number)
                     self.env.user.notify_warning(message=message, sticky=True)
-                    next_is_location = True  # TODO: quitar esto al final (O NO!? puede servir para reubicar)
+                    next_is_location = True
                 else:
                     claim.message_post(body="RMA scanned")
                     claim.stage_id = self.env["crm.claim.stage"].search([('name', '=', 'Recibido')])
@@ -33,9 +33,17 @@ class CrmClaim(models.Model):
                 message = _("The RMA {} doesn't exist").format(barcode)
                 self.env.user.notify_warning(message=message, sticky=True)
         elif self.id > 0:  # This means that we scanned an rma before and now we are scanning the location
-            self.location = barcode
-            message = _("The RMA {} is located at {}").format(self.number, barcode)
-            self.env.user.notify_info(message=message)
+            vstock_location = self.env['vstock.location'].search_read([('vstock_code', '=', barcode[:-1])], ['vstock_id'])
+            if vstock_location:
+                raw_location = vstock_location[0]['vstock_id'][1:]  # '10203040'
+                format_location = " - ".join([(raw_location[i:i+2]) for i in range(0, len(raw_location), 2)])  # '10 - 20 - 30 - 40'
+                self.location = format_location
+                # Cut the first number, is the warehouse
+                message = _("The RMA {} is located at {}").format(self.number, self.location)
+                self.env.user.notify_info(message=message)
+            else:
+                message = _("The scanned location doesn't exist")
+                self.env.user.notify_warning(message=message, sticky=True)
 
         action = self.env.ref('rma_scanner.crm_claim_rma_scanner')
         result = action.read()[0]

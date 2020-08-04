@@ -17,7 +17,8 @@
                 ],
     'data': ['data/product_data.xml',
              'data/parameters.xml',
-             'views/sale_order_view.xml'
+             'views/sale_order_view.xml',
+             'views/account_view.xml'
              ],
     'installable': True
 }

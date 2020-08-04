@@ -17,6 +17,7 @@ msgstr ""
 
 #. module: prepaid_order_discount
 #: model:ir.model.fields,field_description:prepaid_order_discount.field_sale_order_prepaid_option
+#: view:sale.order:prepaid_order_discount.view_account_invoice_filter_prepaid
 msgid "Prepaid option"
 msgstr "Opzione Prepagata"
 

@@ -27,4 +27,15 @@
     <menuitem id="menu_find_rmas" name="Scan RMAs"
         action="crm_claim_rma_scanner"
         parent="crm_claim_rma.menu_sat"/>
+
+    <record model="ir.ui.view" id="crm_case_claims_tree_view_add_location">
+        <field name="name">Add.location</field>
+        <field name="model">crm.claim</field>
+        <field name="inherit_id" ref="crm_claim_rma_custom.crm_case_claims_tree_view_received"/>
+        <field name="arch" type="xml">
+            <field name="bool_category_id" position="before">
+                <field name="location"/>
+            </field>
+        </field>
+    </record>
 </odoo>

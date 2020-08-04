@@ -16,5 +16,17 @@
             <field name="function">True</field>
         </record>
 
+        <record forcecreate="True" id="ir_cron_calculate_fidelity_credit_limit" model="ir.cron">
+            <field name="name">Calculate Fidelity Credit Limit</field>
+            <field eval="True" name="active"/>
+            <field name="interval_number">1</field>
+            <field name="interval_type">months</field>
+            <field name="numbercall">-1</field>
+            <field ref="model_res_partner" name="model_id"/>
+            <field name="state">code</field>
+            <field name="code">model._calculate_fidelity_credit_limit()</field>
+            <field name="function">True</field>
+        </record>
+
     </data>
 </odoo>

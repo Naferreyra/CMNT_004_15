@@ -34,13 +34,13 @@ msgid "The RMA {} doesn't exist"
 msgstr "El RMA {} non esiste"
 
 #. module: rma_scanner
-#: code:addons/rma_scanner/models/crm_claim.py:37
+#: code:addons/rma_scanner/models/crm_claim.py:39
 #, python-format
 msgid "The RMA {} is located at {}"
 msgstr "El RMA {} è in {}"
 
 #. module: rma_scanner
-#: code:addons/rma_scanner/models/crm_claim.py:47
+#: code:addons/rma_scanner/models/crm_claim.py:52
 #, python-format
 msgid "Scan the location of the %s"
 msgstr "Scansiona la posizione di %s"
@@ -65,3 +65,16 @@ msgstr "Scansiona RMAs"
 #: model:ir.actions.act_window,name:rma_scanner.crm_claim_rma_scanner
 msgid "Scanning RMAs"
 msgstr "Scansione RMAs"
+
+#. module: rma_scanner
+#: model:ir.ui.view,arch_db:rma_scanner.vstock_location_tree
+#: model:ir.actions.act_window,name:rma_scanner.action_vstock_location_form
+#: model:ir.ui.menu,name:rma_scanner.menu_vstock_location_config
+msgid "Vstock Locations"
+msgstr "Posizioni Vstock"
+
+#. module: rma_scanner
+#: code:addons/rma_scanner/models/crm_claim.py:42
+#, python-format
+msgid "The scanned location doesn't exist"
+msgstr "La posizione acquisita non esiste"

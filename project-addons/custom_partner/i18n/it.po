@@ -472,3 +472,23 @@ msgstr ' "%s" (Email di contabilità)'
 #, python-format
 msgid "Prospective customer becomes an active customer"
 msgstr "Cliente potenziale diventa cliente attivo"
+
+#. module: custom_partner
+#: model:ir.model.fields,field_description:custom_partner.field_res_partner_fidelity_credit_limit
+msgid "Fidelity Credit Limit"
+msgstr "Limite di credito fedeltà"
+
+#. module: custom_partner
+#: model:ir.model.fields,field_description:custom_partner.field_res_partner_fidelity_credit_limit_include
+msgid "Include fidelity credit limit"
+msgstr "Includi limite di credito fedeltà"
+
+#. module: custom_partner
+#: help:res.partner,fidelity_credit_limit_include:0
+msgid "If this field is checked, the fidelity credit limit will be added to credit limit "
+msgstr "Se questo campo è selezionato, il limite di credito fedeltà verrà aggiunto al limite di credito "
+
+#. module: custom_partner
+#: help:res.partner,fidelity_credit_limit:0
+msgid "Profit of the last x months"
+msgstr "Profitto degli ultimi x mesi"

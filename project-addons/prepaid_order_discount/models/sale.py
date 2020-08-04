@@ -21,9 +21,13 @@ class SaleOrder(models.Model):
                     message = _("It's an order with prepaid option. "
                                 "Please, calculate the discount if partner has prepaid or cancel the prepaid option.")
                 else:
-                    last_product_order = sale.order_line.sorted(key=lambda l: l.sequence)[-1]
-                    if exist_prepaid_discount_line.id != last_product_order.id:
-                        message = _("Please, recalculate prepaid discount")
+                    order_lines_sorted_by_id = sale.order_line.sorted(key=lambda l: l.id)
+                    last_product_order = order_lines_sorted_by_id[-1]
+                    if exist_prepaid_discount_line.id < last_product_order.id:
+                        num_elements = len(order_lines_sorted_by_id) -1 - order_lines_sorted_by_id.mapped('id').index(
+                            exist_prepaid_discount_line.id)
+                        if last_product_order.product_id.categ_id.name != 'Portes' or num_elements > 1:
+                            message = _("Please, recalculate prepaid discount")
             if message:
                 raise exceptions.Warning(message)
         return super().action_confirm()
@@ -39,6 +43,7 @@ class SaleOrder(models.Model):
         prepaid_discount_product_id = self.env.ref('prepaid_order_discount.prepaid_discount_product').id
         shipping_cost_categ = self.env['product.category'].\
             with_context(lang='es_ES').search([('name', '=', 'Portes')])
+        daily_invoicing = self.env['res.partner.invoice.type'].search([('name', '=', 'Diaria')])
         for sale in self:
             # Comprobar que el plazo de pago del cliente no sea prepago por defecto,
             # en cuyo caso no le corresponde este descuento
@@ -50,7 +55,8 @@ class SaleOrder(models.Model):
             # Aplicar promociones
             sale.apply_commercial_rules()
             # Obtener umbrales márgenes y porcentaje descuento a aplicar
-            margin_sale = sale.margin_rappel
+            margin_sale = sale.product_margin_without_shipping_costs(shipping_cost_categ)
+
             margin_1 = int(margin_discount_1.split(',')[0])
             discount_1 = margin_discount_1.split(',')[1]
             margin_2 = int(margin_discount_2.split(',')[0])
@@ -67,6 +73,9 @@ class SaleOrder(models.Model):
                                       'price_unit': -(amount_untaxed*int(discount_1)/100),
                                       'sequence': last_sequence + 1}
                 self.env['sale.order.line'].create(discount_line_vals)
+                # Se pone como método de pago "Pago Inmediato" y facturación "Diaría"
+                sale.payment_term_id = self.env.ref('account.account_payment_term_immediate').id
+                sale.invoice_type_id = daily_invoicing.id
             elif margin_sale > margin_2:
                 last_sequence = sale.order_line.sorted(lambda l: l.sequence)[-1].sequence
                 discount_line_vals = {'order_id': sale.id,
@@ -76,6 +85,9 @@ class SaleOrder(models.Model):
                                       'price_unit': -(amount_untaxed*int(discount_2)/100),
                                       'sequence': last_sequence + 1}
                 self.env['sale.order.line'].create(discount_line_vals)
+                # Se pone como método de pago "Pago Inmediato" y facturación "Diaría"
+                sale.payment_term_id = self.env.ref('account.account_payment_term_immediate').id
+                sale.invoice_type_id = daily_invoicing.id
         return True
 
     @api.multi
@@ -86,5 +98,30 @@ class SaleOrder(models.Model):
             sale.order_line.filtered(lambda l: l.product_id.id == prepaid_discount_product_id).unlink()
             # Marcar check prepaid_discount = False
             sale.prepaid_option = False
+            # Poner plazo de pago y tipo de facturación con los datos del cliente
+            sale.payment_term_id = sale.partner_id.property_payment_term_id
+            sale.invoice_type_id = sale.partner_id.invoice_type_id
         return True
+
+    @api.multi
+    def product_margin_without_shipping_costs(self,shipping_cost_categ):
+        for sale in self:
+            sale.margin_rappel = 0.0
+            margin_rappel = 0.0
+            sale_price = 0.0
+            purchase_price = 0.0
+            for line in sale.order_line:
+                if not line.deposit and line.product_id.categ_id.id not in shipping_cost_categ.ids:
+                    if line.price_unit > 0:
+                        margin_rappel += line.margin_rappel or 0.0
+                    else:
+                        margin_rappel += (line.price_unit * line.product_uom_qty) * ((100.0 - line.discount) / 100.0)
+                    sale_price += line.price_subtotal or 0.0
+                    purchase_price += line.product_id.standard_price_2_inc or 0.0 * line.product_uom_qty
+            if sale_price:
+                if sale_price < purchase_price:
+                    return round((margin_rappel * 100) / purchase_price, 2)
+                else:
+                    return round((margin_rappel * 100) / sale_price, 2)
+
 

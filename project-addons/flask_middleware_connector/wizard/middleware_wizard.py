@@ -237,17 +237,17 @@ class MiddlewareBackend(models.TransientModel):
         if self.mode_export == 'export':
             for product in product_ids:
                 product.with_delay().export_product()
-                product.with_delay(priority=5, eta=60).unlink_product_tag_rel()
-                product.with_delay(priority=2, eta=120).export_product_tag_rel()
+                product.with_delay(priority=1, eta=30).unlink_product_tag_rel()
+                product.with_delay(priority=2, eta=60).export_product_tag_rel()
         elif self.mode_export == 'update':
             for product in product_ids:
                 product.with_delay().update_product()
-                product.with_delay(priority=5, eta=60).unlink_product_tag_rel()
-                product.with_delay(priority=2, eta=120).export_product_tag_rel()
+                product.with_delay(priority=1, eta=30).unlink_product_tag_rel()
+                product.with_delay(priority=2, eta=60).export_product_tag_rel()
         else:
             for product in product_ids:
                 product.with_delay().unlink_product()
-                product.with_delay(priority=5, eta=60).unlink_product_tag_rel()
+                product.with_delay(priority=1, eta=60).unlink_product_tag_rel()
 
     def export_tags(self, object_ids):
         tag_obj = self.env['res.partner.category']
@@ -374,14 +374,14 @@ class MiddlewareBackend(models.TransientModel):
             for tag in product_tag_ids:
                 tag.with_delay().export_product_tag()
                 for product in tag.product_ids:
-                    product.with_delay(priority=5, eta=60).unlink_product_tag_rel()
-                    product.with_delay(priority=2, eta=120).export_product_tag_rel()
+                    product.with_delay(priority=1, eta=30).unlink_product_tag_rel()
+                    product.with_delay(priority=2, eta=60).export_product_tag_rel()
         elif self.mode_export == 'update':
             for tag in product_tag_ids:
                 tag.with_delay().update_product_tag(fields=None)
                 for product in tag.product_ids:
-                    product.with_delay(priority=5, eta=60).unlink_product_tag_rel()
-                    product.with_delay(priority=2, eta=120).export_product_tag_rel()
+                    product.with_delay(priority=1, eta=30).unlink_product_tag_rel()
+                    product.with_delay(priority=2, eta=60).export_product_tag_rel()
         else:
             for tag in product_tag_ids:
                 tag.with_delay().unlink_product_tag()
