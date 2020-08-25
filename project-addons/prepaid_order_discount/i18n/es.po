@@ -50,3 +50,27 @@ msgstr "Calcular prepago"
 msgid "Cancel prepaid"
 msgstr "Cancelar prepago"
 
+#. module: prepaid_order_discount
+#: code:addons/prepaid_order_discount/models/sale.py:52
+#, python-format
+msgid "The prepayment discount cannot be applied due to the customer's payment mode"
+msgstr "El descuento por prepago no se puede aplicar debido al modo de pago del cliente."
+
+#. module: prepaid_order_discount
+#: code:addons/prepaid_order_discount/models/sale.py:53
+#, python-format
+msgid "Prepaid discount cancelled"
+msgstr "Descuento por prepago cancelado"
+
+#. module: prepaid_order_discount
+#: code:addons/prepaid_order_discount/models/sale.py:95
+#, python-format
+msgid "The order margin are below the limits to apply the prepayment discount"
+msgstr "El margen del pedido está por debajo de los límites para aplicar el descuento por prepago"
+
+#. module: prepaid_order_discount
+#: code:addons/prepaid_order_discount/models/sale.py:96
+#, python-format
+msgid "Prepaid discount line has not been created"
+msgstr "No se ha creado línea de descuento por prepago"
+

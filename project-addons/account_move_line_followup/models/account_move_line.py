@@ -30,7 +30,8 @@ class AccountMoveLine(models.Model):
             # Updating maturity date and follow-up data
             if aml_partner:
                 aml_partner_data = aml_partner[0]
-                aml.write({'date_maturity': aml_partner_data['date_maturity']})
+                if aml.date_maturity < aml_partner_data['date_maturity']:
+                    aml.write({'date_maturity': aml_partner_data['date_maturity']})
             else:
                 aml.write({'date_maturity': today})
 

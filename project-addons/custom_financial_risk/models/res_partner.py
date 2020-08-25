@@ -25,18 +25,18 @@ class ResPartner(models.Model):
     def _compute_risk_sale_order(self):
         customers = self.filtered('customer')
         partners = customers | customers.mapped('child_ids')
-        orders_group = self.env['sale.order.line'].read_group(
-            [('state', '=', 'sale'), ('order_partner_id', 'in', partners.ids),
-             ('order_id.invoice_status_2', '=', 'to_invoice')],
+        sale_lines = self.env['sale.order.line'].search_read(
+            ['&',('order_partner_id', 'in', partners.ids),'|','&',
+             ('order_id.state', '=', 'sale'),
+             ('invoice_status', 'in', ('to invoice','no')),('invoice_status', '=', 'to invoice')],
             ['order_partner_id', 'price_total',
-             'amt_to_invoice', 'amt_invoiced'],
-            ['order_partner_id'])
+             'amt_to_invoice', 'amt_invoiced'])
         for partner in customers:
             partner_ids = (partner | partner.child_ids).ids
             # Take in account max of ordered qty and delivered qty
             partner.risk_sale_order = sum(
-                max(x['price_total'], x['amt_to_invoice']) - x['amt_invoiced']
-                for x in orders_group if x['order_partner_id'][0] in
+                (max(x['price_total'], x['amt_to_invoice']) if x['price_total']>0 else min(x['price_total'], x['amt_to_invoice']))- x['amt_invoiced']
+                for x in sale_lines if x['order_partner_id'][0] in
                 partner_ids)
 
     @api.model

@@ -219,13 +219,6 @@ class StockLotacion(models.Model):
                         qty_used:
                     reservation.date_planned = move.date_expected
                     reservation_index += 1
-                    if reservation.sale_id:
-                        sale = reservation.sale_id
-                        followers = sale.message_follower_ids
-                        sale.message_post(
-                            body=_("The date planned of the reservation was \
-                                   changed."),
-                            subtype='mt_comment', partner_ids=followers)
                 else:
                     reservation_used += product_uom_qty - qty_used
                     break

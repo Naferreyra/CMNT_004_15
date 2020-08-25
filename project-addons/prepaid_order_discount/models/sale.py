@@ -26,7 +26,7 @@ class SaleOrder(models.Model):
                     if exist_prepaid_discount_line.id < last_product_order.id:
                         num_elements = len(order_lines_sorted_by_id) -1 - order_lines_sorted_by_id.mapped('id').index(
                             exist_prepaid_discount_line.id)
-                        if last_product_order.product_id.categ_id.name != 'Portes' or num_elements > 1:
+                        if last_product_order.product_id.categ_id.with_context(lang='es_ES').name != 'Portes' and not last_product_order.promotion_line or num_elements > 1:
                             message = _("Please, recalculate prepaid discount")
             if message:
                 raise exceptions.Warning(message)
@@ -49,6 +49,9 @@ class SaleOrder(models.Model):
             # en cuyo caso no le corresponde este descuento
             if sale.partner_id.prepaid_payment_term():
                 sale.cancel_prepaid_option()
+                message = _("The prepayment discount cannot be applied due to the customer's payment mode")
+                self.env.user.notify_info(title=_("Prepaid discount cancelled"),
+                                          message=message)
                 continue
             # Borrar línea descuento prepago existente
             sale.order_line.filtered(lambda l: l.product_id.id == prepaid_discount_product_id).unlink()
@@ -88,6 +91,10 @@ class SaleOrder(models.Model):
                 # Se pone como método de pago "Pago Inmediato" y facturación "Diaría"
                 sale.payment_term_id = self.env.ref('account.account_payment_term_immediate').id
                 sale.invoice_type_id = daily_invoicing.id
+            else:
+                message = _("The order margin are below the limits to apply the prepayment discount")
+                self.env.user.notify_info(title=_("Prepaid discount line has not been created"),
+                                          message=message)
         return True
 
     @api.multi
@@ -106,7 +113,6 @@ class SaleOrder(models.Model):
     @api.multi
     def product_margin_without_shipping_costs(self,shipping_cost_categ):
         for sale in self:
-            sale.margin_rappel = 0.0
             margin_rappel = 0.0
             sale_price = 0.0
             purchase_price = 0.0

@@ -28,12 +28,6 @@
         <field name="model">stock.reservation</field>
         <field name="inherit_id" ref="stock_reserve_sale.view_stock_reservation_form"/>
         <field name="arch" type="xml">
-            <form position="inside">
-                <div class="oe_chatter">
-                    <field name="message_follower_ids" widget="mail_followers"/>
-                    <field name="message_ids" widget="mail_thread"/>
-                </div>
-            </form>
             <form position="attributes">
                 <attribute name="create">false</attribute>
             </form>
