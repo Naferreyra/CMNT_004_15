@@ -61,4 +61,20 @@
          ]]>
         </field>
     </record>
+
+    <record id="send_mail_to_commercials_date_planned_changed" model="mail.template">
+        <field name="name">Notify the expected customization date</field>
+        <field name="email_from">${'odoo_team@visiotechsecurity.com'}</field>
+        <field name="email_cc">${ctx['email_cc']}</field>
+        <field name="subject">Expected date of customization - ${object.name}</field>
+        <field name="email_to">${ctx['email_to']}</field>
+        <field name="model_id" ref="model_kitchen_customization"/>
+        <field name="lang">${ctx['lang']}</field>
+        <field name="body_html"><![CDATA[
+            <p>The expected date of customization <strong>${object.name}</strong> has changed.</p>
+            <p>The new expected date is <strong>${object.date_planned}</strong></p>
+            <p>Best regards.</p>
+         ]]>
+        </field>
+    </record>
 </odoo>

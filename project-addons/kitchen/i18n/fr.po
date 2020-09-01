@@ -354,4 +354,13 @@ msgstr "Type de personnalisation"
 msgid "Product Qty"
 msgstr "Quantité de produit"
 
+#. module: kitchen
+#: model:mail.template,body_html:kitchen.send_mail_to_commercials_date_planned_changed
+msgid "<p>The expected date of customization <strong>${object.name}</strong> has changed.</p>\n"
+"            <p>The new expected date is <strong>${object.date_planned}</strong></p>\n"
+"            <p>Best regards.</p>"
+msgstr "<p>La date prévue de personnalisation <strong>${object.name}</strong> a changé.</p>\n"
+"            <p>La nouvelle date prévue est <strong>${object.date_planned}</strong></p>\n"
+"            <p>Meilleures salutations.</p>"
+
 

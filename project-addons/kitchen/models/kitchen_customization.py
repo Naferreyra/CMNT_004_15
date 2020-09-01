@@ -11,8 +11,7 @@ class KitchenCustomization(models.Model):
 
     is_manager = fields.Boolean(compute='_compute_is_manager',default=True)
     name = fields.Char(default='New', readonly=True, string="Name")
-    order_id = fields.Many2one('sale.order', string="Order")
-    type_ids = fields.Many2many('customization.type', required=1, string="Type")
+    order_id = fields.Many2one('sale.order', string="Order",domain=[('state', '=', 'reserve')])
     commercial_id = fields.Many2one('res.users', required=1, string="Commercial")
     partner_id = fields.Many2one('res.partner', string="Partner")
     user = fields.Char(readonly=True, string="User")
@@ -61,6 +60,16 @@ class KitchenCustomization(models.Model):
             raise exceptions.UserError(_('Please add some products before confirming the customization request'))
         if any(self.customization_line.filtered(lambda l: l.product_qty <=0)):
             raise exceptions.UserError(_("You can't create a customization with a quantity of less than one of a product"))
+        lines_without_type = self.customization_line.filtered(lambda l: not l.type_ids)
+        if lines_without_type:
+            raise exceptions.UserError(_(
+                "You can't confirm a customization without a customization type: %s") % lines_without_type.mapped('product_id.default_code'))
+        if self.order_id:
+            customization_product_lines = set(self.customization_line.mapped('product_id.default_code'))
+            order_product_lines = set(self.order_id.order_line.mapped('product_id.default_code'))
+            if not customization_product_lines.issubset(order_product_lines):
+                raise exceptions.UserError(_(
+                    "You can't confirm a customization with products that not belong to the original order: %s") % str(customization_product_lines - order_product_lines))
         self.state = 'sent'
         template = self.env.ref('kitchen.send_mail_to_kitchen_customization_sent')
         ctx = dict()
@@ -93,11 +102,42 @@ class KitchenCustomization(models.Model):
         for customization in self:
             customization.reservation_status = "waiting"
             if customization.customization_line and all([x.reservation_status != "waiting" for x in customization.customization_line]):
+                customization.action_confirm()
+                customization.state = 'sent'
                 customization.reservation_status = "to customize"
-                #TODO Confirmar la personalización cuando todas las líneas están "Para personalizar.
-                # Ahora mismo falla al enviar el mail (última instrucción del action_confirm), pero no
-                # sé la razón."
-                #customization.action_confirm()
+
+    @api.onchange('order_id')
+    def onchange_order_id(self):
+        if self.order_id:
+            self.partner_id=self.order_id.partner_id
+            self.commercial_id=self.order_id.user_id
+            self.notify_users=[(6,0,[self.order_id.user_id.id])]
+            self.customization_line=False
+            for line in self.order_id.order_line.filtered(
+                lambda l: not l.deposit and l.product_id.categ_id.with_context(
+                    lang='es_ES').name != 'Portes' and l.price_unit >= 0):
+                customization_qty = sum([x.get("product_qty",0) for x in self.env['kitchen.customization.line'].search_read([('sale_line_id','=',line.id),('state','!=','cancel')],['product_qty'])])
+                if line.product_qty - customization_qty >0:
+                    new_line = {
+                        'product_id': line.product_id.id,
+                        'product_qty': line.product_qty - customization_qty,
+                        'sale_line_id': line.id,
+                        'customization_id': self.id
+                    }
+                    self.customization_line.new(new_line)
+
+    def write(self, vals):
+        res = super(KitchenCustomization, self).write(vals)
+        if vals.get('date_planned', False):
+            template = self.env.ref('kitchen.send_mail_to_commercials_date_planned_changed')
+            ctx = dict()
+            ctx.update({
+                'email_to': self.commercial_id.login,
+                'email_cc': ','.join(self.notify_users.mapped('email')),
+                'lang': self.commercial_id.lang
+            })
+            template.with_context(ctx).send_mail(self.id)
+        return res
 
 
 
@@ -121,6 +161,7 @@ class KitchenCustomizationLine(models.Model):
     only_erase_logo = fields.Boolean()
 
     reserved_qty = fields.Float(compute="_compute_reserved_qty", store=True)
+    type_ids = fields.Many2many('customization.type', required=1, string="Type")
 
     @api.depends('sale_line_id.move_ids.move_line_ids.product_id', 'sale_line_id.move_ids.move_line_ids.product_uom_id', 'sale_line_id.move_ids.move_line_ids.product_uom_qty')
     def _compute_reserved_qty(self):
@@ -139,3 +180,16 @@ class KitchenCustomizationLine(models.Model):
             line.reservation_status="waiting"
             if line.reserved_qty >= line.product_qty and line.state == "waiting":
                 line.reservation_status = "to customize"
+
+    @api.onchange('product_qty')
+    def onchange_product_qty(self):
+        if self.sale_line_id:
+            customization_qty = sum([x.get("product_qty", 0) for x in
+                                     self.env['kitchen.customization.line'].search_read(
+                                         [('sale_line_id', '=', self.sale_line_id.id), ('state', '!=', 'cancel'),('id', '!=', self.id)],
+                                         ['product_qty'])])
+
+            if self.product_qty+customization_qty>self.sale_line_id.product_qty:
+                raise exceptions.UserError(_(
+                    "You cannot exceed the maximum product quantity to customize. "
+                    "The maximum quantity to customize is : %s-%s unit(s)") %self.product_id.default_code,self.sale_line_id.product_qty-customization_qty)

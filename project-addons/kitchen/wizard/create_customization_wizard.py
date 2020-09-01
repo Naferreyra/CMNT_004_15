@@ -14,6 +14,7 @@ class CustomizationLine(models.TransientModel):
     only_erase_logo = fields.Boolean()
     max_qty = fields.Float()
     qty_reserved = fields.Float()
+    type_ids = fields.Many2many('customization.type', required=1)
 
 
 class CustomizationWizard(models.TransientModel):
@@ -26,10 +27,13 @@ class CustomizationWizard(models.TransientModel):
     def _get_lines(self):
         wiz_lines = []
         customize_all = self.env['ir.config_parameter'].sudo().get_param('all.products.customize')
-        for line in self.env['sale.order'].browse(self.env.context.get('active_ids')).order_line:
+        for line in self.env['sale.order'].browse(self.env.context.get('active_ids')).order_line.filtered(
+                lambda l: not l.deposit and l.product_id.categ_id.with_context(
+                    lang='es_ES').name != 'Portes' and l.price_unit >= 0):
             new_line = {'product_id': line.product_id.id,
                         'qty': 0,
-                        'sale_line_id': line.id}
+                        'sale_line_id': line.id,
+                        'type_ids': None}
 
             qty_done = sum(self.env['kitchen.customization.line'].search(
                 [('sale_line_id', '=', line.id), ('state', '!=', 'cancel')]).mapped('product_qty'))
@@ -53,7 +57,7 @@ class CustomizationWizard(models.TransientModel):
                     qty = min(reserved_available.values())
             else:
                 qty = sum(moves.mapped('reserved_availability'))
-            new_line["qty_reserved"]=qty
+            new_line["qty_reserved"] = qty
 
             if customize_all == 'False':
                 if qty > 0:
@@ -73,7 +77,8 @@ class CustomizationWizard(models.TransientModel):
     erase_logo = fields.Boolean('Erase Logo')
     comments = fields.Text('Comments')
     add_all = fields.Boolean(string="Add All")
-    notify_users = fields.Many2many('res.users')
+    notify_users = fields.Many2many('res.users', default=lambda self: [
+        (6, 0, [self.env['sale.order'].browse(self.env.context.get('active_ids')).user_id.id])])
 
     @api.onchange('add_all')
     def action_add_all(self):
@@ -83,7 +88,6 @@ class CustomizationWizard(models.TransientModel):
     def action_create(self):
         lines = []
         customization = self.env['kitchen.customization'].create({'partner_id': self.order_id.partner_id.id,
-                                                                  'type_ids': [(6, 0, self.type_ids.ids)],
                                                                   'erase_logo': self.erase_logo,
                                                                   'order_id': self.order_id.id,
                                                                   'commercial_id': self.order_id.user_id.id,
@@ -92,6 +96,9 @@ class CustomizationWizard(models.TransientModel):
                                                                   })
         for line in self.customization_line:
             qty = line.qty
+            if not line.type_ids:
+                raise UserError(_(
+                    "You can't create a customization without a customization type: %s") % line.sale_line_id.product_id.default_code)
             if qty < 0:
                 raise UserError(_(
                     "You can't create a customization with a quantity of less than zero of this product: %s") % line.sale_line_id.product_id.default_code)
@@ -104,7 +111,8 @@ class CustomizationWizard(models.TransientModel):
                     'product_qty': line.qty,
                     'customization_id': customization.id,
                     'sale_line_id': line.sale_line_id.id,
-                    'only_erase_logo': line.only_erase_logo
+                    'only_erase_logo': line.only_erase_logo,
+                    'type_ids': [(6, 0, line.type_ids.ids)]
                 }
                 if line.qty_reserved < qty:
                     customization.state = "waiting"
@@ -112,8 +120,8 @@ class CustomizationWizard(models.TransientModel):
                 lines += self.env['kitchen.customization.line'].create(new_line)
         if lines:
             for line in lines:
-                line.sale_line_id.reservation_ids.date_validity=False
-            if customization.state!='waiting':
+                line.sale_line_id.reservation_ids.date_validity = False
+            if customization.state != 'waiting':
                 customization.action_confirm()
             return {
                 'view_type': 'form',

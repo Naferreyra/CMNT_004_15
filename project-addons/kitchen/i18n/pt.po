@@ -341,3 +341,12 @@ msgstr "Tipo de personalização"
 #: model:ir.model.fields,field_description:kitchen.field_kitchen_customization_line_product_qty
 msgid "Product Qty"
 msgstr "Quantidade do produto"
+
+#. module: kitchen
+#: model:mail.template,body_html:kitchen.send_mail_to_commercials_date_planned_changed
+msgid "<p>The expected date of customization <strong>${object.name}</strong> has changed.</p>\n"
+"            <p>The new expected date is <strong>${object.date_planned}</strong></p>\n"
+"            <p>Best regards.</p>"
+msgstr "<p>A data esperada de personalização <strong>${object.name}</strong> mudou</p>\n"
+"            <p>A nova data esperada é <strong>${object.date_planned}</strong></p>\n"
+"            <p>Cumprimentos.</p>"

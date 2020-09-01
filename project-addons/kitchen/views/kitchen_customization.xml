@@ -87,8 +87,6 @@
                         </group>
                         <group>
                             <field name="erase_logo" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
-                            <field name="type_ids" widget="many2many_tags"
-                                   attrs="{'readonly': [('state', '!=', 'draft')]}"/>
                             <field name="date_planned" readonly="1"/>
                         </group>
                     </group>
@@ -99,8 +97,11 @@
                                 <tree string="Customization Lines" editable="bottom">
                                     <field name="product_id"/>
                                     <field name="product_qty"/>
+                                    <field name="type_ids" widget="many2many_tags"
+                                   attrs="{'readonly': [('state', '!=', 'draft')]}"/>
                                     <field name="only_erase_logo"/>
                                     <field name="state" invisible="1"/>
+                                    <field name="sale_line_id" invisible="1"/>
                                 </tree>
 
                             </field>
@@ -130,7 +131,6 @@
                 <field name="order_id"/>
                 <field name="partner_id"/>
                 <field name="products_qty_format" string="Products and Quantities"/>
-                <field name="type_ids"/>
                 <field name="erase_logo"/>
                 <field name="user"/>
                 <field name="date_planned"/>
@@ -155,4 +155,3 @@
 
 
 </odoo>
-
