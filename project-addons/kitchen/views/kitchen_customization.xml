@@ -53,7 +53,7 @@
             <form string="Kitchen Customization">
                 <header>
                     <field name="state" widget="statusbar" readonly="1"
-                           statusbar_visible="draft,sent,in_progress,done"/>
+                           statusbar_visible="draft,waiting,sent,in_progress,done"/>
                     <button name="action_confirm" string="Confirm" type="object"
                             attrs="{'invisible': [('state','!=','draft')]}"
                             class="oe_highlight"/>

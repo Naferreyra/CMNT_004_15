@@ -70,7 +70,7 @@ class KitchenCustomization(models.Model):
             if not customization_product_lines.issubset(order_product_lines):
                 raise exceptions.UserError(
                     _("You can't confirm a customization with products that not belong to the original order: %s") % str(customization_product_lines - order_product_lines))
-        self.state = 'sent'
+        self.write({'state':'sent'})
         template = self.env.ref('kitchen.send_mail_to_kitchen_customization_sent')
         ctx = dict()
         ctx.update({
