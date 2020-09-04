@@ -65,22 +65,16 @@ msgid "Products and Quantities"
 msgstr "Produits et quantités"
 
 #. module: kitchen
-#: model:ir.model.fields,field_description:kitchen.field_customization_wizard_type_ids
-#: model:ir.model.fields,field_description:kitchen.field_kitchen_customization_type_ids
+#: model:ir.model.fields,field_description:kitchen.field_customization_line_type_ids
+#: model:ir.model.fields,field_description:kitchen.field_kitchen_customization_line_type_ids
 msgid "Type"
 msgstr "Type"
 
 #. module: kitchen
-#: model:ir.model.fields,field_description:kitchen.field_customization_wizard_erase_logo
-#: model:ir.model.fields,field_description:kitchen.field_kitchen_customization_erase_logo
+#: model:ir.model.fields,field_description:kitchen.field_customization_line_erase_logo
+#: model:ir.model.fields,field_description:kitchen.field_kitchen_customization_line_erase_logo
 msgid "Erase Logo"
 msgstr "Supprimer le logo"
-
-#. module: kitchen
-#: model:ir.model.fields,field_description:kitchen.field_kitchen_customization_line_only_erase_logo
-#: model:ir.model.fields,field_description:kitchen.field_customization_line_only_erase_logo
-msgid "Only Erase Logo"
-msgstr "Effacer uniquement le logo"
 
 #. module: kitchen
 #: model:ir.model.fields,field_description:kitchen.field_kitchen_customization_user
@@ -109,7 +103,7 @@ msgstr "Personnalisation"
 
 #. module: kitchen
 #: selection:kitchen.customization,state:0
-msgid "Draft"
+msgid "New"
 msgstr "Nouveau"
 
 #. module: kitchen
@@ -233,24 +227,50 @@ msgid "Cancel"
 msgstr "Annuler"
 
 #. module: kitchen
-#: code:addons/kitchen/models/kitchen_customization.py:43
-msgid "(ONLY LOGO)"
-msgstr "(SEUL LOGO)"
+#: code:addons/kitchen/models/kitchen_customization.py:41
+msgid "(ERASE LOGO)"
+msgstr "(SUPPRIMER LOGO)"
 
 #. module: kitchen
-#: code:addons/kitchen/models/kitchen_customization.py:61
+#: code:addons/kitchen/models/kitchen_customization.py:60
 msgid "Please add some products before confirming the customization request"
 msgstr "Veuillez ajouter un produit avant de confirmer la demande de personnalisation"
 
 #. module: kitchen
-#: code:addons/kitchen/models/kitchen_customization.py:63
+#: code:addons/kitchen/models/kitchen_customization.py:62
 msgid "You can't create a customization with a quantity of less than one of a product"
 msgstr "Vous ne pouvez pas créer une personnalisation de ce produit avec une quantité inférieure à un"
 
 #. module: kitchen
-#: code:addons/kitchen/models/kitchen_customization.py:77
+#: code:addons/kitchen/models/kitchen_customization.py:66
+msgid "You can't confirm a customization without a customization type: %s"
+msgstr "Vous ne pouvez pas confirmer une personnalisation sans type de personnalisation: %s"
+
+#. module: kitchen
+#: code:addons/kitchen/models/kitchen_customization.py:72
+msgid "You can't confirm a customization with products that not belong to the original order: %s"
+msgstr "Vous ne pouvez pas confirmer une personnalisation avec des produits qui n'appartiennent pas à la commande d'origine: %s"
+
+#. module: kitchen
+#: code:addons/kitchen/models/kitchen_customization.py:86
 msgid "The order contains customized products"
 msgstr "La commande contient des produits personnalisés"
+
+#. module: kitchen
+#: code:addons/kitchen/models/kitchen_customization.py:133
+#: code:addons/kitchen/models/kitchen_customization.py:140
+msgid "You can't confirm a customization without a customization type: %s"
+msgstr "Vous ne pouvez pas sauvegarder une personnalisation sans type de personnalisation: %s"
+
+#. module: kitchen
+#: code:addons/kitchen/models/kitchen_customization.py:209
+msgid "You cannot exceed the maximum product quantity to customize. The maximum quantity to customize is : %s-%i unit(s)"
+msgstr "Vous ne pouvez pas dépasser la quantité maximale de produit à personnaliser. La quantité maximale à personnaliser est: %s-%i Unités"
+
+#. module: kitchen
+#: code:addons/kitchen/models/kitchen_customization.py:212
+msgid "You cannot change the product quantity to less than 0"
+msgstr "Vous ne pouvez pas changer la quantité de produit à moins de 0"
 
 #. module: kitchen
 #: code:addons/kitchen/models/sale_order.py:20
@@ -263,17 +283,22 @@ msgid "This picking has been created from an order with customized products"
 msgstr "Ce bon de livraison a été créé à partir d'une commande avec des produits personnalisés"
 
 #. module: kitchen
-#: code:addons/kitchen/wizard/create_customization_wizard.py:97
+#: code:addons/kitchen/wizard/create_customization_wizard.py:99
+msgid "You can't create a customization without a customization type: %s"
+msgstr "Vous ne pouvez pas créer une personnalisation sans un type de personnalisation: %s"
+
+#. module: kitchen
+#: code:addons/kitchen/wizard/create_customization_wizard.py:102
 msgid "You can't create a customization with a quantity of less than zero of this product: %s"
 msgstr "Vous ne pouvez pas créer une personnalisation de ce produit avec une quantité inférieure à zéro : %s"
 
 #. module: kitchen
-#: code:addons/kitchen/wizard/create_customization_wizard.py:100
+#: code:addons/kitchen/wizard/create_customization_wizard.py:105
 msgid "You can't create a customization with a bigger quantity of the product than what appears in the order: %s"
 msgstr "Vous ne pouvez pas créer une personnalisation avec une quantité supérieure à celle du produit dans la commande: %s"
 
 #. module: kitchen
-#: code:addons/kitchen/wizard/create_customization_wizard.py:127
+#: code:addons/kitchen/wizard/create_customization_wizard.py:133
 msgid "You cannot create an empty customization"
 msgstr "Vous ne pouvez pas créer une personnalisation vide"
 
@@ -284,14 +309,6 @@ msgid "<p>Customization <strong>${object.name}</strong> has been completed.</p>\
 "            <ul>\n"
 "                <li>Partner: <strong>${object.partner_id.name | safe}</strong></li>\n"
 "                <li>Order: <strong>${object.order_id.name | safe}</strong></li>\n"
-"                <li>Erase logo: <strong>${object.erase_logo}</strong></li>\n"
-"                <li>Type:\n"
-"                    <ul>\n"
-"                    % for type in object.type_ids:\n"
-"                        <li>${type.name}</li>\n"
-"                    % endfor\n"
-"                    </ul>\n"
-"                </li>\n"
 "                <li>Products and quantities: <strong>${object.products_qty_format} </li>\n"
 "                <li>Responsible for customization: <strong>${object.user} </li>\n"
 "            </ul>\n"
@@ -302,14 +319,6 @@ msgstr "<p>La Personalización <strong>${object.name}</strong> ha terminado.</p>
 "            <ul>\n"
 "                <li>Client: <strong>${object.partner_id.name | safe}</strong></li>\n"
 "                <li>Commande: <strong>${object.order_id.name | safe}</strong></li>\n"
-"                <li>Supprimer le logo: <strong>${object.erase_logo}</strong></li>\n"
-"                <li>Type:\n"
-"                    <ul>\n"
-"                    % for type in object.type_ids:\n"
-"                        <li>${type.name}</li>\n"
-"                    % endfor\n"
-"                    </ul>\n"
-"                </li>\n"
 "                <li>Produits et quantités: <strong>${object.products_qty_format} </li>\n"
 "                <li>Responsable de la personnalisation: <strong>${object.user} </li>\n"
 "            </ul>\n"

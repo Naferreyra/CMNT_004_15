@@ -31,7 +31,6 @@ class KitchenCustomization(models.Model):
     ], string='Customization Status', readonly=True, copy=False, index=True, track_visibility='onchange',
         default='draft')
 
-    erase_logo = fields.Boolean()
     date_planned = fields.Datetime()
     comments = fields.Text(string='Comments')
 
@@ -39,8 +38,9 @@ class KitchenCustomization(models.Model):
         for customization in self:
             customization.products_qty_format = ""
             for line in customization.customization_line:
-                only_logo = _("(ONLY LOGO)") if line.only_erase_logo else ""
-                customization.products_qty_format += ' %i * %s%s;' % (line.product_qty, line.product_id.default_code,only_logo)
+                only_logo = _("(ERASE LOGO)") if line.erase_logo else ""
+                types = line.type_ids.mapped('name')
+                customization.products_qty_format += ' %i * %s %s %s;\n' % (line.product_qty, line.product_id.default_code,types, only_logo)
 
     products_qty_format = fields.Char(compute="_compute_products_format")
 
@@ -62,14 +62,14 @@ class KitchenCustomization(models.Model):
             raise exceptions.UserError(_("You can't create a customization with a quantity of less than one of a product"))
         lines_without_type = self.customization_line.filtered(lambda l: not l.type_ids)
         if lines_without_type:
-            raise exceptions.UserError(_(
-                "You can't confirm a customization without a customization type: %s") % lines_without_type.mapped('product_id.default_code'))
+            raise exceptions.UserError(
+                _("You can't confirm a customization without a customization type: %s") % lines_without_type.mapped('product_id.default_code'))
         if self.order_id:
             customization_product_lines = set(self.customization_line.mapped('product_id.default_code'))
             order_product_lines = set(self.order_id.order_line.mapped('product_id.default_code'))
             if not customization_product_lines.issubset(order_product_lines):
-                raise exceptions.UserError(_(
-                    "You can't confirm a customization with products that not belong to the original order: %s") % str(customization_product_lines - order_product_lines))
+                raise exceptions.UserError(
+                    _("You can't confirm a customization with products that not belong to the original order: %s") % str(customization_product_lines - order_product_lines))
         self.state = 'sent'
         template = self.env.ref('kitchen.send_mail_to_kitchen_customization_sent')
         ctx = dict()
@@ -127,6 +127,19 @@ class KitchenCustomization(models.Model):
                     self.customization_line.new(new_line)
 
     def write(self, vals):
+        lines_without_type = self.customization_line.filtered(lambda l: not l.type_ids)
+        if lines_without_type and not vals.get("order_id",False):
+            raise exceptions.UserError(
+                _("You can't save a customization without a customization type: %s") % lines_without_type.mapped(
+                    'product_id.default_code'))
+        elif vals.get("order_id",False) and vals.get("customization_line",False):
+            for line in vals.get("customization_line",False):
+                line=line[2]
+                if line and (not line.get("type_ids",False) or not line.get("type_ids",False)[0][2]):
+                    raise exceptions.UserError(
+                        _("You can't save a customization without a customization type: %s")
+                        % self.env['product.product'].browse(line.get("product_id")).default_code)
+
         res = super(KitchenCustomization, self).write(vals)
         if vals.get('date_planned', False):
             template = self.env.ref('kitchen.send_mail_to_commercials_date_planned_changed')
@@ -158,7 +171,7 @@ class KitchenCustomizationLine(models.Model):
         ('cancel', 'Cancelled')
     ], related='customization_id.state', string='status', readonly=True, copy=False, store=True,
         default='draft')
-    only_erase_logo = fields.Boolean()
+    erase_logo = fields.Boolean()
 
     reserved_qty = fields.Float(compute="_compute_reserved_qty", store=True)
     type_ids = fields.Many2many('customization.type', required=1, string="Type")
@@ -166,7 +179,10 @@ class KitchenCustomizationLine(models.Model):
     @api.depends('sale_line_id.move_ids.move_line_ids.product_id', 'sale_line_id.move_ids.move_line_ids.product_uom_id', 'sale_line_id.move_ids.move_line_ids.product_uom_qty')
     def _compute_reserved_qty(self):
         for line in self:
-            line.reserved_qty = sum(line.sale_line_id.move_ids.mapped('reserved_availability')) if line.sale_line_id and line.sale_line_id.move_ids else 0
+            res_qty=sum(line.sale_line_id.move_ids.mapped('reserved_availability')) if line.sale_line_id and line.sale_line_id.move_ids else 0
+            if line.sale_line_id and line.customization_id.state=="draft" and res_qty<line.product_qty:
+                line.customization_id.write({'state':"waiting"})
+            line.reserved_qty = res_qty
 
     reservation_status = fields.Selection([
         ('waiting', 'Waiting Availability'),
@@ -174,7 +190,7 @@ class KitchenCustomizationLine(models.Model):
     ], string='Reservation Status', compute='_compute_reservation_status', store=True,
         default='waiting')
 
-    @api.depends('reserved_qty')
+    @api.depends('reserved_qty','customization_id.customization_line','product_qty')
     def _compute_reservation_status(self):
         for line in self:
             line.reservation_status="waiting"
@@ -184,12 +200,16 @@ class KitchenCustomizationLine(models.Model):
     @api.onchange('product_qty')
     def onchange_product_qty(self):
         if self.sale_line_id:
+            domain = [('sale_line_id', '=', self.sale_line_id.id), ('state', '!=', 'cancel'),('id', '!=', self._origin.id)]
             customization_qty = sum([x.get("product_qty", 0) for x in
-                                     self.env['kitchen.customization.line'].search_read(
-                                         [('sale_line_id', '=', self.sale_line_id.id), ('state', '!=', 'cancel'),('id', '!=', self.id)],
-                                         ['product_qty'])])
+                                         self.env['kitchen.customization.line'].search_read(domain,['product_qty'])])
 
             if self.product_qty+customization_qty>self.sale_line_id.product_qty:
-                raise exceptions.UserError(_(
-                    "You cannot exceed the maximum product quantity to customize. "
-                    "The maximum quantity to customize is : %s-%s unit(s)") %self.product_id.default_code,self.sale_line_id.product_qty-customization_qty)
+                raise exceptions.UserError(
+                    _("You cannot exceed the maximum product quantity to customize. The maximum quantity to customize is : %s-%i unit(s)")
+                        %(self.product_id.default_code,(self.sale_line_id.product_qty-customization_qty)))
+        if self.product_qty<0:
+            raise exceptions.UserError(_("You cannot change the product quantity to less than 0"))
+
+
+

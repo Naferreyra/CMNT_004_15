@@ -14,14 +14,6 @@
             <ul>
                 <li>Partner: <strong>${object.partner_id.name | safe}</strong></li>
                 <li>Order: <strong>${object.order_id.name | safe}</strong></li>
-                <li>Erase logo: <strong>${object.erase_logo}</strong></li>
-                <li>Type:
-                    <ul>
-                    % for type in object.type_ids:
-                        <li>${type.name}</li>
-                    % endfor
-                    </ul>
-                </li>
                 <li>Products and quantities: <strong>${object.products_qty_format} </li>
                 <li>Responsible for customization: <strong>${object.user} </li>
             </ul>
@@ -46,14 +38,6 @@
                 <li>Commercial: <strong>${object.commercial_id.name}</strong></li>
                 <li>Partner: <strong>${object.partner_id.name | safe}</strong></li>
                 <li>Order: <strong>${object.order_id.name | safe}</strong></li>
-                <li>Erase logo: <strong>${object.erase_logo}</strong></li>
-                <li>Type:
-                    <ul>
-                    % for type in object.type_ids:
-                        <li>${type.name}</li>
-                    % endfor
-                    </ul>
-                </li>
                 <li>Request: <strong>${object.products_qty_format} </li>
                 <li>Comments: <strong>${object.comments | safe}</strong></li>
             </ul>

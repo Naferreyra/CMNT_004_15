@@ -11,7 +11,7 @@ class CustomizationLine(models.TransientModel):
     product_qty = fields.Float('Quantity Available', readonly=1)
     wizard_id = fields.Many2one('customization.wizard', 'wizard')
     sale_line_id = fields.Many2one('sale.order.line')
-    only_erase_logo = fields.Boolean()
+    erase_logo = fields.Boolean()
     max_qty = fields.Float()
     qty_reserved = fields.Float()
     type_ids = fields.Many2many('customization.type', required=1)
@@ -74,7 +74,6 @@ class CustomizationWizard(models.TransientModel):
                                          'wizard_id', 'lines', default=_get_lines)
     type_ids = fields.Many2many('customization.type', required=1)
 
-    erase_logo = fields.Boolean('Erase Logo')
     comments = fields.Text('Comments')
     add_all = fields.Boolean(string="Add All")
     notify_users = fields.Many2many('res.users', default=lambda self: [
@@ -88,7 +87,6 @@ class CustomizationWizard(models.TransientModel):
     def action_create(self):
         lines = []
         customization = self.env['kitchen.customization'].create({'partner_id': self.order_id.partner_id.id,
-                                                                  'erase_logo': self.erase_logo,
                                                                   'order_id': self.order_id.id,
                                                                   'commercial_id': self.order_id.user_id.id,
                                                                   'comments': self.comments,
@@ -111,7 +109,7 @@ class CustomizationWizard(models.TransientModel):
                     'product_qty': line.qty,
                     'customization_id': customization.id,
                     'sale_line_id': line.sale_line_id.id,
-                    'only_erase_logo': line.only_erase_logo,
+                    'erase_logo': line.erase_logo,
                     'type_ids': [(6, 0, line.type_ids.ids)]
                 }
                 if line.qty_reserved < qty:

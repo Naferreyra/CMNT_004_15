@@ -41,9 +41,10 @@
               parent="kitchen_menu" groups="kitchen.group_kitchen"/>
 
     <menuitem id="commercial_view" name="Commercial View" sequence="1" action="action_show_customizations_commercials"
-                groups="base.group_user" string="Commercial View" parent="customizations_menu"/>
-    <menuitem id="kitchen_view" name="Kitchen View" string="Kitchen View" sequence="2" action="action_show_customizations_kitchen"
-                    groups="kitchen.group_kitchen" parent="customizations_menu"/>
+              groups="base.group_user" string="Commercial View" parent="customizations_menu"/>
+    <menuitem id="kitchen_view" name="Kitchen View" string="Kitchen View" sequence="2"
+              action="action_show_customizations_kitchen"
+              groups="kitchen.group_kitchen" parent="customizations_menu"/>
 
     <record id="kitchen_customization_form" model="ir.ui.view">
         <field name="name">kitchen.customization.form</field>
@@ -63,7 +64,7 @@
                             attrs="{'invisible': [('state','!=','in_progress')]}"
                             class="oe_highlight" groups="kitchen.group_kitchen"/>
                     <button name="action_cancel" string="Cancel" type="object"
-                            attrs="{'invisible': [('state','!=','draft')]}"/>
+                            attrs="{'invisible': [('state','not in',('draft','sent'))]}"/>
                     <button name="action_draft" string="Draft" type="object"
                             attrs="{'invisible': [('state','!=','cancel')]}"/>
                 </header>
@@ -78,28 +79,27 @@
                         <group>
                             <field name="is_manager" invisible="1"/>
                             <field name="order_id"
-                                   attrs="{'readonly': [('state', '!=', 'draft')],'required': [('is_manager','=',False)]}"/>
+                                   attrs="{'readonly': [('state', 'not in', ('draft','sent','waiting'))],'required': [('is_manager','=',False)]}"/>
                             <field name="partner_id"
-                                   attrs="{'readonly': [('state', '!=', 'draft')],'required': [('is_manager','=',False)]}"/>
-                            <field name="commercial_id" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                   attrs="{'readonly': [('state', 'not in', ('draft','sent','waiting'))],'required': [('is_manager','=',False)]}"/>
+                            <field name="commercial_id" attrs="{'readonly': [('state', 'not in', ('draft','sent','waiting'))]}"/>
                             <field name="notify_users" widget="many2many_tags"/>
                             <field name="user"/>
                         </group>
                         <group>
-                            <field name="erase_logo" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
                             <field name="date_planned" readonly="1"/>
                         </group>
                     </group>
                     <notebook>
                         <page string="Products">
                             <field name="customization_line"
-                                   attrs="{'readonly': [('state', '!=', 'draft')]}">
+                                   attrs="{'readonly': [('state', 'not in', ('draft','sent','waiting'))]}">
                                 <tree string="Customization Lines" editable="bottom">
                                     <field name="product_id"/>
                                     <field name="product_qty"/>
                                     <field name="type_ids" widget="many2many_tags"
-                                   attrs="{'readonly': [('state', '!=', 'draft')]}"/>
-                                    <field name="only_erase_logo"/>
+                                           attrs="{'readonly': [('state', 'not in', ('draft','sent','waiting'))]}"/>
+                                    <field name="erase_logo"/>
                                     <field name="state" invisible="1"/>
                                     <field name="sale_line_id" invisible="1"/>
                                 </tree>
@@ -108,7 +108,7 @@
                         </page>
                     </notebook>
                     <group>
-                        <field name="comments" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                        <field name="comments" attrs="{'readonly': [('state', 'not in', ('draft','sent'))]}"/>
                     </group>
                 </sheet>
                 <div class="oe_chatter">
@@ -131,7 +131,6 @@
                 <field name="order_id"/>
                 <field name="partner_id"/>
                 <field name="products_qty_format" string="Products and Quantities"/>
-                <field name="erase_logo"/>
                 <field name="user"/>
                 <field name="date_planned"/>
                 <field name="state"/>
@@ -150,6 +149,18 @@
                         name="my_kitchen_customization_pending_filter"/>
 
             </search>
+        </field>
+    </record>
+
+    <record id="kitchen_customization_form_remove_readonly" model="ir.ui.view">
+        <field name="name">kitchen.customization.form.remove.readonly</field>
+        <field name="model">kitchen.customization</field>
+        <field name="inherit_id" ref="kitchen.kitchen_customization_form"/>
+        <field name="groups_id" eval="[(6, 0, [ref('kitchen.group_kitchen')])]"/>
+        <field name="arch" type="xml">
+            <field name="date_planned" position="attributes">
+                <attribute name="readonly">False</attribute>
+            </field>
         </field>
     </record>
 
