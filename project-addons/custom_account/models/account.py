@@ -266,6 +266,7 @@ class AccountInvoice(models.Model):
         super()._onchange_payment_mode_id()
         self.move_id.line_ids.filtered(lambda l: l.account_id.code == '43000000').write({'payment_mode_id': self.payment_mode_id.id})
 
+    scheme = fields.Selection(related="mandate_id.scheme")
 
 class PaymentMode(models.Model):
 

@@ -773,6 +773,41 @@ class ResPartner(models.Model):
                                         help='Profit of the last x months' ,compute="compute_fidelity_credit_limit", store=True)
     fidelity_credit_limit_include = fields.Boolean("Include fidelity credit limit",
                                                    help="If this field is checked, the fidelity credit limit will be added to credit limit ")
+    mail_count = fields.Integer(compute="_compute_mail_count")
+
+    @api.multi
+    @api.depends('email')
+    def _compute_mail_count(self):
+        for partner in self:
+            domain_to=[]
+            if partner.email and partner.email2:
+                domain_to =['|',('email_to', 'in', [partner.email,partner.email2])]
+            elif partner.email:
+                domain_to = ['|',('email_to', '=', partner.email)]
+            elif partner.email2:
+                domain_to = ['|',('email_to', '=', partner.email2)]
+            if domain_to:
+                count = self.env['mail.mail'].search_count(domain_to+[('recipient_ids','in',[partner.id])])
+            else:
+                count = self.env['mail.mail'].search_count([('recipient_ids', 'in', [partner.id])])
+            partner.mail_count = count
+
+    def action_view_email(self):
+        domain_to = []
+        if self.email and self.email2:
+            domain_to = ['|',('email_to', 'in', [self.email, self.email2])]
+        elif self.email:
+            domain_to = ['|',('email_to', '=', self.email)]
+        elif self.email2:
+            domain_to = ['|',('email_to', '=', self.email2)]
+        mails = self.env['mail.mail'].search_read(domain_to+[('recipient_ids','in',[self.id])
+                ],['id'])
+        mail_ids = [x['id'] for x in mails]
+        action = self.env.ref('custom_partner.action_view_emails').read()[0]
+        if len(mail_ids) > 0:
+            action['domain'] = [('id', 'in', mail_ids)]
+            action['context'] = [('id', 'in', mail_ids)]
+        return action
 
 
 class AccountMoveLine(models.Model):

@@ -89,8 +89,6 @@
         </field>
     </record>
 
-    <delete model="ir.ui.view" id="product_brand.product_search_form_view"/>
-
     <record id="product_add_tags_search" model="ir.ui.view">
         <field name="name">product.add.tags.search</field>
         <field name="model">product.product</field>

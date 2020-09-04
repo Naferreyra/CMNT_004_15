@@ -4,7 +4,6 @@ from odoo import models, api, fields, exceptions, _
 
 
 class SaleOrder(models.Model):
-
     _inherit = 'sale.order'
 
     prepaid_option = fields.Boolean("Prepaid option")
@@ -15,7 +14,7 @@ class SaleOrder(models.Model):
             message = ''
             if sale.prepaid_option:
                 prepaid_discount_product_id = self.env.ref('prepaid_order_discount.prepaid_discount_product').id
-                exist_prepaid_discount_line = sale.order_line.\
+                exist_prepaid_discount_line = sale.order_line. \
                     filtered(lambda l: l.product_id.id == prepaid_discount_product_id)
                 if not exist_prepaid_discount_line:
                     message = _("It's an order with prepaid option. "
@@ -24,9 +23,15 @@ class SaleOrder(models.Model):
                     order_lines_sorted_by_id = sale.order_line.sorted(key=lambda l: l.id)
                     last_product_order = order_lines_sorted_by_id[-1]
                     if exist_prepaid_discount_line.id < last_product_order.id:
-                        num_elements = len(order_lines_sorted_by_id) -1 - order_lines_sorted_by_id.mapped('id').index(
+                        # cálculamos el número de elementos que hay despues de la línea de descuento prepago
+                        num_elements = len(order_lines_sorted_by_id) - 1 - order_lines_sorted_by_id.mapped('id').index(
                             exist_prepaid_discount_line.id)
-                        if last_product_order.product_id.categ_id.with_context(lang='es_ES').name != 'Portes' and not last_product_order.promotion_line or num_elements > 1:
+                        last_elements = order_lines_sorted_by_id[-num_elements:]
+                        # Si las líneas creadas posteriormente al descuento prepago no son ni gastos de envío, ni promos ,
+                        # ni una línea asociada a otra que sea posterior al descuento por prepago hay que recalcular el descuento prepago
+                        if num_elements >= 1 and any(line.product_id.categ_id.with_context(
+                                lang='es_ES').name != 'Portes' and not line.promotion_line and not line.original_line_id in last_elements
+                                                     for line in last_elements):
                             message = _("Please, recalculate prepaid discount")
             if message:
                 raise exceptions.Warning(message)
@@ -41,7 +46,7 @@ class SaleOrder(models.Model):
         margin_discount_1 = self.env['ir.config_parameter'].sudo().get_param('minimum_margin.discount_perc.prepaid_1')
         margin_discount_2 = self.env['ir.config_parameter'].sudo().get_param('minimum_margin.discount_perc.prepaid_2')
         prepaid_discount_product_id = self.env.ref('prepaid_order_discount.prepaid_discount_product').id
-        shipping_cost_categ = self.env['product.category'].\
+        shipping_cost_categ = self.env['product.category']. \
             with_context(lang='es_ES').search([('name', '=', 'Portes')])
         daily_invoicing = self.env['res.partner.invoice.type'].search([('name', '=', 'Diaria')])
         for sale in self:
@@ -73,7 +78,7 @@ class SaleOrder(models.Model):
                                       'product_id': prepaid_discount_product_id,
                                       'name': _("%s prepaid discount") % (discount_1 + '%'),
                                       'product_uom_qyt': 1.0,
-                                      'price_unit': -(amount_untaxed*int(discount_1)/100),
+                                      'price_unit': -(amount_untaxed * int(discount_1) / 100),
                                       'sequence': last_sequence + 1}
                 self.env['sale.order.line'].create(discount_line_vals)
                 # Se pone como método de pago "Pago Inmediato" y facturación "Diaría"
@@ -85,7 +90,7 @@ class SaleOrder(models.Model):
                                       'product_id': prepaid_discount_product_id,
                                       'name': _("%s prepaid discount") % (discount_2 + '%'),
                                       'product_uom_qyt': 1.0,
-                                      'price_unit': -(amount_untaxed*int(discount_2)/100),
+                                      'price_unit': -(amount_untaxed * int(discount_2) / 100),
                                       'sequence': last_sequence + 1}
                 self.env['sale.order.line'].create(discount_line_vals)
                 # Se pone como método de pago "Pago Inmediato" y facturación "Diaría"
@@ -111,13 +116,13 @@ class SaleOrder(models.Model):
         return True
 
     @api.multi
-    def product_margin_without_shipping_costs(self,shipping_cost_categ):
+    def product_margin_without_shipping_costs(self, shipping_cost_categ):
         for sale in self:
             margin_rappel = 0.0
             sale_price = 0.0
             purchase_price = 0.0
             for line in sale.order_line:
-                if not line.deposit and line.product_id.categ_id.id not in shipping_cost_categ.ids:
+                if not line.deposit and line.product_id.categ_id.id not in shipping_cost_categ.ids and not line.original_line_id:
                     if line.price_unit > 0:
                         margin_rappel += line.margin_rappel or 0.0
                     else:
@@ -129,5 +134,3 @@ class SaleOrder(models.Model):
                     return round((margin_rappel * 100) / purchase_price, 2)
                 else:
                     return round((margin_rappel * 100) / sale_price, 2)
-
-

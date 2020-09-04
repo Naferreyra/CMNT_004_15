@@ -1095,7 +1095,7 @@ IBAN ES52 0081 0530 5900 0109 8214
 BIC: BSABESBB
                                 </pre>
                             </t>
-                            <t t-if="lang == 'en_US'">
+                            <t t-if="lang in ('en_US','de_DE')">
                                 <pre style="font-size:12px; color:#6D6E70">
 CAIXABANC
 IBAN ES46 2100 1726 5902 0032 1288
@@ -1134,6 +1134,14 @@ BIC: CAIXESBBXXX
                 <div class="text-center" style="font-size: 10px; font-weight: bold; color:#6D6E70;">
                     <label>
                         <p style="font-size: 11px; font-weight: normal;">
+                            <span t-if="lang == 'de_DE'">
+                                (1) Steuerfreie innergemeinschaftliche Lieferung. Leistungsempfänger Steuerschuidner germäß Artikel 194 EU Mehrwertsteuerrichtlinie 2006/112/EC.
+                                <br/>
+                                (2) Steuerfreie innergemeinschaftliche Lieferung. Leistungsempfänger Steuerschuidner germäß Artikel 194 der Mehrwertsteuerrichtlinie.
+                                <br/>
+                                <br/>
+                            </span>
+
                             <span style="font-weight: bold;">PLEASE REMEMBER to include your sales order and/or invoice
                                 number on your bank transfers. This ensures your payment is processed correctly.</span>
                             <span t-if="lang == 'fr_FR' and o.type == 'out_invoice' and o.state != 'proforma2'">

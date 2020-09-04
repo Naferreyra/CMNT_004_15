@@ -11,15 +11,16 @@ class ProductTemplate(models.Model):
             if product.product_variant_ids:
                 self.env.cr.execute(
                     """
-                    SELECT SUM(product_qty) FROM purchase_order_line pol
+                    SELECT pol.id FROM purchase_order_line pol
                     JOIN purchase_order po ON po.id = pol.order_id
                     WHERE pol.state = 'purchase_order' AND po.completed_purchase is False 
                     AND pol.company_id = %s AND pol.product_id in %s
                     """, (self.env.user.company_id.id, tuple(product.product_variant_ids.ids))
                 )
                 qty = self.env.cr.fetchall()
-                if qty[0][0]:
-                    product.qty_in_production += qty[0][0]
+                if qty:
+                    lines = self.env['purchase.order.line'].browse(qty[0])
+                    product.qty_in_production += sum(lines.mapped("production_qty"))
         return res
 
 

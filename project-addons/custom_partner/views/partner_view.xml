@@ -26,16 +26,6 @@
                         <field name="past_month_invoiced"/>
                     </group>
                 </xpath>
-                <!-- TODO: Revisar si siguen existiendo estos campos-->
-                <!--field name="debit" position="attributes">
-                    <attribute name="widget">monetary</attribute>
-                    <attribute name="options">{'currency_field': 'eur_currency'}</attribute>
-                </field>
-                <field name="credit" position="attributes">
-                    <attribute name="widget">monetary</attribute>
-                    <attribute name="options">{'currency_field': 'eur_currency'}</attribute>
-                </field-->
-
             </field>
         </record>
         <record id="view_partner_property_form_2" model="ir.ui.view">
@@ -361,6 +351,9 @@
                         context="{'search_default_partner_id': active_id}"
                         attrs="{'invisible': [('supplier','=', False)]}"/>
                 </xpath>
+                <xpath expr="//field[@name='child_ids']/form/sheet/group/group/field[@name='name']" position="attributes">
+                    <attribute name="attrs">{'required' : [('type', 'in', ['contact','delivery'])]}</attribute>
+                </xpath>
             </field>
         </record>
 
@@ -592,4 +585,28 @@
         </field>
     </record>
 
+    <record id="action_view_emails" model="ir.actions.act_window">
+        <field name="name">E-mails</field>
+        <field name="res_model">mail.mail</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="view_partner_form_add_button_email" model="ir.ui.view">
+        <field name="name">Partner Form with emails button</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button name="action_view_email"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-envelope-o">
+                    <field name="mail_count"
+                        widget="statinfo"
+                        string="E-mails"/>
+                </button>
+            </div>
+        </field>
+    </record>
 </odoo>
