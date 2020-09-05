@@ -41,7 +41,7 @@ class AccountMoveLine(models.Model):
                                                       ('parent_id', '=', False), ('child_ids', '!=', False)])
 
         # Searching all positive account move line with cyc notify date
-        aml_notify_date = self.search_read([('full_reconcile_id', '=', False),
+        aml_notify_date = self.search_read([('reconciled', '=', False),
                                             ('account_id', '=', 443),
                                             ('debit', '!=', 0),
                                             ('cyc_notify_date', '!=', False)],

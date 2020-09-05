@@ -87,9 +87,4 @@ class StockMove(models.Model):
                         reservation.date_planned = pick.date_expected
                         if not reservation.claim_id:
                             continue
-                        followers = reservation.claim_id.message_follower_ids
-                        reservation.claim_id.\
-                            message_post(body="The date planned was changed.",
-                                         subtype='mt_comment',
-                                         partner_ids=followers)
         return super(StockMove, self).write(vals)

@@ -1270,3 +1270,8 @@ msgstr "Extractos bancarios ignorados"
 #: model:ir.ui.view,arch_db:custom_account.ignored_statements_search
 msgid "Old Journal"
 msgstr "Antiguo Diario"
+
+#. module: custom_account
+#: model:ir.model.fields,field_description:custom_account.field_account_invoice_scheme
+msgid "Scheme"
+msgstr "Esquema"

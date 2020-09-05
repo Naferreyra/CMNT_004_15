@@ -88,7 +88,9 @@ class CreatePickingMove(models.TransientModel):
             if move.move_id.product_id.default_code == "----- PTE NOMBRE -----":
                 raise UserError(
                     _("A picking cannot be created with a product called \"") + move.move_id.product_id.default_code + "\"")
-            if self.container_id:
+            if self.container_id \
+                    and move.move_id.container_id \
+                    and self.container_id.id != move.move_id.container_id.id:
                 move.move_id.container_id = False
             if not move.move_id.picking_type_id:
                 move.move_id.picking_type_id = type_id
@@ -114,14 +116,14 @@ class CreatePickingMove(models.TransientModel):
                         all_moves[new_move.purchase_line_id.order_id.id] += new_move
                     else:
                         all_moves[new_move.purchase_line_id.order_id.id] = new_move
-                if self.container_id:
+                if self.container_id and not move.move_id.container_id:
                     new_move.container_id = self.container_id.id
-                else:
-                    new_move.date_expected = self.date_picking
+                elif not self.container_id:
+                    move.move_id.date_expected = self.date_picking
             else:
-                if self.container_id:
+                if self.container_id and not move.move_id.container_id:
                     move.move_id.container_id = self.container_id.id
-                else:
+                elif not self.container_id:
                     move.move_id.date_expected = self.date_picking
                 moves += move.move_id
                 if self.supplier_mode:

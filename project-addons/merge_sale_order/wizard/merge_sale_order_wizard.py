@@ -93,7 +93,7 @@ class MergePurchaseOrder(models.TransientModel):
                             existing_so_line = so_line
                             break
                 if existing_so_line:
-                    if existing_so_line.product_id.categ_id.name != 'Portes':
+                    if existing_so_line.product_id.categ_id.with_context(lang='es_ES').name != 'Portes':
                         existing_so_line.product_uom_qty += \
                             line.product_uom_qty
                         taxes = existing_so_line.tax_id + line.tax_id
