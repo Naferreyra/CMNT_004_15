@@ -5,6 +5,17 @@
         <field name="model">stock.sale.deposit</field>
         <field name="arch" type="xml">
             <form string="Sales deposits">
+                <label string="Deposits"/>
+                 <field name="deposit_change_qty" mode="tree">
+                    <tree string="Deposits" create="false" delete="false" editable="top">
+                        <field name="partner_id"/>
+                        <field name="sale_id"/>
+                        <field name="picking_id"/>
+                        <field name="date"/>
+                        <field name="product_id"/>
+                        <field name="qty_to_sale"/>
+                    </tree>
+                </field>
                 <footer>
                     <button string="Create sales" name="create_sale" type="object"/>
                     <button string="Cancel" special="cancel"/>

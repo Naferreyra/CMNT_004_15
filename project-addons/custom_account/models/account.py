@@ -182,16 +182,20 @@ class AccountInvoice(models.Model):
         self.ensure_one()
         payments = self.env['account.move.line']
         if self.type == "out_invoice" and self.sale_order_ids:
-            payments = self.sale_order_ids.mapped('payment_line_ids')
+            payments = self.sale_order_ids.mapped('payment_line_ids').filtered(lambda l: not l.reconciled)
         return payments
 
     @api.multi
     def action_move_create(self):
         res = super().action_move_create()
         for inv in self:
-            inv.move_id.line_ids.\
-                write({'blocked': inv.payment_mode_id.blocked or
-                       inv.payment_term_id.blocked})
+            if inv.type == 'out_refund':
+                inv.move_id.line_ids.\
+                    write({'blocked': inv.payment_mode_id.blocked})
+            else:
+                inv.move_id.line_ids.\
+                    write({'blocked': inv.payment_mode_id.blocked or
+                                      inv.payment_term_id.blocked})
             payment_move_lines = inv._get_payment()
             for payment_line in payment_move_lines:
                 inv.assign_outstanding_credit(payment_line.id)
@@ -266,6 +270,7 @@ class AccountInvoice(models.Model):
         super()._onchange_payment_mode_id()
         self.move_id.line_ids.filtered(lambda l: l.account_id.code == '43000000').write({'payment_mode_id': self.payment_mode_id.id})
 
+    scheme = fields.Selection(related="mandate_id.scheme")
 
 class PaymentMode(models.Model):
 

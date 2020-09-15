@@ -31,11 +31,6 @@ msgid "Category"
 msgstr "Cetegoria"
 
 #. module: crm_claim_rma_custom
-#: model:ir.model.fields,field_description:crm_claim_rma_custom.field_equivalent_products_wizard_qty_available_external
-msgid "External Stock"
-msgstr "Stock esterno"
-
-#. module: crm_claim_rma_custom
 #: model:ir.model.fields,field_description:crm_claim_rma_custom.field_crm_claim_category_id
 msgid "Tags"
 msgstr "Etichette"
@@ -459,3 +454,18 @@ msgstr "<p>Informazioni chiamata:</p>
 #: model:ir.ui.view,arch_db:crm_claim_rma_custom.crm_case_claims_form_view_inherit
 msgid "Claim/Action Description"
 msgstr "Note"
+
+#. module: crm_claim_rma_custom
+#: model:ir.model.fields,field_description:crm_claim_rma_custom.field_crm_claim_transport_incidence
+msgid "Transport incidence"
+msgstr "Incidenza trasporti"
+
+#. module: crm_claim_rma_custom
+#: model:ir.model.fields,field_description:crm_claim_rma_custom.field_crm_claim_t_incidence_picking
+msgid "Trans. inc. picking"
+msgstr "Bolla inc. tras."
+
+#. module: crm_claim_rma_custom
+#: model:ir.ui.view,arch_db:crm_claim_rma_custom.view_crm_case_claims_filter_custom
+msgid "Transport incidence"
+msgstr "Incidenza trasporti"

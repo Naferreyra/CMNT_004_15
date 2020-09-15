@@ -83,7 +83,7 @@ class ProductListener(Component):
             "last_sixty_days_sales", "joking_index", "sale_ok", "barcode",
             "description_sale", "manufacturer_pref", "standard_price", "type",
             "discontinued", "state", "item_ids", "sale_in_groups_of", "replacement_id",
-            "weight", "volume"
+            "weight", "volume", "standard_price_2_inc"
         ]
         for field in up_fields:
             if field in fields:
@@ -101,8 +101,8 @@ class ProductListener(Component):
                 pack.product_tmpl_id.product_variant_ids.with_delay(priority=2, eta=30).update_product()
 
         if 'tag_ids' in fields:
-            record.with_delay(priority=5, eta=60).unlink_product_tag_rel()
-            record.with_delay(priority=2, eta=120).export_product_tag_rel()
+            record.with_delay(priority=1, eta=30).unlink_product_tag_rel()
+            record.with_delay(priority=2, eta=60).export_product_tag_rel()
 
     def on_record_unlink(self, record):
         record.with_delay().unlink_product()
@@ -166,10 +166,10 @@ class ProductProduct(models.Model):
     def compute_date_next_incoming(self):
         moves = self.env['stock.move'].search(
             [('product_id', '=', self.id), ('purchase_line_id', '!=', False), ('state', 'not in', ['cancel','done']),
-             ('location_dest_id.usage', 'like', 'internal'),('picking_id','!=',False)],
-            limit=1, order="date_expected asc")
+             ('location_dest_id.usage', 'like', 'internal'),'|',('picking_id','!=',False),('container_id','!=',False)]).sorted(
+            key=lambda m: m.date_expected and m.date_reliability)
         if moves:
-            return moves.date_expected
+            return moves[0].date_expected
         return (datetime.datetime.now() - datetime.timedelta(days=365)).strftime("%Y-%m-%d %H:%M:%S")
 
 
@@ -333,15 +333,15 @@ class ProductTagsListener(Component):
         record.with_delay(priority=1, eta=60).export_product_tag()
         if 'product_ids' in fields:
             for product in record.product_ids:
-                product.with_delay(priority=5, eta=60).unlink_product_tag_rel()
-                product.with_delay(priority=2, eta=120).export_product_tag_rel()
+                product.with_delay(priority=1, eta=30).unlink_product_tag_rel()
+                product.with_delay(priority=2, eta=60).export_product_tag_rel()
 
     def on_record_write(self, record, fields=None):
         record.with_delay(priority=2, eta=120).update_product_tag()
         if 'product_ids' in fields:
             for product in record.product_ids:
-                product.with_delay(priority=5, eta=60).unlink_product_tag_rel()
-                product.with_delay(priority=2, eta=120).export_product_tag_rel()
+                product.with_delay(priority=1, eta=30).unlink_product_tag_rel()
+                product.with_delay(priority=2, eta=60).export_product_tag_rel()
 
     def on_record_unlink(self, record):
         record.with_delay(priority=3, eta=120).unlink_product_tag()

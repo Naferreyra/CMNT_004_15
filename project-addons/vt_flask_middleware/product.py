@@ -65,7 +65,6 @@ class Product(SyncModel):
     pvm_3 = FloatField(default=0.0)
     last_sixty_days_sales = FloatField(default=0.0)
     joking_index = FloatField(default=0.0)
-    external_stock = FloatField(default=0.0)
     sale_ok = BooleanField()
     ean13 = CharField(max_length=13)
     description_sale = TextField()
@@ -79,6 +78,8 @@ class Product(SyncModel):
     date_next_incoming = DateTimeField(formats=['%Y-%m-%d %H:%M:%S'])
     weight = FloatField(default=0.0)
     volume = FloatField(default=0.0)
+    cost_price = FloatField(default=0.0)
+    real_stock = FloatField(default=0.0)
 
     def __unicode__(self):
         return self.name

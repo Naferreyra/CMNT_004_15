@@ -1,0 +1,75 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* prepaid_order_discount
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 11.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-05-14 11:30+0000\n"
+"PO-Revision-Date: 2020-05-14 11:30+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: prepaid_order_discount
+#: model:ir.model.fields,field_description:prepaid_order_discount.field_sale_order_prepaid_option
+#: view:sale.order:prepaid_order_discount.view_account_invoice_filter_prepaid
+msgid "Prepaid option"
+msgstr "Opzione Prepagata"
+
+#. module: prepaid_order_discount
+#: code:addons/prepaid_order_discount/models/sale.py:28
+#, python-format
+msgid "Please, recalculate prepaid discount"
+msgstr "Per favore, ricalcola lo sconto da prepagato"
+
+#. module: prepaid_order_discount
+#: code:addons/prepaid_order_discount/models/sale.py:23
+#, python-format
+msgid "It's an order with prepaid option. Please, calculate the discount if partner has prepaid or cancel the prepaid option."
+msgstr "È un ordine con opzione prepagata. Per favore, calcola lo sconto se il cliente ha prepagato o anulla l'opzione prepagata."
+
+#. module: prepaid_order_discount
+#: code:addons/prepaid_order_discount/models/sale.py:57
+#: code:addons/prepaid_order_discount/models/sale.py:65
+#, python-format
+msgid "%s prepaid discount"
+msgstr "%s sconto per prepagare"
+
+#. module: prepaid_order_discount
+#: view:sale.order:prepaid_order_discount.view_sale_prepaid_discount
+msgid "Calculate prepaid"
+msgstr "Calcolare prepagata"
+
+#. module: prepaid_order_discount
+#: view:sale.order:prepaid_order_discount.view_sale_prepaid_discount
+msgid "Cancel prepaid"
+msgstr "Anulla prepagata"
+
+#. module: prepaid_order_discount
+#: code:addons/prepaid_order_discount/models/sale.py:52
+#, python-format
+msgid "The prepayment discount cannot be applied due to the customer's payment mode"
+msgstr "Lo sconto per pagamento anticipato non può essere applicato a causa della modalità di pagamento del cliente"
+
+#. module: prepaid_order_discount
+#: code:addons/prepaid_order_discount/models/sale.py:53
+#, python-format
+msgid "Prepaid discount cancelled"
+msgstr "Sconto per pagamento anticipato annullato"
+
+#. module: prepaid_order_discount
+#: code:addons/prepaid_order_discount/models/sale.py:95
+#, python-format
+msgid "The order margin are below the limits to apply the prepayment discount"
+msgstr "Il margine dell'ordine è inferiore ai limiti per applicare lo sconto per pagamento anticipato"
+
+#. module: prepaid_order_discount
+#: code:addons/prepaid_order_discount/models/sale.py:96
+#, python-format
+msgid "Prepaid discount line has not been created"
+msgstr "La riga di sconto prepagata non è stata creata"

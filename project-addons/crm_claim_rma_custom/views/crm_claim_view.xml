@@ -24,11 +24,12 @@
             <filter context="{'group_by':'date_closed'}" position="after">
                 <filter string="Comercial" domain="[]" context="{'group_by':'comercial'}"/>
             </filter>
-
             <filter context="{'group_by':'date_closed'}">
                 <filter string="Country" domain="[]" context="{'group_by':'country'}"/>
             </filter>
-
+            <filter domain="[('user_id','=', False)]" position="after">
+                <filter string="Transport incidence" domain="[('transport_incidence','=', True)]"/>
+            </filter>
         </field>
     </record>
 
@@ -62,6 +63,8 @@
             <field name="rma_cost" position="after">
                 <field name="date_received"/>
                 <field name="allow_confirm_blocked" attrs="{'invisible': [('claim_type', '!=', %(crm_claim_type.crm_claim_type_customer)d)]}" groups="account.group_account_manager"/>
+                <field name="t_incidence_picking" attrs="{'invisible':[('transport_incidence', '=', False)]}"/>
+                <field name="transport_incidence"/>
             </field>
             <field name="email_from" position="after">
                 <field name="comercial"/>

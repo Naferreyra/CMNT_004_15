@@ -27,11 +27,12 @@ class ResPartner(models.Model):
 
     electronic_invoice_subjected = fields.Boolean(default=False)
 
-    @api.onchange('prospective', 'country_id')
+    @api.onchange('prospective', 'country_id','dropship','supplier')
     def onchange_prospective(self):
-        self.electronic_invoice_subjected = False
-        self.codice_destinatario = 'XXXXXXX'
-        if not self.prospective and self.country_id.code == 'IT':
-            self.electronic_invoice_subjected = True
-            self.codice_destinatario = '0000000'
+        if self.codice_destinatario in ('XXXXXXX','0000000'):
+            self.electronic_invoice_subjected = False
+            self.codice_destinatario = 'XXXXXXX'
+            if not self.prospective and not self.dropship and not self.supplier and self.country_id.code == 'IT':
+                self.electronic_invoice_subjected = True
+                self.codice_destinatario = '0000000'
 

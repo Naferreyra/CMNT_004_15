@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record model="product.product" id="prepaid_discount_product">
+        <field name="name">Prepaid discount</field>
+        <field name="default_code">Prepaid discount</field>
+        <field name="type">service</field>
+        <field name="invoice_policy">order</field>
+        <field name="purchase_ok" eval="False"/>
+        <field name="sale_ok" eval="False"/>
+    </record>
+</odoo>

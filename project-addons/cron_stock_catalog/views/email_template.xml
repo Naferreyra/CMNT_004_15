@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="email_template_purchase_stock_catalog" model="mail.template">
+        <field name="name">Purchase Stock Catalog</field>
+        <field name="email_from">odoo_team@visiotechsecurity.com</field>
+        <field name="subject">Listado Stock Diario</field>
+        <field name="email_to">purchasing.spain@visiotechsecurity.com</field>
+        <field name="model_id" ref="base.model_res_users"/>
+        <field name="auto_delete" eval="False"/>
+        <field name="body_html"><![CDATA[
+            <p>Hello</p>
+            <p>Here is the Stock Catalog for today</p>
+            ]]>
+         </field>
+    </record>
+
+    <record id="email_template_product_valuation" model="mail.template">
+        <field name="name">Product Valuation</field>
+        <field name="email_from">odoo_team@visiotechsecurity.com</field>
+        <field name="subject">Valoración de Stock</field>
+        <field name="email_to">isierra@visiotechsecurity.com</field>
+        <field name="model_id" ref="base.model_res_users"/>
+        <field name="auto_delete" eval="False"/>
+        <field name="body_html"><![CDATA[
+            <p>Hello</p>
+            <p>Here is the Product Valuation for today</p>
+            ]]>
+         </field>
+    </record>
+</odoo>

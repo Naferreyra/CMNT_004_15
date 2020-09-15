@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_vstock_location,access_vstock_location,model_vstock_location,base.group_user,1,1,0,0
+access_vstock_location_manager,access_vstock_location_manager,model_vstock_location,stock.group_adv_location,1,1,1,1

@@ -25,21 +25,19 @@ class ResPartner(models.Model):
     def _compute_risk_sale_order(self):
         customers = self.filtered('customer')
         partners = customers | customers.mapped('child_ids')
-        moves = self.env['stock.move'].search(
-            [('sale_line_id.state', '=', 'sale'), ('sale_line_id.order_partner_id', 'in', partners.ids),
-             ('picking_id', '!=', False), ('state', 'not in', ('cancel', 'done'))])
-        sale_lines = moves.mapped('sale_line_id')
-
-        # Search if the are some lines with products to be invoiced that may or may not have stock_moves(like services)
-        sale_lines = sale_lines | self.env['sale.order.line'].search(
-            [('invoice_status', '=', 'to invoice'), ('order_partner_id', 'in', partners.ids)])
+        sale_lines = self.env['sale.order.line'].search_read(
+            ['&',('order_partner_id', 'in', partners.ids),'|','&',
+             ('order_id.state', '=', 'sale'),
+             ('invoice_status', 'in', ('to invoice','no')),('invoice_status', '=', 'to invoice')],
+            ['order_partner_id', 'price_total',
+             'amt_to_invoice', 'amt_invoiced'])
         for partner in customers:
             partner_ids = (partner | partner.child_ids).ids
-            # Take in account max of ordered qty and delivered qty or min if price is less of zero
+            # Take in account max of ordered qty and delivered qty
             partner.risk_sale_order = sum(
-                (max(line.price_total, line.amt_to_invoice) if line.price_total > 0
-                 else min(line.price_total, line.amt_to_invoice)) - line.amt_invoiced for line in sale_lines if
-                line.order_partner_id.id in partner_ids)
+                (max(x['price_total'], x['amt_to_invoice']) if x['price_total']>0 else min(x['price_total'], x['amt_to_invoice']))- x['amt_invoiced']
+                for x in sale_lines if x['order_partner_id'][0] in
+                partner_ids)
 
     @api.model
     def _risk_field_list(self):

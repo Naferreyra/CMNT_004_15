@@ -721,6 +721,94 @@ class ResPartner(models.Model):
             'target': 'new',
             }
 
+    @api.multi
+    @api.depends('company_credit_limit', 'insurance_credit_limit','fidelity_credit_limit','fidelity_credit_limit_include')
+    def _compute_credit_limit(self):
+        res = super(ResPartner, self)._compute_credit_limit()
+        partners = self.filtered(lambda p: p.fidelity_credit_limit_include)
+        for partner in partners:
+            partner.credit_limit += partner.fidelity_credit_limit
+        return res
+
+    def _calculate_fidelity_credit_limit(self):
+        partners = self.env['res.partner'].search([('parent_id','=',False),('customer','=',True),('fidelity_credit_limit_include', '=', True)])
+        partners.compute_fidelity_credit_limit()
+
+    @api.multi
+    @api.depends('fidelity_credit_limit_include')
+    def compute_fidelity_credit_limit(self):
+        """This function calculates the field fidelity_credit_limit.
+        Only open and unexpired, or paid invoices will be used for its calculation.
+        Fidelity_credit_limit will be the sum of the benefit of the invoice lines
+        whose invoice type is "out_invoice" - the sum of the benefit of the invoice lines
+        whose invoice type is "out_refund"
+        If total benefit of last x months(the variable x is determined by the system
+        parameter "benefit.months") is lower than 0, the value of this field will be 0 """
+        months = int(self.env['ir.config_parameter'].sudo().get_param('benefit.months'))
+        d1 = datetime.strptime(datetime.now().strftime("%Y-%m-%d"), "%Y-%m-%d")
+        date_end = d1.strftime("%Y-%m-%d")
+        d2 = d1 - dateutil.relativedelta.relativedelta(months=months)
+        date_start = d2.strftime("%Y-%m-%d")
+        for partner in self:
+            benefit = 0
+            if partner.fidelity_credit_limit_include:
+                invoice_lines = partner.env['account.invoice'].search(
+                    ['&', '&', '&',
+                     ('date_invoice', '>=', date_start), ('date_invoice', '<=', date_end), '&',
+                     ('partner_id', 'child_of', [partner.id]),
+                     ('type', 'in', ['out_invoice', 'out_refund']), '|',
+                     ('state', '=', 'paid'), '&',('state', '=', 'open'), ('date_due', '>=', date_end)]).mapped(
+                    'invoice_line_ids')
+                for line in invoice_lines:
+                    if line.invoice_id.type == 'out_invoice':
+                        benefit += line.quantity * line.price_unit * (100.0 - line.discount) / 100.0 - (
+                            line.cost_unit if line.cost_unit else 0) * line.quantity
+                    else:
+                        benefit -= line.quantity * line.price_unit * (100.0 - line.discount) / 100.0 - (
+                            line.cost_unit if line.cost_unit else 0) * line.quantity
+
+            partner.fidelity_credit_limit = benefit if benefit >= 0 else 0
+
+    fidelity_credit_limit = fields.Float("Fidelity Credit Limit",
+                                        help='Profit of the last x months' ,compute="compute_fidelity_credit_limit", store=True)
+    fidelity_credit_limit_include = fields.Boolean("Include fidelity credit limit",
+                                                   help="If this field is checked, the fidelity credit limit will be added to credit limit ")
+    mail_count = fields.Integer(compute="_compute_mail_count")
+
+    @api.multi
+    @api.depends('email')
+    def _compute_mail_count(self):
+        for partner in self:
+            domain_to=[]
+            if partner.email and partner.email2:
+                domain_to =['|',('email_to', 'in', [partner.email,partner.email2])]
+            elif partner.email:
+                domain_to = ['|',('email_to', '=', partner.email)]
+            elif partner.email2:
+                domain_to = ['|',('email_to', '=', partner.email2)]
+            if domain_to:
+                count = self.env['mail.mail'].search_count(domain_to+[('recipient_ids','in',[partner.id])])
+            else:
+                count = self.env['mail.mail'].search_count([('recipient_ids', 'in', [partner.id])])
+            partner.mail_count = count
+
+    def action_view_email(self):
+        domain_to = []
+        if self.email and self.email2:
+            domain_to = ['|',('email_to', 'in', [self.email, self.email2])]
+        elif self.email:
+            domain_to = ['|',('email_to', '=', self.email)]
+        elif self.email2:
+            domain_to = ['|',('email_to', '=', self.email2)]
+        mails = self.env['mail.mail'].search_read(domain_to+[('recipient_ids','in',[self.id])
+                ],['id'])
+        mail_ids = [x['id'] for x in mails]
+        action = self.env.ref('custom_partner.action_view_emails').read()[0]
+        if len(mail_ids) > 0:
+            action['domain'] = [('id', 'in', mail_ids)]
+            action['context'] = [('id', 'in', mail_ids)]
+        return action
+
 
 class AccountMoveLine(models.Model):
     _inherit = 'account.move.line'

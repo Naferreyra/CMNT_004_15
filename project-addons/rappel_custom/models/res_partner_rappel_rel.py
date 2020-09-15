@@ -139,7 +139,7 @@ class ResPartnerRappelRel(models.Model):
                 else:
                     rappel_info['amount'] = 0.0
 
-            if period[1] <= fields.Date.from_string(fields.Date.today()):
+            if period[1] < fields.Date.from_string(fields.Date.today()):
                 if total_rappel:
                     rappel_calculated_obj.create({
                         'partner_id': rappel.partner_id.id,

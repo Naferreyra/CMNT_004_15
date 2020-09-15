@@ -16,7 +16,7 @@ class SaleOrder(models.Model):
     def _action_confirm(self):
         res = super()._action_confirm()
         for sale in self:
-            sale.picking_ids.write({'commercial': sale.user_id.id, 'internal_notes': sale.internal_notes})
+            sale.picking_ids.filtered(lambda p: p.state != 'cancel').write({'commercial': sale.user_id.id, 'internal_notes': sale.internal_notes})
             # session = ConnectorSession(self.env.cr, SUPERUSER_ID,
             #                            context=self.env.context)
             # for picking in sale.picking_ids:

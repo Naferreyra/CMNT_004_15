@@ -5,7 +5,7 @@ It will try to automatically create the user table and admin user
 if they don't exist.
 """
 
-from peewee import CharField, IntegerField, FloatField, ForeignKeyField, BooleanField
+from peewee import CharField, IntegerField, FloatField, ForeignKeyField, BooleanField, DateTimeField
 from commercial import Commercial
 from app import app
 from database import SyncModel
@@ -55,6 +55,8 @@ class Customer(SyncModel):
     prospective = BooleanField(default=False)
     phone1 = CharField(max_length=40, null=True)
     phone2 = CharField(max_length=40, null=True)
+    is_prepaid_payment_term = BooleanField(default=False)
+    last_sale_date = DateTimeField(formats=['%Y-%m-%d %H:%M:%S'])
 
     MOD_NAME = 'customer'
 

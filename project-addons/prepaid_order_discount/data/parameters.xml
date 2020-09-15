@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="margin_prepaid_discount_1" model="ir.config_parameter">
+        <field name="key">minimum_margin.discount_perc.prepaid_1</field>
+        <field name="value">20,3</field>
+    </record>
+    <record id="margin_prepaid_discount_2" model="ir.config_parameter">
+        <field name="key">minimum_margin.discount_perc.prepaid_2</field>
+        <field name="value">35,5</field>
+    </record>
+</odoo>

@@ -37,26 +37,34 @@ class MergePurchaseOrder(models.TransientModel):
     def action_done(self):
         sale_orders = self.env['sale.order'].browse(
             self._context.get('active_ids', []))
-        if len(self._context.get('active_ids', [])) < 2:
+        if len(sale_orders) < 2:
             raise UserError(_('Please select at least two sale orders'))
-        if any(order.state not in ('draft', 'reserve') for order in sale_orders):
-            raise UserError(_('Please select Sale orders which are in Quotation or Reserve state'))
         partner = sale_orders[0].partner_id.id
-        if any(order.partner_id.id != partner for order in sale_orders):
-            raise UserError(_('Please select Sale orders whose Customers are the same'))
         partner_shipping_id = sale_orders[0].partner_shipping_id.id
-        if any(order.partner_shipping_id.id != partner_shipping_id for order in sale_orders):
-            raise UserError(_('Please select Sale orders whose shipping addresses are the same'))
         partner_invoice_id = sale_orders[0].partner_invoice_id.id
-        if any(order.partner_invoice_id.id != partner_invoice_id for order in sale_orders):
-            raise UserError(_('Please select Sale orders whose invoice addresses are the same'))
+        prepaid_option = sale_orders[0].prepaid_option
+        for order in sale_orders:
+            if order.state not in ('draft', 'reserve'):
+                raise UserError(_('Please select Sale orders which are in Quotation or Reserve state'))
+            if order.partner_id.id != partner:
+                raise UserError(_('Please select Sale orders whose Customers are the same'))
+            if order.partner_shipping_id.id != partner_shipping_id :
+                raise UserError(_('Please select Sale orders whose shipping addresses are the same'))
+            if order.partner_invoice_id.id != partner_invoice_id :
+                raise UserError(_('Please select Sale orders whose invoice addresses are the same'))
+            if order.prepaid_option != prepaid_option:
+                raise UserError(_('Please all selected orders must have the same prepaid option'))
         if self.merge_type in ('new_cancel', 'new_delete'):
-            so = self.env['sale.order'].create({'partner_id': partner, 'state': sale_orders[0].state})
+            so = self.env['sale.order'].create({'partner_id': partner, 'state': sale_orders[0].state, 'prepaid_option': prepaid_option})
             so.onchange_partner_id()
             self.merge_orders(sale_orders, so)
         else:
             so = self.sale_order_id
             self.merge_orders(sale_orders, so, True)
+
+        if so.prepaid_option:
+            so.calculate_prepaid_discount()
+
         return {
             'view_type': 'form',
             'view_mode': 'form',
@@ -85,7 +93,7 @@ class MergePurchaseOrder(models.TransientModel):
                             existing_so_line = so_line
                             break
                 if existing_so_line:
-                    if existing_so_line.product_id.product_brand_id.name!='Gastos envio':
+                    if existing_so_line.product_id.categ_id.with_context(lang='es_ES').name != 'Portes':
                         existing_so_line.product_uom_qty += \
                             line.product_uom_qty
                         taxes = existing_so_line.tax_id + line.tax_id

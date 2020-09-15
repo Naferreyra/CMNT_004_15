@@ -1126,3 +1126,9 @@ msgstr "Ignorare estratti bancarie"
 #: model:ir.ui.menu,name:custom_account.ignored_statements_menu
 msgid "Ignored Bank Statement Lines"
 msgstr "Estratti bancarie ignorati"
+
+#. module: custom_account
+#: model:ir.model.fields,field_description:custom_account.field_account_bank_statement_line_old_journal_id
+#: model:ir.ui.view,arch_db:custom_account.ignored_statements_search
+msgid "Old Journal"
+msgstr "Giornale vecchio"

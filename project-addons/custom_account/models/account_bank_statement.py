@@ -6,7 +6,8 @@ class AccountBankStatementLine(models.Model):
 
     _inherit = "account.bank.statement.line"
 
-    old_statement_id = fields.Integer()
+    old_statement_id = fields.Many2one('account.bank.statement', string='Old Statement', index=True, ondelete='cascade')
+    old_journal_id = fields.Many2one('account.journal', related='old_statement_id.journal_id', string='Old Journal', store=True, readonly=True)
     ignored_reason = fields.Text("Reason")
     statement_id = fields.Many2one(required=False)
 
@@ -37,7 +38,7 @@ class AccountBankStatementLine(models.Model):
         for line in self:
             if line.old_statement_id:
                 line.statement_id = line.old_statement_id
-                line.old_statement_id = False
+                line.old_statement_id = None
                 line.statement_id.balance_end_real += line.amount
             else:
                 raise UserError(_('There is no old statement to link'))

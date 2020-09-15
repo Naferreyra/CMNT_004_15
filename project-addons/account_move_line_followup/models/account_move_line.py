@@ -30,7 +30,8 @@ class AccountMoveLine(models.Model):
             # Updating maturity date and follow-up data
             if aml_partner:
                 aml_partner_data = aml_partner[0]
-                aml.write({'date_maturity': aml_partner_data['date_maturity']})
+                if aml.date_maturity < aml_partner_data['date_maturity']:
+                    aml.write({'date_maturity': aml_partner_data['date_maturity']})
             else:
                 aml.write({'date_maturity': today})
 
@@ -40,7 +41,7 @@ class AccountMoveLine(models.Model):
                                                       ('parent_id', '=', False), ('child_ids', '!=', False)])
 
         # Searching all positive account move line with cyc notify date
-        aml_notify_date = self.search_read([('full_reconcile_id', '=', False),
+        aml_notify_date = self.search_read([('reconciled', '=', False),
                                             ('account_id', '=', 443),
                                             ('debit', '!=', 0),
                                             ('cyc_notify_date', '!=', False)],

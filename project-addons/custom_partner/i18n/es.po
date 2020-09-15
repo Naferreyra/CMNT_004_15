@@ -493,3 +493,23 @@ msgstr "Cliente potencial pasa a ser activo"
 #: model:ir.ui.view,arch_db:custom_partner.res_partner_view_web_search
 msgid "Non Active"
 msgstr "No activo"
+
+#. module: custom_partner
+#: model:ir.model.fields,field_description:custom_partner.field_res_partner_fidelity_credit_limit
+msgid "Fidelity Credit Limit"
+msgstr "Límite de crédito de fidelidad"
+
+#. module: custom_partner
+#: model:ir.model.fields,field_description:custom_partner.field_res_partner_fidelity_credit_limit_include
+msgid "Include fidelity credit limit"
+msgstr "Incluir Límite de crédito de fidelidad"
+
+#. module: custom_partner
+#: help:res.partner,fidelity_credit_limit_include:0
+msgid "If this field is checked, the fidelity credit limit will be added to credit limit "
+msgstr "Si este campo está marcado, el límite de crédito de fidelidad será añadido al límite de crédito"
+
+#. module: custom_partner
+#: help:res.partner,fidelity_credit_limit:0
+msgid "Profit of the last x months"
+msgstr "Beneficio de los últimos x meses"

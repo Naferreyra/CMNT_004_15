@@ -8,9 +8,11 @@
     "depends": ['purchase',
                 'stock',
                 'account',
-                'sale_display_stock'],
+                'sale_display_stock',
+                'custom_account'],
     "data": ['wizard/separate_orders_wizard.xml',
-             'views/purchase_view.xml'
+             'views/purchase_view.xml',
+             "data/sequence.xml"
              ],
     "installable": True
 }

@@ -40,6 +40,14 @@ class PurchaseOrder(models.Model):
     force_confirm = fields.Boolean()
 
     @api.model
+    def _check_picking_to_process(self):
+        pickings_to_stock = self.env['stock.picking'].search([('picking_type_id', '=',
+                                                               self.env.ref('stock.picking_type_in').id),
+                                                              ('state', 'in',
+                                                               ("assigned", "confirmed", "partially_available"))])
+        pickings_to_stock._process_picking()
+
+    @api.model
     def _process_purchase_order_automated(self):
         purchases = self.search([('force_confirm', '=', True),
                                  ('order_line', '!=', False),
@@ -53,11 +61,10 @@ class PurchaseOrder(models.Model):
             if not output_folder:
                 raise exceptions.UserError(_("Please create an export folder"))
             output_folder.export_file(attachment.datas, attachment.name)
-            for pick in order.picking_ids:
-                pick.not_sync = True
-                pick.action_assign()
-                for move in pick.move_lines.filtered(lambda m: m.state not in
-                                                     ['done', 'cancel']):
-                    for move_line in move.move_line_ids:
-                        move_line.qty_done = move_line.product_uom_qty
-                pick.action_done()
+            order.picking_ids._process_picking()
+        self._check_picking_to_process()
+
+    picking_type_id = fields.Many2one('stock.picking.type',
+                                      default=lambda self:
+                                      self.env.ref('automatize_edi_it.picking_type_receive_top_deposit'))
+

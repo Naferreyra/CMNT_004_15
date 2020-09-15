@@ -23,7 +23,7 @@
     'version': '1.0',
     'category': 'Custom',
     'description': """Several little customizations in partners""",
-    'author': 'Alberto Cañal',
+    'author': 'Visiotech',
     "depends": ['custom_partner','l10n_it_fatturapa'],
     "data": ["views/partner_view.xml"],
     "installable": True

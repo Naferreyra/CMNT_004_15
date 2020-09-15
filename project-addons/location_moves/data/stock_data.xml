@@ -14,12 +14,6 @@
         <field name="active" eval="True"/>
     </record>
 
-    <record id="stock_location_external" model="stock.location">
-        <field name="name">Almacén externo</field>
-        <field name="location_id" ref="stock.warehouse0" />
-        <field name="usage">internal</field>
-        <field name="active" eval="True"/>
-    </record>
 
     <!--record id="stock_location_coocked" model="stock.location">
         <field name="name">Cocinados</field>

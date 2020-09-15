@@ -13,7 +13,6 @@
                     <field name="virtual_stock_conservative" string="Virtual Stock Conservative"/>
                     <field name="qty_available_wo_wh"/>
                     <field name="qty_available_input_loc"/>
-                    <field name="qty_available_external"/>
                     <field name="incoming_qty"/>
                     <field name="qty_in_production"/>
                     <field name="qty_available_italy" invisible="1"/>
@@ -32,7 +31,6 @@
             <field name="virtual_stock_conservative" position="after">
                 <field name="qty_available_wo_wh"/>
                 <field name="qty_available_input_loc"/>
-                <field name="qty_available_external"/>
                 <field name="incoming_qty"/>
                 <field name="qty_in_production"/>
             </field>

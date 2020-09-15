@@ -16,28 +16,45 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: rma_scanner
-#: code:addons/rma_scanner/models/crm_claim.py:15
+#: code:addons/rma_scanner/models/crm_claim.py:22
 #, python-format
 msgid "The {} is already received"
 msgstr "{} è già ricevuto"
 
 #. module: rma_scanner
-#: code:addons/rma_scanner/models/crm_claim.py:20
+#: code:addons/rma_scanner/models/crm_claim.py:29
 #, python-format
 msgid "{} received"
 msgstr "{} ricevuto"
 
 #. module: rma_scanner
-#: code:addons/rma_scanner/models/crm_claim.py:23
+#: code:addons/rma_scanner/models/crm_claim.py:33
 #, python-format
 msgid "The RMA {} doesn't exist"
 msgstr "El RMA {} non esiste"
 
 #. module: rma_scanner
-#: code:addons/rma_scanner/models/crm_claim.py:21
+#: code:addons/rma_scanner/models/crm_claim.py:39
+#, python-format
+msgid "The RMA {} is located at {}"
+msgstr "El RMA {} è in {}"
+
+#. module: rma_scanner
+#: code:addons/rma_scanner/models/crm_claim.py:52
+#, python-format
+msgid "Scan the location of the %s"
+msgstr "Scansiona la posizione di %s"
+
+#. module: rma_scanner
+#: code:addons/rma_scanner/models/crm_claim.py:26
 #, python-format
 msgid "RMA scanned"
 msgstr "RMA scannerizzato"
+
+#. module: rma_scanner
+#: model:ir.model.fields,field_description:rma_scanner.field_crm_claim_location
+msgid "Location"
+msgstr "Ubicación"
 
 #. module: rma_scanner
 #: model:ir.ui.menu,name:rma_scanner.menu_find_rmas
@@ -48,3 +65,16 @@ msgstr "Scansiona RMAs"
 #: model:ir.actions.act_window,name:rma_scanner.crm_claim_rma_scanner
 msgid "Scanning RMAs"
 msgstr "Scansione RMAs"
+
+#. module: rma_scanner
+#: model:ir.ui.view,arch_db:rma_scanner.vstock_location_tree
+#: model:ir.actions.act_window,name:rma_scanner.action_vstock_location_form
+#: model:ir.ui.menu,name:rma_scanner.menu_vstock_location_config
+msgid "Vstock Locations"
+msgstr "Posizioni Vstock"
+
+#. module: rma_scanner
+#: code:addons/rma_scanner/models/crm_claim.py:42
+#, python-format
+msgid "The scanned location doesn't exist"
+msgstr "La posizione acquisita non esiste"

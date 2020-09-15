@@ -28,10 +28,18 @@ class ProcurementGroup(models.Model):
     def _run_scheduler_tasks(self, use_new_cursor=False, company_id=False):
         super()._run_scheduler_tasks(use_new_cursor=use_new_cursor,
                                      company_id=company_id)
+        location_it = self.env['stock.location'].search([('name', '=', 'Depósito Visiotech Italia')])
+        operation_it = self.env['stock.picking.type'].search([('name', '=', 'Albarán de salida desde depósito IT')])
         pick_ids = self.env["stock.picking"].\
             search([("picking_type_id", "=",
                      self.env.ref('stock.picking_type_internal').id),
                     ("state", "in", ("assigned", "confirmed", "partially_available"))])
+        # Italy pickings
+        pick_ids += self.env["stock.picking"].\
+            search([("location_id", "=", location_it.id),
+                    ("picking_type_id", "=", operation_it.id),
+                    ("state", "in", ("assigned", "confirmed", "partially_available"))])
+
         for pick_assign in pick_ids.filtered(
                 lambda l: l.state == "assigned"):
             pick_assign.action_done()

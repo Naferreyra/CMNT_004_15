@@ -22,7 +22,7 @@ from odoo import models, api, _, fields
 from odoo.exceptions import ValidationError, Warning
 
 
-class StockLotacion(models.Model):
+class StockLocation(models.Model):
 
     _inherit = "stock.location"
 
@@ -137,20 +137,8 @@ class StockLotacion(models.Model):
         self.location_move(product_id, 'stock.stock_location_stock', qty,
                            'stock_location_sat', False, check_qty, assign)
 
-    def move_external_stock(self, product_id, qty, check_qty, assign=True):
-        self.location_move(product_id, 'stock_location_external', qty,
-                           'stock.stock_location_stock', True, check_qty,
-                           assign)
 
-    def move_stock_external(self, product_id, qty, check_qty, assign=True):
-        self.location_move(product_id, 'stock.stock_location_stock', qty,
-                           'stock_location_external', False, check_qty,
-                           assign)
 
-    def move_beach_external(self, product_id, qty, check_qty, assign=False):
-        self.location_move(product_id, 'stock.stock_location_company', qty,
-                           'stock_location_external', False, check_qty,
-                           assign)
 
     def location_move(self, product_id, source_location, qty, dest_location,
                       send_message=False, check_qty=False, assign=True):
@@ -219,13 +207,6 @@ class StockLotacion(models.Model):
                         qty_used:
                     reservation.date_planned = move.date_expected
                     reservation_index += 1
-                    if reservation.sale_id:
-                        sale = reservation.sale_id
-                        followers = sale.message_follower_ids
-                        sale.message_post(
-                            body=_("The date planned of the reservation was \
-                                   changed."),
-                            subtype='mt_comment', partner_ids=followers)
                 else:
                     reservation_used += product_uom_qty - qty_used
                     break

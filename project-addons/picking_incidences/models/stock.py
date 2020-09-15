@@ -124,8 +124,10 @@ class StockPicking(models.Model):
             if not move.qty_ready:
                 new_moves.append(move.id)
             elif float_compare(remaining_qty, 0, precision_rounding=precision) > 0 and \
-                 float_compare(remaining_qty, move.product_qty, precision_rounding=precision) < 0:
-                new_move = move._split(remaining_qty)
+                    float_compare(remaining_qty, move.product_qty, precision_rounding=precision) < 0:
+                move_ctx = move._context.copy()
+                move_ctx.update(accept_ready_qty=True)
+                new_move = move.with_context(move_ctx)._split(remaining_qty)
                 new_moves.append(new_move)
         if new_moves:
             new_moves = self.env['stock.move'].browse(new_moves)

@@ -108,7 +108,7 @@ class StockPicking(models.Model):
                     if status["Country"]:
                         city_country += ' (' + status["Country"] + ')'
 
-                    date_time = status["Date"] + ' ' + status["Time"]
+                    date_time = status["Date"] + ' ' + (status["Time"] if status["Time"] else "")
 
                     data_status = {
                         'wizard_id': new.id,

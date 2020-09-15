@@ -39,11 +39,11 @@ class StockPickingReport(models.Model):
         ('end', 'End of Lifecycle'),
         ('obsolete', 'Obsolete'),
         ('make_to_order', 'Make to order')], 'Product State', readonly=True)
-    product_brand_id = fields.Many2one('product.brand', 'Product Brand',readonly=True)
-    partner_vat = fields.Char('Partner VAT',readonly=True)
+    product_brand_id = fields.Many2one('product.brand', 'Product Brand', readonly=True)
+    partner_vat = fields.Char('Partner VAT', readonly=True)
     origin = fields.Char('Origin', readonly=True)
     location_dest_name = fields.Char('Location Destination Name', readonly=True)
-    product_pricelist = fields.Many2one('product.pricelist','Pricelist',readonly=True)
+    product_pricelist = fields.Many2one('product.pricelist', 'Pricelist', readonly=True)
 
     def _select(self):
         select_str = """
@@ -52,12 +52,17 @@ class StockPickingReport(models.Model):
                     t.uom_id as product_uom,
                     -- sum(l.product_uom_qty / u.factor * u2.factor)
                     sm.product_qty as product_uom_qty,
-                    CASE WHEN p_pack.is_pack and SUM(sm_pack.price_unit) != 0 and count(pack_line.id) > 1 /*Kit con varios productos*/
+                   CASE WHEN p_pack.is_pack and SUM(sm_pack.price_unit) != 0 and count(pack_line.id) > 1 /*Kit con varios productos - Albarán transferido*/
                             THEN abs((SUM(pack_line_2.product_qty) * sm.price_unit) / SUM(pack_line.product_qty * sm_pack.price_unit)) *
                             (SUM(sol.price_unit * (1 - sol.discount/100)) / count(pack_line.id)) * SUM((sm.product_qty / pack_line_2.product_qty))
-                          WHEN p_pack.is_pack and count(pack_line.id) = 1 
+                         WHEN p_pack.is_pack and SUM(coalesce(sm_pack.price_unit,0)) = 0 and SUM(pack_line.product_qty * p_pack_line.last_purchase_price) != 0 /*Kit con varios productos - Alabrán no transferido*/
+                            THEN abs((SUM(pack_line_2.product_qty) * p.last_purchase_price) / SUM(pack_line.product_qty * p_pack_line.last_purchase_price)) *
+                            	(SUM(sol.price_unit * (1 - sol.discount/100)) / count(pack_line.id)) * SUM((sm.product_qty / pack_line_2.product_qty))
+                         WHEN p_pack.is_pack and SUM(coalesce(sm_pack.price_unit,0)) = 0 and SUM(pack_line.product_qty * p_pack_line.last_purchase_price) = 0 /*Kit con varios productos - Alabrán no transferido - No se puede obtner el coste*/
+                            THEN (SUM(sol.price_unit * (1 - sol.discount/100)) * SUM(sm.product_qty)) / count(pack_line.id)	
+                         WHEN p_pack.is_pack and count(pack_line.id) = 1 /*Packs - X uds de un mismo producto*/
                             THEN (SUM(sol.price_unit * (1 - sol.discount/100)) / SUM(pack_line.product_qty))* SUM(sm.product_qty)
-                          ELSE SUM(sol.price_unit * (1 - sol.discount/100)) * SUM(sm.product_qty) 
+                          ELSE SUM(sol.price_unit * (1 - sol.discount/100)) * SUM(sm.product_qty)  /*Resto de casos*/
                     END as price_total,
                     count(*) as nbr,
                     s.date as date,
@@ -76,7 +81,7 @@ class StockPickingReport(models.Model):
                     s.origin as origin,
                     sl.name as location_dest_name,
                     so.pricelist_id as product_pricelist     
-                             
+
         """
         return select_str
 
@@ -104,6 +109,7 @@ class StockPickingReport(models.Model):
                     and sm_pack.picking_type_id = sm.picking_type_id /*Para que no salgan devoluciones*/
                     and sm_pack.product_id = pack_line.product_id /*Asegurarnos que las lineas que encuentran son del pack*/
                     and sm_pack.state <> 'cancel'
+                LEFT JOIN product_product p_pack_line on p_pack_line.id = sm_pack.product_id
                 -- left join product_uom u2 on (u2.id = sm.uom_id)
         """
 
@@ -137,7 +143,8 @@ class StockPickingReport(models.Model):
                     rp.vat,
                     s.origin,
                     sl.name,
-                    so.pricelist_id
+                    so.pricelist_id,
+                    p.id
         """
         return group_by_str
 

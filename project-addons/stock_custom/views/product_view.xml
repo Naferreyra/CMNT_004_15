@@ -89,8 +89,6 @@
         </field>
     </record>
 
-    <delete model="ir.ui.view" id="product_brand.product_search_form_view"/>
-
     <record id="product_add_tags_search" model="ir.ui.view">
         <field name="name">product.add.tags.search</field>
         <field name="model">product.product</field>
@@ -196,7 +194,6 @@
                 <field name="biggest_sale_qty"/>
                 <field name="remaining_days_sale"/>
                 <field name="qty_available_input_loc"/>
-                <field name="qty_available_external"/>
                 <field name="average_margin"/>
                 <field name="standard_price"/>
                 <field name="last_purchase_price"/>
@@ -220,4 +217,18 @@
     <menuitem id="product_stock_catalog_update_menu" name="product_stock_catalog_update_menu" string="Stock catalog Update"
               action="product_stock_catalog_update_action"
               parent="purchase.menu_procurement_management" sequence="100"/>
+
+
+    <record id="action_product_toxic_stock" model="ir.actions.act_window">
+        <field name="name">Toxic Stock</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">product.product</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="product.product_search_form_view"/>
+        <field name="view_id" ref="product.product_product_tree_view"/>
+        <field name="domain">[('sale_ok', '=', True),('tag_ids', 'ilike', 'Toxic'),('qty_available', '>', 0)]</field>
+    </record>
+
+     <menuitem id="menu_products_toxic_stock" action="action_product_toxic_stock"
+        parent="sale.product_menu_catalog"  sequence="2"/>
 </odoo>

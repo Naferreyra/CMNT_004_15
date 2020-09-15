@@ -15,20 +15,11 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
 
-#. module: location_moves
-#: model:stock.location,name:location_moves.stock_location_external
-msgid "Almacén externo"
-msgstr "Almacén externo"
 
 #. module: location_moves
 #: model:stock.location,name:location_moves.stock_location_damaged
 msgid "Averiados"
 msgstr "Averiados"
-
-#. module: location_moves
-#: selection:location.moves,move_type:0
-msgid "Beach -> External"
-msgstr "Playa -> Almacén externo"
 
 #. module: location_moves
 #: selection:location.moves,move_type:0
@@ -118,11 +109,6 @@ msgstr "Desarrollo -> Existencias"
 #: model:stock.location,name:location_moves.stock_location_nursing
 msgid "Enfermeria"
 msgstr "Enfermería"
-
-#. module: location_moves
-#: selection:location.moves,move_type:0
-msgid "External -> Stock"
-msgstr "Almacén externo -> Existencias"
 
 #. module: location_moves
 #: model:ir.model.fields,field_description:location_moves.field_location_moves_id

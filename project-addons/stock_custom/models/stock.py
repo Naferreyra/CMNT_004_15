@@ -240,6 +240,8 @@ class StockMove(models.Model):
             move.parent_partner=move.sale_line_id.order_id.partner_id if move.sale_line_id else move.partner_id
     parent_partner = fields.Many2one('res.partner',compute="_compute_parent_partner",string="Partner")
 
+    purchase_order_id = fields.Many2one('purchase.order',related='purchase_line_id.order_id')
+
 
 class StockReturnPicking(models.TransientModel):
     _inherit = 'stock.return.picking'

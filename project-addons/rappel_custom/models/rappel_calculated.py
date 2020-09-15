@@ -1,7 +1,7 @@
 # © 2019 Comunitea
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 from odoo import api, fields, models
-from datetime import datetime
+from datetime import datetime,timedelta
 
 
 class RappelCalculated(models.Model):
@@ -64,4 +64,7 @@ class RappelCalculated(models.Model):
 
         invoice.compute_taxes()
         invoice.action_invoice_open()
+        date_invoice = datetime.strptime(invoice.date_invoice, '%Y-%m-%d') if invoice and invoice.date_invoice else ""
+        if date_invoice and date_invoice.day == 1:
+            invoice.date_invoice = date_invoice - timedelta(days=1)
         return True

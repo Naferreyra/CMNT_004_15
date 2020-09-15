@@ -612,3 +612,15 @@ msgstr "Catálogo de existencias"
 #: model:ir.ui.view,arch_db:stock_custom.product_add_tags_search
 msgid "Main supplier not contains outlet"
 msgstr "Proveedor principal no contiene outlet"
+
+#. module: stock_custom
+#: model:ir.ui.menu,name:stock_custom.menu_sale_report_uniview_projects
+#: model:ir.actions.act_window,name:stock_custom.action_sale_report_uniview_projects
+msgid "Sales Analysis 2 - Uniview and Projects"
+msgstr "Análisis de ventas 2 - Uniview, Proyectos y grandes cuentas"
+
+#. module: stock_custom
+#: model:ir.ui.menu,name:stock_custom.menu_products_toxic_stock
+#: model:ir.actions.act_window,name:stock_custom.action_product_toxic_stock
+msgid "Toxic Stock"
+msgstr "Stock Tóxico"

@@ -41,15 +41,11 @@ class StockContainer(models.Model):
     @api.depends('move_ids.picking_id.scheduled_date')
     def _get_date_expected(self):
         for container in self:
-            min_date = False
             if container.move_ids:
-                for move in container.move_ids:
-                    if move.picking_id:
-                        if not min_date or min_date < move.picking_id.scheduled_date:
-                            min_date = move.picking_id.scheduled_date
-                if min_date:
-                    container.date_expected = min_date
-                    container.move_ids.write({'date_expected': min_date})
+                max_date = max(container.move_ids.mapped('date_expected') or fields.Date.today())
+                if max_date:
+                    container.date_expected = max_date
+                    container.move_ids.write({'date_expected': max_date})
             if not container.date_expected:
                 container.date_expected = fields.Date.today()
 
@@ -149,7 +145,11 @@ class StockMove(models.Model):
     @api.multi
     def write(self, vals):
         for move in self:
-            if 'product_uom_qty' in vals and self.purchase_line_id and self.picking_id and 'origin' not in vals:
+            if 'product_uom_qty' in vals \
+                    and self.purchase_line_id \
+                    and self.picking_id \
+                    and 'origin' not in vals\
+                    and not move._context.get('accept_ready_qty'):
                 if move.product_uom_qty > vals['product_uom_qty'] > 0:
                     move.copy({'picking_id': False, 'product_uom_qty': move.product_uom_qty - vals['product_uom_qty']})
                 elif vals['product_uom_qty'] > move.product_uom_qty:
@@ -211,12 +211,6 @@ class StockReservation(models.Model):
                 if reservation_qty - reservation_used <= product_uom_qty - qty_used:
                     reservation.date_planned = move.date_expected
                     reservation_index += 1
-                    if reservation.sale_id:
-                        sale = reservation.sale_id
-                        followers = sale.message_follower_ids
-                        sale.message_post(body=_("The date planned of the reservation was changed."),
-                                          subtype='mt_comment',
-                                          partner_ids=followers)
                 else:
                     reservation_used += product_uom_qty - qty_used
                     break

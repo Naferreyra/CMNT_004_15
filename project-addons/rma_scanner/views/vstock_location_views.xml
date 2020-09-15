@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="vstock_location_tree" model="ir.ui.view">
+        <field name="name">vstock.location.tree</field>
+        <field name="model">vstock.location</field>
+        <field name="arch" type="xml">
+            <tree string="Vstock Locations">
+                <field name="vstock_id"/>
+                <field name="vstock_code"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_vstock_location_form" model="ir.actions.act_window">
+        <field name="name">Vstock Locations</field>
+        <field name="res_model">vstock.location</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="vstock_location_tree" />
+    </record>
+
+    <menuitem id="menu_vstock_location_config" action="action_vstock_location_form" name="Vstock Locations" parent="stock.menu_warehouse_config" sequence="8" groups="stock.group_adv_location"/>
+</odoo>

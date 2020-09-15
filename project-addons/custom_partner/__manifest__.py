@@ -29,10 +29,12 @@
                 'base_partner_sequence', 'stock', 'account_credit_control',
                 'purchase', 'prospective_customer', 'account_due_list',
                 'customer_lost', 'sale_margin_percentage', 'contacts',
-                'mail_tracking', 'crm_phone_validation', 'commercial_rules'],
+                'crm_phone_validation', 'commercial_rules'],
     "data": ["views/partner_view.xml",
              "views/sale_view.xml",
              "security/ir.model.access.csv",
-             "data/custom_partner_data.xml"],
+             "data/custom_partner_data.xml",
+             "security/groups.xml",
+             "data/parameters.xml"],
     "installable": True
 }

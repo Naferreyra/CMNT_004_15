@@ -7,7 +7,6 @@ class EquivalentProductsWizard(models.TransientModel):
 
     kitchen_stock = fields.Float("Kitchen Stock", readonly=True)
     virtual_stock_conservative = fields.Float("Available Stock", readonly=True)
-    qty_available_external = fields.Float("External Stock", readonly=True)
 
     def default_get(self, fields):
         res = super(EquivalentProductsWizard, self).default_get(fields)
@@ -22,7 +21,6 @@ class EquivalentProductsWizard(models.TransientModel):
         # super(EquivalentProductsWizard, self).onchange_product()
         self.kitchen_stock = self.product_id.qty_available_wo_wh
         self.virtual_stock_conservative = self.product_id.virtual_stock_conservative
-        self.qty_available_external = self.product_id.qty_available_external
         self.virtual_stock = self.product_id.virtual_available
         self.real_stock = self.product_id.qty_available
         self.product_tag_ids = self.product_id.tag_ids

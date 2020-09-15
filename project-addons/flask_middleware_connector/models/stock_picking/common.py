@@ -19,7 +19,7 @@ class PickingListener(Component):
                 and picking.picking_type_id.code == 'outgoing' \
                 and not picking.not_sync \
                 and picking.company_id.id == 1:
-            record.with_delay(priority=1, eta=60).export_picking()
+            picking.with_delay(priority=3, eta=30).export_picking()
 
     def on_record_write(self, record, fields=None):
         picking = record
@@ -31,30 +31,25 @@ class PickingListener(Component):
                 and picking.picking_type_id.code == 'outgoing' \
                 and not picking.not_sync \
                 and picking.company_id.id == 1:
-            if 'name' in fields or 'partner_id' in fields or \
-                    ('not_sync' in fields and not record.not_sync):
-                record.with_delay(priority=1, eta=60).export_picking()
-                picking_products = self.env['stock.move'].search([('picking_id', '=', picking.id)])
-                for product in picking_products:
-                    product.with_delay(priority=1, eta=120).export_pickingproduct()
-            elif 'state' in fields and record.state == 'cancel' \
-                    or 'not_sync' in fields and record.not_sync \
-                    or 'company_id' in fields and record.company_id != 1:
-                picking_products = self.env['stock.move'].search([('picking_id', '=', picking.id)])
-                for product in picking_products:
-                    product.with_delay(priority=1, eta=120).unlink_pickingproduct()
-                record.with_delay(priority=5, eta=120).unlink_picking()
+            if 'name' in fields or 'partner_id' in fields or ('not_sync' in fields and not picking.not_sync):
+                picking.with_delay(priority=3, eta=30).export_picking()
+                for product in picking.move_lines:
+                    product.with_delay(priority=4, eta=60).export_pickingproduct()
+            elif picking.state == 'cancel' \
+                    or ('not_sync' in fields and picking.not_sync) \
+                    or ('company_id' in fields and picking.company_id != 1):
+                for product in picking.move_lines:
+                    product.with_delay(priority=3, eta=30).unlink_pickingproduct()
+                picking.with_delay(priority=4, eta=60).unlink_picking()
             else:
-                for field in up_fields:
-                    if field in fields:
-                        record.with_delay(priority=2, eta=120).update_picking(fields=fields)
-                        break
+                if set(fields).intersection(set(up_fields)):
+                    picking.with_delay(priority=3, eta=30).update_picking(fields=fields)
         else:
             job = self.env['queue.job'].sudo().search([('func_string', 'like', '%, ' + str(picking.id) + ')%'),
                                                        ('model_name', '=', model_name)], order='date_created desc',
                                                       limit=1)
             if job and 'unlink' not in job.name:
-                record.with_delay(priority=5, eta=120).unlink_picking()
+                record.with_delay(priority=4, eta=30).unlink_picking()
 
     def on_record_unlink(self, record):
         picking = record
@@ -63,10 +58,9 @@ class PickingListener(Component):
                 and picking.picking_type_id.code == 'outgoing' \
                 and not picking.not_sync \
                 and picking.company_id.id == 1:
-            picking_products = self.env['stock.move'].search([('picking_id', '=', picking.id)])
-            for product in picking_products:
-                product.with_delay(priority=1, eta=120).unlink_pickingproduct()
-            record.with_delay(priority=5, eta=120).unlink_picking()
+            for product in picking.move_lines:
+                product.with_delay(priority=3, eta=120).unlink_pickingproduct()
+            record.with_delay(priority=4, eta=120).unlink_picking()
 
 
 class StockPicking(models.Model):
@@ -121,7 +115,7 @@ class StockMoveListener(Component):
                     and move_line.picking_id.picking_type_id.code == 'outgoing' \
                     and not move_line.picking_id.not_sync \
                     and move_line.picking_id.company_id.id == 1:
-                record.with_delay(priority=1, eta=180).export_pickingproduct()
+                record.with_delay(priority=4, eta=60).export_pickingproduct()
 
     def on_record_write(self, record, fields=None):
         up_fields = ["parent_id", "product_uom_qty", "product_id", "picking_id"]
@@ -131,9 +125,10 @@ class StockMoveListener(Component):
                     and move_line.picking_id.picking_type_id.code == 'outgoing'\
                     and not move_line.picking_id.not_sync \
                     and move_line.picking_id.company_id.id == 1:
-                for field in up_fields:
-                    if field in fields:
-                        record.with_delay(priority=2, eta=240).update_pickingproduct(fields=fields)
+                if 'picking_id' in fields:
+                    record.with_delay(priority=4, eta=60).export_pickingproduct()
+                if set(fields).intersection(set(up_fields)):
+                    record.with_delay(priority=4, eta=120).update_pickingproduct(fields=fields)
 
     def on_record_unlink(self, record):
         for move_line in record:
@@ -142,7 +137,7 @@ class StockMoveListener(Component):
                     and move_line.picking_id.picking_type_id.code == 'outgoing' \
                     and not move_line.picking_id.not_sync \
                     and move_line.picking_id.company_id.id == 1:
-                record.with_delay(priority=5, eta=240).unlink_pickingproduct()
+                record.with_delay(priority=4, eta=120).unlink_pickingproduct()
 
     def on_stock_move_change(self, record):
         record._cr.execute("select 1 where '%s' in (select trim(trailing ']' from trim(leading '[' from record_ids)) "

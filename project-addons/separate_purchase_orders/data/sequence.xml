@@ -1,0 +1,14 @@
+<odoo noupdate="1">
+    <data>
+
+        <record id="seq_separate_purchase_order" model="ir.sequence">
+            <field name="name">Split purchase orders</field>
+            <field name="code">split.purchase.orders.name</field>
+            <field name="prefix">OC</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+            <field name="active" eval="True"/>
+        </record>
+
+    </data>
+</odoo>
