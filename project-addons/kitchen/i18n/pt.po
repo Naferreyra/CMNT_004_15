@@ -127,11 +127,6 @@ msgid "Done"
 msgstr "Concluído"
 
 #. module: kitchen
-#: model:ir.model.fields,field_description:kitchen.field_customization_wizard_add_all
-msgid "Add All"
-msgstr "Adicionar todos"
-
-#. module: kitchen
 #: model:ir.model.fields,field_description:kitchen.field_customization_wizard_comments
 #: model:ir.model.fields,field_description:kitchen.field_kitchen_customization_comments
 msgid "Comments"
@@ -266,7 +261,7 @@ msgid "You cannot change the product quantity to less than 0"
 msgstr "Você não pode alterar a quantidade do produto para menos de 0"
 
 #. module: kitchen
-#: code:addons/kitchen/models/sale_order.py:20
+#: code:addons/kitchen/models/sale_order.py:18
 msgid "You can't transfer an order with pending customizations"
 msgstr "Nao podes transferir um pedido com personalizações pendentes"
 

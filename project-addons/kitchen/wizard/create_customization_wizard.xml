@@ -8,7 +8,6 @@
                 <group>
                     <field name="notify_users" widget="many2many_tags"/>
                     <field name="order_id" invisible="1"/>
-                    <field name="add_all"/>
                 </group>
 
                 <field name="customization_line">

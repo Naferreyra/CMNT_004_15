@@ -31,7 +31,7 @@ class CustomizationWizard(models.TransientModel):
                 lambda l: not l.deposit and l.product_id.categ_id.with_context(
                     lang='es_ES').name != 'Portes' and l.price_unit >= 0):
             new_line = {'product_id': line.product_id.id,
-                        'qty': 0,
+                        'qty': line.product_qty,
                         'sale_line_id': line.id,
                         'type_ids': None}
 
@@ -75,7 +75,7 @@ class CustomizationWizard(models.TransientModel):
     type_ids = fields.Many2many('customization.type', required=1)
 
     comments = fields.Text('Comments')
-    add_all = fields.Boolean(string="Add All")
+
     notify_users = fields.Many2many('res.users', default=lambda self: [
         (6, 0, [self.env['sale.order'].browse(self.env.context.get('active_ids')).user_id.id])])
 
