@@ -133,5 +133,20 @@ msgstr "Separar pedidos"
 msgid "Add All"
 msgstr "Añadir todo"
 
+#. module: separate_purchase_orders
+#: code:addons/separate_purchase_orders/models/purchase.py:80
+msgid "You cannot cancel an order that has separate orders. Please cancel them earlier."
+msgstr "No puedes cancelar una orden de compra que tiene pedidos hijos. Por favor, cancélalos antes"
+
+#. module: separate_purchase_orders
+#: model:ir.ui.view,arch_db:separate_purchase_orders.purchase_order_form_custom
+msgid "Cancel"
+msgstr "Cancelar"
+
+#. module: separate_purchase_orders
+#: model:ir.ui.view,arch_db:separate_purchase_orders.purchase_order_form_custom
+msgid "Set to Purchase Order"
+msgstr "Pasar a Orden de compra"
+
 
 

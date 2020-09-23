@@ -8,7 +8,7 @@
                 <group>
                     <field name="date_planned"/>
                     <field name="add_all"/>
-                    <field name="order_line_details" colspan="4" nolabel="1">
+                    <field name="order_line_details" colspan="4" nolabel="1" limit="1000">
                         <tree create="false" delete="false" editable="top">
                             <field name="product_id" readonly="1"/>
                             <field name="production_qty" readonly="1"/>

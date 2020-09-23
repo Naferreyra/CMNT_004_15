@@ -73,6 +73,17 @@ class PurchaseOrder(models.Model):
             vals["name"] = self.env['ir.sequence'].next_by_code('split.purchase.orders.name') or 'New'
         return super(PurchaseOrder, self).create(vals)
 
+    @api.multi
+    def button_cancel(self):
+        for order in self:
+            if order.state=="purchase_order" and order.order_split_ids.filtered(lambda o:o.state!='cancel'):
+                raise UserError(_("You cannot cancel an order that has separate orders. Please cancel them earlier."))
+        return super(PurchaseOrder, self).button_cancel()
+
+    @api.multi
+    def button_purchase_order(self):
+        return self.write({'state': 'purchase_order'})
+
 
 class PurchaseOrderLine(models.Model):
     _inherit = 'purchase.order.line'
