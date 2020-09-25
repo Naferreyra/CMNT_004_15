@@ -35,12 +35,6 @@ class ProductTemplate(models.Model):
             qty = product.with_context(location=locs).qty_available
             product.qty_available_wo_wh = qty
 
-    @api.multi
-    def _get_external_stock(self):
-        for product in self:
-            locs = [self.env.ref('location_moves.stock_location_external').id]
-            qty = product.with_context(location=locs).qty_available
-            product.qty_available_external = qty
 
     @api.multi
     def _get_input_loc_stock(self):
@@ -142,10 +136,6 @@ class ProductTemplate(models.Model):
         digits=dp.get_precision('Product Unit of Measure'))
     qty_available_input_loc = fields.\
         Float(string="Qty. on input", compute="_get_input_loc_stock",
-              readonly=True,
-              digits=dp.get_precision('Product Unit of Measure'))
-    qty_available_external = fields.\
-        Float(string="Qty. in external loc.", compute="_get_external_stock",
               readonly=True,
               digits=dp.get_precision('Product Unit of Measure'))
     qty_in_production = fields.\

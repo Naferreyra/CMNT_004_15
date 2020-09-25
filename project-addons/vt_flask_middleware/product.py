@@ -65,7 +65,6 @@ class Product(SyncModel):
     pvm_3 = FloatField(default=0.0)
     last_sixty_days_sales = FloatField(default=0.0)
     joking_index = FloatField(default=0.0)
-    external_stock = FloatField(default=0.0)
     sale_ok = BooleanField()
     ean13 = CharField(max_length=13)
     description_sale = TextField()

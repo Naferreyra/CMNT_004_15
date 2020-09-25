@@ -28,10 +28,7 @@ class SaleOrderLine(models.Model):
     qty_available = fields.\
         Float('Qty available', readonly=True, compute="_compute_qty_available",
               digits=dp.get_precision('Product Unit of Measure'))
-    qty_available_external = fields. \
-        Float('Qty. in external loc.', readonly=True,
-              related='product_id.qty_available_external',
-              digits=dp.get_precision('Product Unit of Measure'))
+
     incoming_qty = fields.\
         Float('Incoming qty.', readonly=True, compute='_get_incoming_qty',
               digits=dp.get_precision('Product Unit of Measure'))

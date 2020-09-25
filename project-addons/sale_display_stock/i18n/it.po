@@ -71,13 +71,6 @@ msgid "Qty available"
 msgstr "Stock disp."
 
 #. module: sale_display_stock
-#: model:ir.model.fields,field_description:sale_display_stock.field_product_product_qty_available_external
-#: model:ir.model.fields,field_description:sale_display_stock.field_product_template_qty_available_external
-#: model:ir.model.fields,field_description:sale_display_stock.field_sale_order_line_qty_available_external
-msgid "Qty. in external loc."
-msgstr "Stock magaz. esterno"
-
-#. module: sale_display_stock
 #: model:ir.model.fields,field_description:sale_display_stock.field_product_template_qty_in_production
 msgid "Qty. in production"
 msgstr "In produzione"

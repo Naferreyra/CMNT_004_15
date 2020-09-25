@@ -31,11 +31,6 @@ msgid "Category"
 msgstr "Cetegoria"
 
 #. module: crm_claim_rma_custom
-#: model:ir.model.fields,field_description:crm_claim_rma_custom.field_equivalent_products_wizard_qty_available_external
-msgid "External Stock"
-msgstr "Stock esterno"
-
-#. module: crm_claim_rma_custom
 #: model:ir.model.fields,field_description:crm_claim_rma_custom.field_crm_claim_category_id
 msgid "Tags"
 msgstr "Etichette"

@@ -10,7 +10,7 @@ class ProductProduct(models.Model):
     def cron_stock_catalog(self):
         headers = ["ID", "Proveedor principal", "Referencia interna", "Fabricando", "Entrante", "Stock cocina",
                    "Stock real", "Stock disponible", "Ventas en los últimos 60 días con stock",
-                   "Cant. pedido más grande", "Días de stock restantes", "Stock en playa", "Stock alm. externo",
+                   "Cant. pedido más grande", "Días de stock restantes", "Stock en playa",
                    "Media de margen de últimas ventas", "Cost Price", "Último precio de compra",
                    "Última fecha de compra", "Reemplazado por", "Estado"]
 
@@ -18,7 +18,7 @@ class ProductProduct(models.Model):
 
         fields = ["id", "seller_id", "code", "qty_in_production", "incoming_qty", "qty_available_wo_wh",
                   "qty_available", "virtual_stock_conservative", "last_sixty_days_sales", "biggest_sale_qty",
-                  "remaining_days_sale", "qty_available_input_loc", "qty_available_external", "average_margin",
+                  "remaining_days_sale", "qty_available_input_loc", "average_margin",
                   "standard_price", "last_purchase_price", "last_purchase_date", "replacement_id", "state"]
         rows = []
         translate_state = {"draft": "En desarrollo", "sellable": "Normal", "end": "Fin del ciclo de vida",

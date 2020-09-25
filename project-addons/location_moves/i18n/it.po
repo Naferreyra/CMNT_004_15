@@ -16,19 +16,9 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: location_moves
-#: model:stock.location,name:location_moves.stock_location_external
-msgid "Almacén externo"
-msgstr "Magazzino esterno"
-
-#. module: location_moves
 #: model:stock.location,name:location_moves.stock_location_damaged
 msgid "Averiados"
 msgstr "Averie"
-
-#. module: location_moves
-#: selection:location.moves,move_type:0
-msgid "Beach -> External"
-msgstr "Spiaggia -> Magazzino esterno"
 
 #. module: location_moves
 #: selection:location.moves,move_type:0
@@ -118,11 +108,6 @@ msgstr "Sviluppo -> Stock"
 #: model:stock.location,name:location_moves.stock_location_nursing
 msgid "Enfermeria"
 msgstr "Infermeria"
-
-#. module: location_moves
-#: selection:location.moves,move_type:0
-msgid "External -> Stock"
-msgstr "Esternoo -> Stock"
 
 #. module: location_moves
 #: model:ir.model.fields,field_description:location_moves.field_location_moves_id

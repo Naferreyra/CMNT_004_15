@@ -49,7 +49,6 @@ class ProductProductExporter(Component):
             'real_stock': binding.qty_available
         }
         if binding.show_stock_outside:
-            vals['external_stock'] = binding.qty_available_external
             stock_qty = eval(
                 "product." + self.backend_record.product_stock_field_id.name,
                 {'product': binding})

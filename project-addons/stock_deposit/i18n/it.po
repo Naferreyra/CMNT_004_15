@@ -94,6 +94,7 @@ msgstr "Data dell'ultimo messaggio."
 
 #. module: stock_deposit
 #: model:ir.ui.view,arch_db:stock_deposit.view_stock_deposit_form
+#: model:ir.model.fields,field_description:stock_deposit.field_stock_sale_deposit_change_qty_date
 msgid "Dates"
 msgstr "Date"
 
@@ -246,11 +247,13 @@ msgstr "Indirizzo facoltativo, dove verrà consegnata la merce, utilizzata in pa
 #. module: stock_deposit
 #: model:ir.model,name:stock_deposit.model_res_partner
 #: model:ir.ui.view,arch_db:stock_deposit.view_stock_deposit_search
+#: model:ir.model.fields,field_description:stock_deposit.field_stock_sale_deposit_change_qty_partner_id
 msgid "Partner"
 msgstr "Partner"
 
 #. module: stock_deposit
 #: model:ir.model.fields,field_description:stock_deposit.field_stock_deposit_picking_id
+#: model:ir.model.fields,field_description:stock_deposit.field_stock_sale_deposit_change_qty_picking_id
 msgid "Picking"
 msgstr "Bolle"
 
@@ -262,6 +265,7 @@ msgstr "Bolle"
 #. module: stock_deposit
 #: model:ir.ui.view,arch_db:stock_deposit.view_stock_deposit_search
 #: model:ir.model.fields,field_description:stock_deposit.field_stock_deposit_product_id
+#: model:ir.model.fields,field_description:stock_deposit.field_stock_sale_deposit_change_qty_product_id
 msgid "Product"
 msgstr "Prodotto"
 
@@ -372,6 +376,22 @@ msgstr "Perdida"
 #: model:ir.ui.view,arch_db:stock_deposit.view_stock_deposit_form
 msgid "Deposit loss"
 msgstr "A perdere"
+
+#. module: stock_deposit
+#: code:addons/stock_deposit/wizard/stock_sale_deposit.py:54
+#, python-format
+msgid "The quantity to sale cannot be zero or greater than the original."
+msgstr "La quantità da vendere non può essere zero o maggiore dall'originale."
+
+#. module: stock_deposit
+#: model:ir.model.fields,field_description:stock_deposit.field_stock_sale_deposit_change_qty_sale_id
+msgid "Order"
+msgstr "Ordine"
+
+#. module: stock_deposit
+#: model:ir.model.fields,field_description:stock_deposit.field_stock_sale_deposit_change_qty_qty_to_sale
+msgid "Qty to sale"
+msgstr "Quantità da vendere"
 
 #. module: stock_deposit
 #: selection:sale.order.line,invoice_status:0

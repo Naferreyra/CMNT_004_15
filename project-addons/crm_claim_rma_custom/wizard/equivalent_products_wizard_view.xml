@@ -8,7 +8,6 @@
             <field name="real_stock" position="after">
                 <field name="virtual_stock_conservative"/>
                 <field name="kitchen_stock"/>
-                <field name="qty_available_external"/>
             </field>
         </field>
     </record>

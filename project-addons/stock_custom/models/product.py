@@ -65,8 +65,7 @@ class ProductProduct(models.Model):
         products = self.env['product.product'].search(
             [('categ_id', '=', category_id.id)])
         ids_products = [x.id for x in products
-                        if x.qty_available_external > 0 or
-                        x.qty_available > 0]
+                        if x.qty_available > 0]
         return {
             'domain': "[('id','in', " + str(ids_products) + ")]",
             'name': _('Stock New'),
