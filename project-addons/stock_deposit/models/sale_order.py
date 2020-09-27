@@ -30,8 +30,9 @@ class SaleOrderLine(models.Model):
     deposit = fields.Boolean('Deposit')
     deposit_date = fields.Date('Date Dep.')
     invoice_status = fields.Selection(selection_add=[('deposit', 'Deposit')])
+    deposit_sold = fields.Boolean("Deposit sold")
 
-    @api.depends('deposit')
+    @api.depends('deposit', 'deposit_sold')
     def _compute_invoice_status(self):
         """Add new invoice status:
         - deposit: if the product is a deposit not recalculate invoice_state
@@ -40,11 +41,20 @@ class SaleOrderLine(models.Model):
         location_deposit_ids = self.env['stock.location'].search([('deposit', '=', True)]).ids
         for line in self:
             if line.deposit \
-                    and any(move.location_dest_id.id in location_deposit_ids for move in line.move_ids)\
+                    and any(move.location_dest_id.id in location_deposit_ids
+                            for move in line.move_ids.filtered(lambda l: l.state == 'done'))\
                     and line.qty_invoiced == 0\
-                    and not self._context.get('to_invoice_deposit', False):
+                    and not line.deposit_sold:
                 line.invoice_status = 'deposit'
 
+    def _get_to_invoice_qty(self):
+        super()._get_to_invoice_qty()
+        deposit_obj = self.env['stock.deposit']
+        for line in self:
+            if line.deposit and line.deposit_sold:
+                deposits = deposit_obj.search([('sale_line_id', '=', line.id),
+                                               ('state', '=', 'sale')])
+                line.qty_to_invoice = sum(deposits.mapped('product_uom_qty'))
 
     @api.depends('product_uom_qty', 'discount', 'price_unit', 'tax_id', 'deposit')
     def _compute_amount(self):
@@ -63,6 +73,21 @@ class SaleOrderLine(models.Model):
         else:
             self.deposit_date = False
 
+    @api.multi
+    def invoice_line_create(self, invoice_id, qty):
+        lines = self
+        deposit_obj = self.env['stock.deposit']
+        for line in self:
+            if line.deposit:
+                if not line.deposit_sold:
+                    lines -= line
+                else:
+                    deposits = deposit_obj.search([('sale_line_id', '=', line.id),
+                                                   ('state', '=', 'sale')])
+                    deposits.write({'state': 'invoiced',
+                                    'invoice_id': invoice_id})
+        return super(SaleOrderLine, lines).invoice_line_create(invoice_id, qty)
+
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
@@ -76,12 +101,3 @@ class SaleOrder(models.Model):
         for sale in self:
             sale.deposit_count = len(sale.deposit_ids)
 
-    @api.multi
-    def action_confirm(self):
-        res = super().action_confirm()
-
-        for line in self.order_line:
-            if line.deposit:
-                line.qty_invoiced = line.product_uom_qty
-                line.invoice_status = 'invoiced'
-        return res

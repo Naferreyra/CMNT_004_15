@@ -77,8 +77,12 @@ class StockDeposit(models.Model):
                                       readonly=True)
     user_id = fields.Many2one('res.users', 'Comercial', required=False,
                               readonly=False, ondelete='cascade', index=1)
-    # cost_subtotal = fields.Float('Cost', related='move_id.cost_subtotal',
-    #                              store=True, readonly=True) TODO:Migrar.
+    sale_line_id = fields.Many2one(related='move_id.sale_line_id',
+                                   string='Sale line',
+                                   store=True,
+                                   readonly=True)
+    cost_subtotal = fields.Float('Cost', related='move_id.price_unit',
+                                 store=True, readonly=True)
 
     @api.multi
     def sale(self):
@@ -110,9 +114,8 @@ class StockDeposit(models.Model):
             move._action_confirm()
             picking.action_assign()
             picking.action_done()
-            deposit.env.context = dict(deposit.env.context,
-                                       to_invoice_deposit=True)
             deposit.write({'state': 'sale', 'sale_move_id': move.id})
+            deposit.sale_line_id.write({'deposit_sold': True})
 
     @api.one
     def _prepare_deposit_move(self, picking, group):

@@ -15,7 +15,23 @@
         </field>
     </record>
 
-    <!-- TODO:Migrar <record id="view_order_form_deposit_button" model="ir.ui.view">
+    <record id="action_sale_stock_deposit" model="ir.actions.act_window">
+        <field name="name">deposit.view</field>
+        <field name="res_model">stock.deposit</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_type">form</field>
+        <field name="view_id" ref="view_stock_deposit_tree"/>
+        <field name="search_view_id" ref="view_stock_deposit_search"/>
+        <field name="context">{'search_default_groupby_state': 1}</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                This menu allow you to view deposit
+                of products associated to the order.
+            </p>
+        </field>
+    </record>
+
+    <record id="view_order_form_deposit_button" model="ir.ui.view">
         <field name="name">sale.order.form</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="stock_reserve_sale.view_order_form_reserve"/>
@@ -23,8 +39,8 @@
             <div name="button_box" position="inside">
                 <button
                     class="oe_stat_button"
-                    icon="fa-cogs"
-                    name="%(stock_deposit.action_stock_deposit)d"
+                    icon="fa-upload"
+                    name="%(stock_deposit.action_sale_stock_deposit)d"
                     type="action"
                     attrs="{'invisible': [('deposit_count', '=', 0)]}"
                     context="{'search_default_sale_id': id}">
@@ -33,5 +49,5 @@
                 </button>
             </div>
         </field>
-    </record> -->
+    </record>
 </odoo>

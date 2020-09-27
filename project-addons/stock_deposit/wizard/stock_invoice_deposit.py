@@ -64,6 +64,7 @@ class StockInvoiceDeposit(models.TransientModel):
             invoice = self.env['account.invoice'].create(inv_vals)
             for line in sale_lines:
                 line.with_context(my_context).invoice_line_create(invoice.id, line.qty_to_invoice)
+            invoice.compute_taxes()
             invoice_ids.append(invoice.id)
             sale_deposit.write({'invoice_id': invoice.id})
         deposits.write({'state': 'invoiced'})
