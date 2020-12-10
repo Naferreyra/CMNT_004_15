@@ -117,8 +117,6 @@ class CustomizationWizard(models.TransientModel):
                     new_line["state"] = "waiting"
                 lines += self.env['kitchen.customization.line'].create(new_line)
         if lines:
-            for line in lines:
-                line.sale_line_id.reservation_ids.date_validity = False
             if customization.state != 'waiting':
                 customization.action_confirm()
             return {

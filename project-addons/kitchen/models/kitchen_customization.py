@@ -84,6 +84,11 @@ class KitchenCustomization(models.Model):
         if vals.get('order_id', False):
             self.env['sale.order'].browse(vals.get('order_id')).message_post(
                 body=_("The order contains customized products"))
+        if vals.get('order_id',False):
+            order_lines = self.env['sale.order.line'].search([('order_id','=',vals.get('order_id'))])
+            for line in order_lines:
+                for reserve in line.reservation_ids:
+                    reserve.date_validity = False
         return super(KitchenCustomization, self).create(vals)
 
     def action_cancel(self):
