@@ -27,7 +27,7 @@ class ProductProduct(models.Model):
             stock_days = 0.00
             stock_per_day = product.get_daily_sales()
             virtual_available = product.virtual_available - \
-                product.incoming_qty + product.qty_available_external
+                product.incoming_qty
             if stock_per_day > 0 and virtual_available:
                 stock_days = round(virtual_available / stock_per_day)
 
@@ -50,7 +50,7 @@ class ProductProduct(models.Model):
                     product.joking_index = -1
                 else:
                     # Calculamos días de stock
-                    stock = product.virtual_stock_conservative + product.qty_available_external
+                    stock = product.virtual_stock_conservative
                     stock_days = 0
                     if stock > 0:
                         if product.last_sixty_days_sales > 0:
@@ -79,8 +79,6 @@ class ProductProduct(models.Model):
             date.today() - relativedelta(days=60))
         warehouses = self.env["stock.warehouse"].search([])
         stock_location_ids = [x.lot_stock_id.id for x in warehouses]
-        stock_location_ids. \
-            append(self.env.ref('location_moves.stock_location_external').id)
         product_obj = self.env["product.product"]
         self.env.cr.\
             execute("select distinct product_id from stock_move where "
@@ -116,7 +114,7 @@ class ProductProduct(models.Model):
                     and product.last_sixty_days_sales == 0 \
                     and product.type == 'product' \
                     and product.categ_id.parent_id.name != 'Outlet' \
-                    and (product.virtual_available - product.incoming_qty + product.qty_available_external) == 0:
+                    and (product.virtual_available - product.incoming_qty) == 0:
                 product.joking_index = 0
             elif product.joking_index == -1 \
                     and product.last_sixty_days_sales == 0 \

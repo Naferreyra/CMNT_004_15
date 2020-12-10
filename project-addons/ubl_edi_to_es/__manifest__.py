@@ -6,9 +6,9 @@
     'author': 'Comunitea',
     'webbsite': 'https://www.comunitea.com',
     'description': """""",
-    'depends': ['purchase_order_ubl'],
+    'depends': ['purchase_order_ubl','sale_display_stock'],
     'category': 'EDI',
-    'data': ['views/purchase_view.xml'],
+    'data': ['views/purchase_view.xml','views/product_view.xml','views/sale_view.xml'],
     'auto_install': False,
     'installable': True,
 }

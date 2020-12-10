@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="cancel_moves_wzd_view" model="ir.ui.view">
+        <field name="name">cancel.moves.wzd.form</field>
+        <field name="model">cancel.moves.wzd</field>
+        <field name="arch" type="xml">
+            <form string="Cancel Moves">
+                <group string="Are you sure you want to cancel these records?">
+                    <field name="move_detail_ids" colspan="3" nolabel="1">
+                        <tree create="false" delete="false" edit="false">
+                            <field name="origin"/>
+                            <field name="container_id"/>
+                            <field name="product_id"/>
+                            <field name="qty"/>
+                            <field name="move_id" invisible="1"/>
+                        </tree>
+                    </field>
+                </group>
+                <footer>
+                    <button string="Confirm" class="btn-primary" name="action_cancel_moves" type="object"/>
+                    <button string="Cancel" class="btn-default" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <act_window name="Cancel moves"
+                res_model="cancel.moves.wzd"
+                src_model="stock.move"
+                view_id="cancel_moves_wzd_view"
+                view_mode="form"
+                target="new"
+                key2="client_action_multi"
+                id="action_cancel_moves_wzd"/>
+</odoo>

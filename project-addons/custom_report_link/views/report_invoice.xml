@@ -5,17 +5,31 @@
 <t t-name="custom_report_link.report_invoice_custom_document">
         <t t-call="custom_report_link.external_layout_custom_invoice">
             <t t-set="o" t-value="doc.with_context({'lang':doc.partner_id.lang})"/>
+            <t t-set="print_hs_code" t-value="doc.env.context.get('print_hs_code',False)"/>
+
             <div class="page">
                 <table class="table table-condensed" style="font-size:12px; margin-top: 5%;">
                     <thead>
                         <tr style="font-size:12px; background-color:#da1f2e; color:white;">
-                            <th width="22%" style="vertical-align:middle;"><strong>Reference</strong></th>
-                            <th width="40%" style="vertical-align:middle;"><strong>Description</strong></th>
-                            <th width="4%" class="text-center" style="vertical-align:middle;"><strong>Quantity</strong></th>
-                            <th width="12%" class="text-center" style="vertical-align:middle;"><strong>Unit Price</strong></th>
-                            <th width="7%" class="text-center" style="vertical-align:middle;"><strong>Discount</strong></th>
-                            <th width="7%" class="text-center" style="vertical-align:middle;"><strong>Amount</strong></th>
-                            <th width="10%" class="text-center" style="vertical-align:middle;"><strong>Delivery Note</strong></th>
+                            <t t-if="not print_hs_code">
+                                <th width="22%" style="vertical-align:middle;"><strong>Reference</strong></th>
+                                <th width="40%" style="vertical-align:middle;"><strong>Description</strong></th>
+                                <th width="4%" class="text-center" style="vertical-align:middle;"><strong>Quantity</strong></th>
+                                <th width="12%" class="text-center" style="vertical-align:middle;"><strong>Unit Price</strong></th>
+                                <th width="7%" class="text-center" style="vertical-align:middle;"><strong>Discount</strong></th>
+                                <th width="7%" class="text-center" style="vertical-align:middle;"><strong>Amount</strong></th>
+                                <th width="10%" class="text-center" style="vertical-align:middle;"><strong>Delivery Note</strong></th>
+                            </t>
+                            <t t-if="print_hs_code">
+                                <th width="18%" style="vertical-align:middle;"><strong>Reference</strong></th>
+                                <th width="10%" style="vertical-align:middle;"><strong>H.S. Code</strong></th>
+                                <th width="36%" style="vertical-align:middle;"><strong>Description</strong></th>
+                                <th width="3%" class="text-center" style="vertical-align:middle;"><strong>Quantity</strong></th>
+                                <th width="10%" class="text-center" style="vertical-align:middle;"><strong>Unit Price</strong></th>
+                                <th width="7%" class="text-center" style="vertical-align:middle;"><strong>Discount</strong></th>
+                                <th width="7%" class="text-center" style="vertical-align:middle;"><strong>Amount</strong></th>
+                                <th width="9%" class="text-center" style="vertical-align:middle;"><strong>Delivery Note</strong></th>
+                            </t>
                         </tr>
                     </thead>
                     <tbody style="font-size:12px; color:6D6E70;">
@@ -82,6 +96,9 @@
                                 <tr t-foreach="o.invoice_line_ids.sorted(key=lambda r: ('SO' in str(r.origin), r.origin or ''))" t-as="l1">
                                     <t t-if="l1.sale_order_id.name == p.name">
                                             <td><span t-field="l1.product_id"/></td>
+                                            <t t-if="print_hs_code">
+                                                <td class="text-center"><span t-field="l1.product_id.product_tmpl_id.hs_code_id.local_code"/></td>
+                                            </t>
                                             <t t-if="l1.product_id.description_editable">
                                                 <td style="font-size:10px"><span t-field="l1.name"/></td>
                                             </t>
@@ -138,6 +155,9 @@
                                     <!--t t-if="l1.product_id.type == 'service'"-->
                                         <t t-if="not l1.origin">
                                             <td><span t-field="l1.product_id"/></td>
+                                            <t t-if="print_hs_code">
+                                                <td class="text-center"><span t-field="l1.product_id.product_tmpl_id.hs_code_id.local_code"/></td>
+                                            </t>
                                             <t t-if="l1.product_id.description_editable">
                                                 <td style="font-size:10px"><span t-field="l1.name"/></td>
                                             </t>
@@ -172,6 +192,9 @@
                         <t t-if="not o.sale_order_ids">
                            <tr t-foreach="o.invoice_line_ids.sorted(key=lambda r: ('SO' in str(r.origin), r.origin or ''))" t-as="l1">
                                     <td><span t-field="l1.product_id"/></td>
+                                    <t t-if="print_hs_code">
+                                        <td class="text-center"><span t-field="l1.product_id.product_tmpl_id.hs_code_id.local_code"/></td>
+                                    </t>
                                     <t t-if="l1.product_id.description_editable">
                                           <td style="font-size:10px"><span t-field="l1.name"/></td>
                                     </t>
@@ -234,6 +257,30 @@
     />
 
     <record id="action_report_invoice_custom" model="ir.actions.report">
+        <field name="paperformat_id" ref="custom_report_link.paperformat_invoice"/>
+    </record>
+    <template id="report_invoice_custom_2">
+       <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-set="doc" t-value="doc.with_context({'print_hs_code':True})"/>
+                <t t-call="custom_report_link.report_invoice_custom_document" t-lang="doc.partner_id.lang"/>
+            </t>
+        </t>
+    </template>
+
+    <report
+        id="action_report_invoice_custom_2"
+        string="Facturas H.S Code"
+        model="account.invoice"
+        report_type="qweb-pdf"
+        file="custom_report_link.report_invoice_custom_2"
+        name="custom_report_link.report_invoice_custom_2"
+        print_report_name="(object._get_printed_report_name())"
+        attachment_use="True"
+        attachment="(object.state in ('open','paid')) and ('INV'+(object.number or '').replace('/','')+'.pdf')"
+    />
+
+    <record id="action_report_invoice_custom_2" model="ir.actions.report">
         <field name="paperformat_id" ref="custom_report_link.paperformat_invoice"/>
     </record>
 </odoo>

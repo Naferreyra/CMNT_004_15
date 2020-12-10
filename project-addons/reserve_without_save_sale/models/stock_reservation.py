@@ -3,7 +3,9 @@ from odoo import fields, models, api, registry, _
 from odoo.exceptions import UserError
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
+import logging
 
+_logger = logging.getLogger(__name__)
 
 class StockReservation(models.Model):
 
@@ -12,7 +14,7 @@ class StockReservation(models.Model):
     _order = "sequence asc"
 
     def _new_sequence(self):
-        query = "SELECT MAX(sequence)  FROM stock_reservation "
+        query = "SELECT sequence FROM stock_reservation ORDER BY sequence DESC LIMIT 1"
         self.env.cr.execute(query, ())
         regs = self.env.cr.fetchall()
         for reg in regs:
@@ -25,7 +27,7 @@ class StockReservation(models.Model):
 
     unique_js_id = fields.Char(size=64)
     sequence = fields.Integer(help='Gives the priority in reservation.',
-                              default=_new_sequence)
+                              default=_new_sequence, index=True)
     user_id = fields.Many2one('res.users', relation='sale_id.user_id',
                               string='Responsible', readonly=True)
     date_order = fields.Datetime(relation='sale_id.date_order', readonly=True)
@@ -158,13 +160,13 @@ class StockReservation(models.Model):
                                 ('move_id.state', 'not in', ['done',
                                                              'cancel'])])
         reserves_to_delete = self.env['stock.reservation']
-        for reserve in reserves:
-            check_other_reserves = self.\
-                search([('sale_line_id', '=', reserve.sale_line_id.id),
-                        ('partner_id', '!=', False),
-                        ('move_id.state', 'not in', ['done', 'cancel'])])
-            if check_other_reserves:
-                reserves_to_delete |= reserve
+        check_other_reserves = self.\
+            search([('sale_line_id', 'in', reserves.mapped('sale_line_id').ids),
+                    ('partner_id', '!=', False),
+                    ('move_id.state', 'not in', ['done', 'cancel'])])
+        if check_other_reserves:
+            reserves_to_delete |= reserves.\
+                filtered(lambda r: r.sale_line_id.id in check_other_reserves.mapped('sale_line_id').ids)
         if reserves_to_delete:
             reserves_to_delete.unlink()
 
@@ -198,3 +200,29 @@ class StockReservation(models.Model):
         reservation_to_release.release()
         super().release_validity_exceeded(ids)
         return True
+
+    @api.model
+    def delete_canceled_reserves(self, interval_dates=[]):
+        if not interval_dates:
+            now = fields.Datetime.now()
+            d1 = datetime.strptime(now, '%Y-%m-%d %H:%M:%S') + \
+                 timedelta(days=-7)
+            d2 = datetime.strptime(now, '%Y-%m-%d %H:%M:%S') + \
+                 timedelta(days=-14)
+            start_date = datetime.strftime(d1, '%Y-%m-%d')
+            end_date = datetime.strftime(d2, '%Y-%m-%d')
+        else:
+            start_date = interval_dates[0]
+            end_date = interval_dates[1]
+        _logger.info("SEARCH CANCELED RESERVATIONS -> STARTING")
+        reserves = self.search([('create_date', '>=', start_date),
+                                ('create_date', '<', end_date),
+                                ('sale_line_id', '=', False),
+                                ('mrp_id', '=', False),
+                                ('claim_id', '=', False),
+                                ('move_id.state', 'in', ['cancel'])])
+        _logger.info("SEARCH CANCELED RESERVATIONS -> FINISHED")
+        if reserves:
+            _logger.info("UNLINK CANCELED RESERVATIONS -> STARTING")
+            reserves.unlink()
+            _logger.info("UNLINK CANCELED RESERVATIONS -> FINISHED")

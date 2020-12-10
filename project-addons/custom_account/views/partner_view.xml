@@ -13,6 +13,9 @@
                 <field name="title" position="after">
                     <field name="dropship" attrs="{'invisible': [('type', '!=', 'delivery')]}"/>
                 </field>
+                <field name="parent_id" position="attributes">
+                    <attribute name="attrs">{'invisible':['|', '&amp;', ('is_company','=', True),('parent_id', '=', False),('company_name', '!=', False),('company_name', '!=', '')],'required':[('dropship','=',True)]}</attribute>
+                </field>
                 <field name="email" position="after">
                     <field name="email2" widget="email" attrs="{'invisible': [('is_company','=',False), ('dropship','=',True)]}"/>
                     <field name="newsletter"/>

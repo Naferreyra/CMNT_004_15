@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record model="ir.ui.view" id="view_partner_form_industryean_edi">
+        <field name="name">Partner form ean edi</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <field name="industry_id" position="after">
+                <field name="ean"/>
+                <field name="edi_enabled"/>
+            </field>
+        </field>
+    </record>
+</odoo>

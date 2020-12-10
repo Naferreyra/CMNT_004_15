@@ -170,7 +170,7 @@ msgid "Partner error"
 msgstr "Error empresa"
 
 #. module: purchase_picking
-#: code:addons/purchase_picking/wizard/create_picking_move.py:76
+#: code:addons/purchase_picking/wizard/create_picking_move.py:80
 #, python-format
 msgid "Picking error"
 msgstr "Error en albarán"
@@ -191,7 +191,7 @@ msgid "Picking created"
 msgstr "Albarán creado"
 
 #. module: purchase_picking
-#: code:addons/purchase_picking/wizard/create_picking_move.py:77
+#: code:addons/purchase_picking/wizard/create_picking_move.py:80
 #, python-format
 msgid "Picking error"
 msgstr "Error en albaranes"
@@ -217,7 +217,7 @@ msgid "Quantity"
 msgstr "Cantidad"
 
 #. module: purchase_picking
-#: code:addons/purchase_picking/wizard/create_picking_move.py:92
+#: code:addons/purchase_picking/wizard/create_picking_move.py:101
 #, python-format
 msgid "Quantity error"
 msgstr "Error en cantidad"
@@ -269,7 +269,7 @@ msgid "The date planned of the reservation was changed."
 msgstr "La fecha planificada de la reserva ha cambiado."
 
 #. module: purchase_picking
-#: code:addons/purchase_picking/wizard/create_picking_move.py:93
+#: code:addons/purchase_picking/wizard/create_picking_move.py:101
 #, python-format
 msgid "The quantity is greater than the original."
 msgstr "La cantidad es mayor a la original."
@@ -281,7 +281,7 @@ msgid "The sale order is already assigned."
 msgstr "El pedido de venta ya está asignado."
 
 #. module: purchase_picking
-#: code:addons/purchase_picking/wizard/create_picking_move.py:77
+#: code:addons/purchase_picking/wizard/create_picking_move.py:80
 #, python-format
 msgid "Type not found"
 msgstr "Tipo no encontrado"
@@ -361,3 +361,50 @@ msgstr "Si este campo está marcado, los albaranes se crearán agrupados por pro
 #: model:ir.model.fields,field_description:purchase_picking.field_picking_from_moves_wizard_supplier_mode
 msgid "Create pickings grouped by supplier"
 msgstr "Crear albaranes agrupados por proveedor"
+
+#. module: purchase_picking
+#: code:addons/purchase_picking/wizard/create_picking_move.py:164
+#, python-format
+msgid "Picking already created"
+msgstr "Albarán ya creado"
+
+#. module: purchase_picking
+#: model:ir.ui.view,arch_db:purchase_picking.cancel_moves_wzd_view
+#: model:ir.actions.act_window,name:purchase_picking.action_cancel_moves_wzd
+msgid "Cancel Moves"
+msgstr "Cancelar movimientos"
+
+#. module: purchase_picking
+#: model:ir.ui.view,arch_db:purchase_picking.cancel_moves_wzd_view
+msgid "Confirm"
+msgstr "Aceptar"
+
+#. module: purchase_picking
+#: model:ir.ui.view,arch_db:purchase_picking.cancel_moves_wzd_view
+msgid "Are you sure you want to cancel these records?"
+msgstr "¿Estás seguro de que deseas cancelar estos movimientos?"
+
+#. module: purchase_picking
+#: model:ir.ui.view,arch_db:purchase_picking.cancel_moves_wzd_view
+msgid "Cancel"
+msgstr "Cancelar"
+
+#. module: purchase_picking
+#: model:ir.model.fields,field_description:purchase_picking.field_cancel_moves_lines_wzd_product_id
+msgid "Product"
+msgstr "Producto"
+
+#. module: purchase_picking
+#: model:ir.model.fields,field_description:purchase_picking.field_cancel_moves_lines_wzd_origin
+msgid "Origin"
+msgstr "Origen"
+
+#. module: purchase_picking
+#: model:ir.model.fields,field_description:purchase_picking.field_cancel_moves_lines_wzd_qty
+msgid "Quantity"
+msgstr "Cantidad"
+
+#. module: purchase_picking
+#: model:ir.model.fields,field_description:purchase_picking.field_cancel_moves_lines_wzd_container_id
+msgid "Container"
+msgstr "Contenedor"

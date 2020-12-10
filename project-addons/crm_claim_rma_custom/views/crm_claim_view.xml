@@ -50,7 +50,7 @@
                 <field name="rma_cost"/>
                 <field name="priority"/>
                 <field name="bool_category_id"/>
-                <field name="date_deadline"/>
+                <field name="warehouse_location"/>
             </tree>
         </field>
     </record>
@@ -65,6 +65,7 @@
                 <field name="allow_confirm_blocked" attrs="{'invisible': [('claim_type', '!=', %(crm_claim_type.crm_claim_type_customer)d)]}" groups="account.group_account_manager"/>
                 <field name="t_incidence_picking" attrs="{'invisible':[('transport_incidence', '=', False)]}"/>
                 <field name="transport_incidence"/>
+                <field name="warehouse_location"/>
             </field>
             <field name="email_from" position="after">
                 <field name="comercial"/>
@@ -127,7 +128,7 @@
                 <attribute name="context">{'search_product_id': product_id}</attribute>
             </field>
             <field name="internal_description" position="after">
-                <field name="substate_id" options="{'no_quick_create':True,'no_create_edit':True}"/>
+                <field name="substate_id" options="{'no_open': True,'no_quick_create':True,'no_create_edit':True}"/>
                 <field name="write_date"/>
             </field>
             <field name="product_returned_quantity" position="after">
@@ -174,10 +175,10 @@
                 <field name="country"/>
                 <field name="comercial"/>
             </xpath>
-            <xpath expr="//field[@name='date_deadline']" position="replace">
-                <field name="date_deadline"/>
+            <xpath expr="//field[@name='company_id']" position="replace">
+                <field name="warehouse_location"/>
             </xpath>
-            <xpath expr="//field[@name='date_deadline']" position="before">
+            <xpath expr="//field[@name='rma_cost']" position="before">
                 <field name="priority"/>
                 <field name="bool_category_id"/>
             </xpath>

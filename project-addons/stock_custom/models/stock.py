@@ -79,10 +79,11 @@ class StockPicking(models.Model):
                         cont += 1
         res = super().action_done()
         for picking in self:
-            picking_states = picking.sale_id.picking_ids.mapped('state')
-            if all(state in ('done', 'cancel') for state in picking_states) \
-                    and not all(state == 'cancel' for state in picking_states):
-                picking.sale_id.action_done()
+            if picking.sale_id:
+                picking_states = self.env['stock.picking'].search_read([('sale_id', '=', picking.sale_id.id)],['state'])
+                if all(picking['state'] in ('done', 'cancel') for picking in picking_states) \
+                        and not all(picking['state'] == 'cancel' for picking in picking_states):
+                    picking.sale_id.action_done()
         return res
 
     @api.multi
@@ -94,11 +95,10 @@ class StockPicking(models.Model):
                     (vals.get('carrier_name', False) and picking.carrier_tracking_ref and not picking.carrier_name) or
                     (vals.get('carrier_name', False) and vals.get('carrier_tracking_ref', False) and not picking.carrier_name and not picking.carrier_tracking_ref)) and\
                     picking.picking_type_code == 'outgoing' and picking.sale_id:
-                pickings_to_send.append(picking.id)
+                pickings_to_send.append(picking)
         result = super().write(vals)
         if pickings_to_send:
-            pickings = self.env["stock.picking"].browse(pickings_to_send)
-            for picking in pickings:
+            for picking in pickings_to_send:
                 # We need to do this after the write, otherwise the email template won't get well some  picking values
                 picking_template = self.env.ref('stock_custom.picking_done_template')
                 picking_template.with_context(lang=picking.partner_id.commercial_partner_id.lang).send_mail(picking.id)

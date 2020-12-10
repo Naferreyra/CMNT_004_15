@@ -10,7 +10,7 @@ class ProductProduct(models.Model):
     def cron_stock_catalog(self):
         headers = ["ID", "Proveedor principal", "Referencia interna", "Fabricando", "Entrante", "Stock cocina",
                    "Stock real", "Stock disponible", "Ventas en los últimos 60 días con stock",
-                   "Cant. pedido más grande", "Días de stock restantes", "Stock en playa", "Stock alm. externo",
+                   "Cant. pedido más grande", "Días de stock restantes", "Stock en playa",
                    "Media de margen de últimas ventas", "Cost Price", "Último precio de compra",
                    "Última fecha de compra", "Reemplazado por", "Estado"]
 
@@ -18,7 +18,7 @@ class ProductProduct(models.Model):
 
         fields = ["id", "seller_id", "code", "qty_in_production", "incoming_qty", "qty_available_wo_wh",
                   "qty_available", "virtual_stock_conservative", "last_sixty_days_sales", "biggest_sale_qty",
-                  "remaining_days_sale", "qty_available_input_loc", "qty_available_external", "average_margin",
+                  "remaining_days_sale", "qty_available_input_loc", "average_margin",
                   "standard_price", "last_purchase_price", "last_purchase_date", "replacement_id", "state"]
         rows = []
         translate_state = {"draft": "En desarrollo", "sellable": "Normal", "end": "Fin del ciclo de vida",
@@ -46,19 +46,23 @@ class ProductProduct(models.Model):
                         .format(datetime.now().strftime('%m%d')),
                         "cron_stock_catalog.email_template_purchase_stock_catalog")
 
-
-    def cron_product_valuation(self):
-        headers = ["ID","Nombre del Producto","Marca","Categoria","Proveedores", "Cantidad", "Valor"]
+    def cron_product_valuation(self, to_date=False):
+        headers = ["ID", "Nombre del Producto", "Marca", "Categoria", "Proveedores", "Cantidad", "Valor"]
 
         products_real_time_ids = self.env['product.template'].search([('property_valuation', '=', 'real_time')]).ids
         domain = [('type', '=', 'product'), ('qty_available', '>', 0),
                   ('product_tmpl_id', 'in', products_real_time_ids)]
 
-        fields = ["display_name", "qty_available", "standard_price", "cost_method", "categ_id","product_brand_id","seller_ids"]
+        fields = ["display_name", "qty_available", "standard_price", "cost_method", "categ_id", "product_brand_id",
+                  "seller_ids"]
         rows = []
-
-        products = self.env['product.product'].with_context(company_owned=True, owner_id=False).search_read(domain,
-                                                                                                            fields)
+        if to_date:
+            products = self.env['product.product'].with_context(company_owned=True, owner_id=False,
+                                                                to_date=to_date).search_read(domain,
+                                                                                             fields)
+        else:
+            products = self.env['product.product'].with_context(company_owned=True, owner_id=False).search_read(domain,
+                                                                                                                fields)
         fifo_automated_values = {}
         if products:
             self.env['account.move.line'].check_access_rights('read')
@@ -69,7 +73,11 @@ class ProductProduct(models.Model):
                         GROUP BY aml.product_id, aml.account_id"""
             params = (tuple(x['id'] for x in products),
                       self.env.user.company_id.id)
-            query = query % ('',)
+            if to_date:
+                query = query % ('AND aml.date <= %s',)
+                params = params + (to_date,)
+            else:
+                query = query % ('',)
             self.env.cr.execute(query, params=params)
 
             res = self.env.cr.fetchall()
@@ -78,9 +86,16 @@ class ProductProduct(models.Model):
         for product in products:
             value = 0
             category_name = product["categ_id"][1]
-            brand_name = product["product_brand_id"][1] if product["product_brand_id"] and product["product_brand_id"][1] else 0
+            brand_name = product["product_brand_id"][1] if product["product_brand_id"] and product["product_brand_id"][
+                1] else 0
             if product["cost_method"] in ['standard', 'average']:
-                value = round(product["standard_price"] * product["qty_available"], 2)
+                price_used = product['standard_price']
+                if to_date:
+                    price_used = product.get_history_price(
+                        self.env.user.company_id.id,
+                        date=to_date,
+                    )
+                value = round(price_used * product["qty_available"], 2)
             elif product["cost_method"] == 'fifo':
                 valuation_account_id = self.env['product.category'].browse(product["categ_id"][0]). \
                     property_stock_valuation_account_id.id
@@ -90,23 +105,25 @@ class ProductProduct(models.Model):
             if seller_ids:
                 sellers = self.env['product.supplierinfo'].browse(seller_ids)
                 display_name = sellers[0].display_name or 0
-                product_fields = [product["id"],product['display_name'], brand_name, category_name,
+                product_fields = [product["id"], product['display_name'], brand_name, category_name,
                                   display_name, product["qty_available"], value]
                 rows.append(product_fields)
-                if len(sellers)>1:
-                    sellers=sellers[1::]
+                if len(sellers) > 1:
+                    sellers = sellers[1::]
                     for seller in sellers:
                         display_name = seller.display_name or 0
-                        product_fields = ["","", "","",display_name,"",""]
+                        product_fields = ["", "", "", "", display_name, "", ""]
                         rows.append(product_fields)
             else:
-                product_fields = [product["id"],product['display_name'], brand_name, category_name,
+                product_fields = [product["id"], product['display_name'], brand_name, category_name,
                                   0, product["qty_available"], value]
                 rows.append(product_fields)
 
         file_b64 = self.generate_xls(headers, rows)
+        if not to_date:
+            to_date = datetime.now().strftime('%m%d')
         self.send_email(file_b64, "product_valuation",
-                        "product_valuation_{}.xlsx".format(datetime.now().strftime('%m%d')),
+                        "product_valuation_{}.xlsx".format(to_date),
                         "cron_stock_catalog.email_template_product_valuation")
 
     @api.multi
@@ -164,4 +181,3 @@ class ProductProduct(models.Model):
 
         with open(file_name, "rb") as file:
             return base64.b64encode(file.read())
-

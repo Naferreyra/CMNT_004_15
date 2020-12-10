@@ -9,40 +9,36 @@ class AccountInvoice(models.Model):
         res = super().invoice_line_move_line_get()
         if self.type == 'in_invoice':
             for line_data in res:
-                total_qty = 0.0
-                moves_price = 0.0
                 i_line_id = line_data['invl_id']
                 i_line = self.env['account.invoice.line'].browse(i_line_id)
-                selected_move = False
                 if i_line.move_line_ids and \
+                    i_line.purchase_line_id and \
                         i_line.product_id.valuation == 'real_time':
-                    for move in i_line.move_line_ids.\
-                            filtered(lambda x: x.picking_type_code ==
-                                     'incoming'):
-                        selected_move = move
-                        qty = move.product_qty
-                        total_qty += qty
-                        if move.product_id.cost_method in ['average', 'fifo'] \
-                                and move.price_unit:
-                            price_unit = move.price_unit
-                            moves_price += price_unit * qty
-                        else:
-                            price_unit = move.product_id.standard_price
-                            moves_price += price_unit * qty
-                    line_data['price_move'] = moves_price
-                    if selected_move and selected_move.purchase_line_id and \
-                            selected_move.picking_id and \
-                            selected_move.picking_id.backorder_id:
-                        line_data['create_date'] = \
-                            selected_move._get_origin_create_date()
+                    purchase_line = i_line.purchase_line_id
+                    qty = i_line.quantity
+                    if i_line.product_id.cost_method in ['average', 'fifo'] \
+                            and purchase_line.price_unit:
+                        price_unit = purchase_line.price_unit * (1-(purchase_line.discount/100))
+                        purchase_price = price_unit * qty
                     else:
-                        line_data['create_date'] = selected_move.create_date
+                        price_unit = i_line.product_id.standard_price
+                        purchase_price = price_unit * qty
+                    line_data['price_purchase'] = purchase_price
+                    line_data['purchase_line'] = purchase_line
+                    move_lines = i_line.move_line_ids.filtered(
+                        lambda x: x.picking_id and
+                        x.picking_type_code == 'incoming' and
+                        x.state not in ('draft', 'cancel'))
+                    if len(move_lines) > 1:
+                        line_data['create_date'] = \
+                            i_line.move_line_ids[0]._get_origin_create_date()
+                    else:
+                        line_data['create_date'] = move_lines.create_date
             res.extend(self._cost_diff_move_lines(res))
         return res
 
     @api.model
     def _cost_diff_move_lines(self, res):
-        company_currency = self.company_id.currency_id
         diff_res = []
         # calculate and write down the possible price difference
         # between invoice price and product price
@@ -60,20 +56,15 @@ class AccountInvoice(models.Model):
             acc = fpos.map_account(acc).id
             a = i_line.product_id.product_tmpl_id.\
                 get_product_accounts(fiscal_pos=fpos)['stock_input'].id
-            if 'price_move' in line and acc and \
-                    tools.float_compare(line['price_move'],
-                                        i_line.price_subtotal, 2):
-                if i_line.invoice_id.currency_id.id != \
-                        company_currency.id:
-                    price_subtotal = i_line.invoice_id.currency_id.\
-                        with_context(date=line['create_date']).\
-                        compute(i_line.price_subtotal, company_currency,
-                                round=True)
-                else:
-                    price_subtotal = i_line.price_subtotal
-
-                price_diff = \
-                    price_subtotal - line['price_move']
+            if 'purchase_line' in line \
+                    and line['purchase_line'].currency_id.id != i_line.invoice_id.currency_id.id:
+                line['price_purchase'] = line['purchase_line'].currency_id. \
+                    with_context(date=line['create_date']). \
+                    compute(line['price_purchase'], i_line.invoice_id.currency_id, round=True)
+            price_subtotal = i_line.price_subtotal
+            if 'price_purchase' in line and acc and \
+                    tools.float_compare(line['price_purchase'], price_subtotal, 2):
+                price_diff = price_subtotal - line['price_purchase']
                 if tools.float_is_zero(price_diff, 2):
                     continue
 

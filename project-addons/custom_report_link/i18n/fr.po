@@ -1087,3 +1087,13 @@ msgstr "report.custom_report_link.report_overduecustom"
 #: model:ir.ui.view,arch_db:custom_report_link.external_layout_custom_saleorder
 msgid "The products reservation is not guaranteed after 7 days from the date of this document."
 msgstr "Au-delà de 7 jours à compter de la date du présent document, la réservation des produits disponibles n´est plus garantie."
+
+#. module: custom_report_link
+#: model:ir.ui.view,arch_db:custom_report_link.report_invoice_custom_document
+msgid "<strong>H.S. Code</strong>"
+msgstr "<strong>Code S.H.</strong>"
+
+#. module: custom_report_link
+#: model:ir.ui.view,arch_db:custom_report_link.external_layout_custom_invoice
+msgid "Simplified Invoice"
+msgstr "Facture simplifiée"

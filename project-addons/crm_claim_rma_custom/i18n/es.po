@@ -30,10 +30,6 @@ msgstr "RMAs Recividos"
 msgid "Category"
 msgstr "Certificado"
 
-#. module: crm_claim_rma_custom
-#: model:ir.model.fields,field_description:crm_claim_rma_custom.field_equivalent_products_wizard_qty_available_external
-msgid "External Stock"
-msgstr "Stock alm. externo"
 
 #. module: crm_claim_rma_custom
 #: model:ir.model.fields,field_description:crm_claim_rma_custom.field_crm_claim_category_id
@@ -474,3 +470,20 @@ msgstr "Albarán inc. trans."
 #: model:ir.ui.view,arch_db:crm_claim_rma_custom.view_crm_case_claims_filter_custom
 msgid "Transport incidence"
 msgstr "Incidencia transporte"
+
+#. module: crm_claim_rma_custom
+#: model:ir.model.fields,field_description:crm_claim_rma_custom.field_crm_claim_warehouse_location
+#: model:ir.model.fields,field_description:crm_claim_rma_custom.field_res_users_warehouse_location
+msgid "Warehouse Location"
+msgstr "Sede"
+
+#. module: crm_claim_rma_custom
+#: code:addons/crm_claim_rma_custom/models/crm_claim.py:81
+#, python-format
+msgid "Please, select the warehouse location of the RMA"
+msgstr "Por favor, selecciona la sede del RMA"
+
+#. module: crm_claim_rma_custom
+#: selection:crm.claim,warehouse_location:0
+msgid "In transit"
+msgstr "En tránsito"

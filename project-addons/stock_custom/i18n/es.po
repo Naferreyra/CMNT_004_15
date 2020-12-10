@@ -624,3 +624,13 @@ msgstr "Análisis de ventas 2 - Uniview, Proyectos y grandes cuentas"
 #: model:ir.actions.act_window,name:stock_custom.action_product_toxic_stock
 msgid "Toxic Stock"
 msgstr "Stock Tóxico"
+
+#. module: stock_custom
+#: model:ir.model.fields,field_description:stock_custom.field_res_partner_send_hs_code_invoice
+msgid "Send H.S Code Invoice"
+msgstr "Enviar factura con H.S Code"
+
+#. module: stock_custom
+#: model:ir.model.fields,help:stock_custom.field_res_partner_send_hs_code_invoice
+msgid "If this field is checked, the pdf attached to the invoice email will be the invoice template H.S Code."
+msgstr "Si este campo está marcado, el pdf adjunto al correo electrónico de la factura será la plantilla de factura H.S Code."

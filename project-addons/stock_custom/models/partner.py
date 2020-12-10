@@ -9,3 +9,6 @@ class ResPartner(models.Model):
 
     not_print_picking = fields.Boolean(
         help="Only print attachments on picking with attachs. report")
+
+    send_hs_code_invoice = fields.Boolean(string="Send H.S Code Invoice", help="If this field is checked, the pdf attached to the invoice email will be the invoice template H.S Code.")
+

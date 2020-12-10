@@ -621,3 +621,15 @@ msgstr "Descripción en líneas"
 #, python-format
 msgid "Products free per unit"
 msgstr "Productos gratis por unidad"
+
+#. modules: sale_promotions_extend
+#: selection:promos.rules.actions,action_type:0
+#, python-format
+msgid "Sale points programme discount on Brand"
+msgstr "Descuento por el programa de puntos en una Marca"
+
+#. modules: sale_promotions_extend
+#: selection:promos.rules.actions,action_type:0
+#, python-format
+msgid "Discount % on Brand accumulated (Price Unit)"
+msgstr "Descuento acumulado % en marca (Precio Unidad)"

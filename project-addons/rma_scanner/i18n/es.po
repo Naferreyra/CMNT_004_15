@@ -78,3 +78,8 @@ msgstr "Ubicaciones Vstock"
 #, python-format
 msgid "The scanned location doesn't exist"
 msgstr "La ubicación escaneada no existe"
+
+#. module: rma_scanner
+#: model:ir.actions.act_window,name:rma_scanner.action_wizard_print_rma
+msgid "Print Label"
+msgstr "Imprimir Etiqueta"

@@ -192,3 +192,25 @@ msgstr "Password Webservice"
 #: help:middleware.backend,username:0
 msgid "Webservice user"
 msgstr "Utente Webservice"
+
+#. module: flask_middleware_connector
+#: code:addons/flask_middleware_connector/res_partner/common.py:177
+#, python-format
+msgid "CSV connector access checked by %s"
+msgstr "Accesso al connettore CSV verificato da %s"
+
+#. module: flask_middleware_connector
+#: code:addons/flask_middleware_connector/res_partner/common.py:205
+#, python-format
+msgid "<p>CSV conector access has been changed by %s </p><ul><li>  %s &#10137; %s </li></ul>"
+msgstr "<p>L'accesso al connettore è stato modificato da %s </p><ul><li>  %s &#10137; %s </li></ul>"
+
+#. module: flask_middleware_connector
+#: model:ir.model.fields,help:flask_middleware_connector.field_res_partner_csv_connector_access
+msgid "System field to allow csv connector access"
+msgstr "Campo che dà accesso al connettore CSV"
+
+#. module: flask_middleware_connector
+#: model:ir.model.fields,field_description:flask_middleware_connector.field_res_partner_csv_connector_access
+msgid "CSV Connector Access"
+msgstr "Accesso al connettore CSV"

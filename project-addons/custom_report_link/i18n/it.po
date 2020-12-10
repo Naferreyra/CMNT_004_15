@@ -1104,3 +1104,13 @@ msgstr "report.custom_report_link.report_overcustom"
 #: model:ir.model,name:custom_report_link.model_report_custom_report_link_report_overduecustom
 msgid "report.custom_report_link.report_overduecustom"
 msgstr "report.custom_report_link.report_overduecustom"
+
+#. module: custom_report_link
+#: model:ir.ui.view,arch_db:custom_report_link.report_invoice_custom_document
+msgid "<strong>H.S. Code</strong>"
+msgstr "<strong>Codice SA</strong>"
+
+#. module: custom_report_link
+#: model:ir.ui.view,arch_db:custom_report_link.external_layout_custom_invoice
+msgid "Simplified Invoice"
+msgstr "Fattura semplificata"

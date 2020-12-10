@@ -247,11 +247,13 @@ msgstr "Dirección opcional, donde se entregarán los bienes, especialmente util
 #. module: stock_deposit
 #: model:ir.model,name:stock_deposit.model_res_partner
 #: model:ir.ui.view,arch_db:stock_deposit.view_stock_deposit_search
+#: model:ir.model.fields,field_description:stock_deposit.field_stock_sale_deposit_change_qty_partner_id
 msgid "Partner"
 msgstr "Empresa"
 
 #. module: stock_deposit
 #: model:ir.model.fields,field_description:stock_deposit.field_stock_deposit_picking_id
+#: model:ir.model.fields,field_description:stock_deposit.field_stock_sale_deposit_change_qty_picking_id
 msgid "Picking"
 msgstr "Albarán"
 
@@ -263,6 +265,7 @@ msgstr "Albarán"
 #. module: stock_deposit
 #: model:ir.ui.view,arch_db:stock_deposit.view_stock_deposit_search
 #: model:ir.model.fields,field_description:stock_deposit.field_stock_deposit_product_id
+#: model:ir.model.fields,field_description:stock_deposit.field_stock_sale_deposit_change_qty_product_id
 msgid "Product"
 msgstr "Producto"
 
@@ -373,3 +376,30 @@ msgstr "Pérdida"
 #: model:ir.ui.view,arch_db:stock_deposit.view_stock_deposit_form
 msgid "Deposit loss"
 msgstr "A pérdidas"
+
+#. module: stock_deposit
+#: code:addons/stock_deposit/wizard/stock_sale_deposit.py:54
+#, python-format
+msgid "The quantity to sale cannot be zero or greater than the original."
+msgstr "La cantidad a vender no puede ser cero o mayor que la original"
+
+#. module: stock_deposit
+#: model:ir.model.fields,field_description:stock_deposit.field_stock_sale_deposit_change_qty_sale_id
+msgid "Order"
+msgstr "Pedido"
+
+#. module: stock_deposit
+#: model:ir.model.fields,field_description:stock_deposit.field_stock_sale_deposit_change_qty_date
+msgid "Date"
+msgstr "Fecha"
+
+#. module: stock_deposit
+#: model:ir.model.fields,field_description:stock_deposit.field_stock_sale_deposit_change_qty_qty_to_sale
+msgid "Qty to sale"
+msgstr "Cantidad a vender"
+
+#. module: stock_deposit
+#: code:addons/stock_deposit/wizard/stock_invoice_deposit.py:34
+#, python-format
+msgid "There are two or more different account journals. Please, make sure to select sale orders with the same journal."
+msgstr "Hay dos o más diarios diferentes. Por favor, asegúrese de seleccionar pedidos con el mismo diario."

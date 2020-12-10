@@ -156,7 +156,7 @@
                 <field name="client_order_ref"/>
             </field>
             <button name="action_unlock" position="attributes">
-                <attribute name="groups">sales_team.group_sale_salesman</attribute>
+                <attribute name="groups">account.group_account_manager</attribute>
                 <attribute name="string">Cancel</attribute>
             </button>
             <field name="confirmation_date" position="before">

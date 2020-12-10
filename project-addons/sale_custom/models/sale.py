@@ -196,7 +196,8 @@ class SaleOrder(models.Model):
             self.env.user.notify_warning(message=warning, sticky=True)
 
     def action_confirm(self):
-        if not self.env.context.get('bypass_override', False):
+        if not self.env.context.get('bypass_override', False) and (
+                not self.env.context.get('bypass_risk', False) or self.env.context.get('force_check', False)):
             user_buyer = self.env['ir.config_parameter'].sudo().get_param(
                 'web.user.buyer')
             for sale in self:
@@ -223,14 +224,16 @@ class SaleOrder(models.Model):
                     self.env.user.notify_info(title="Please consider that!",
                                               message=message)
         res = super().action_confirm()
-        for sale in self:
-            products_to_order = ''
-            for product in sale.order_line.mapped('product_id'):
-                if product.state == 'make_to_order':
-                    products_to_order = products_to_order + \
-                                        product.default_code + ', '
-            if products_to_order:
-                sale.send_email_to_purchases(products_to_order)
+
+        if isinstance(res, bool):
+            for sale in self:
+                products_to_order = ''
+                for product in sale.order_line.mapped('product_id'):
+                    if product.state == 'make_to_order':
+                        products_to_order = products_to_order + \
+                                            product.default_code + ', '
+                if products_to_order:
+                    sale.send_email_to_purchases(products_to_order)
         return res
 
     @api.multi
@@ -258,7 +261,7 @@ class SaleOrder(models.Model):
             max_weight = self.env['ir.config_parameter'].sudo().get_param('dhl_max_weight')
             products_weight = 0
             for line in self.order_line:
-                if isinstance(line.id ,int):
+                if isinstance(line.id, int):
                     products_weight += line.product_id.weight * line.product_uom_qty
             if products_weight > float(max_weight):
                 message = _('Sale has been blocked due to exceed the weight limit in DHL air shipments.')
@@ -299,4 +302,3 @@ class StockMoveLine(models.Model):
         context.pop('default_state', False)
         self = self.with_context(context)
         return super(StockMoveLine, self).create(vals)
-

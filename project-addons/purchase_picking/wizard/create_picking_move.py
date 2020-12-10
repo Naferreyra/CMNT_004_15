@@ -20,9 +20,7 @@
 
 
 from odoo import models, fields, api, exceptions, _
-
-
-from odoo.exceptions import except_orm,UserError
+from odoo.exceptions import except_orm, UserError
 
 
 class MoveDetails(models.TransientModel):
@@ -82,9 +80,9 @@ class CreatePickingMove(models.TransientModel):
             raise exceptions.except_orm(_('Picking error'), _('Type not found'))
         type_id = type_ids[0]
         moves = self.env['stock.move']
-        all_moves=dict(self.env['stock.move'])
+        all_moves = dict(self.env['stock.move'])
         # se recorren los movimientos para agruparlos por tipo
-        for move in self.move_detail_ids:
+        for move in self.move_detail_ids.filtered(lambda m: not m.move_id.picking_id):
             if move.move_id.product_id.default_code == "----- PTE NOMBRE -----":
                 raise UserError(
                     _("A picking cannot be created with a product called \"") + move.move_id.product_id.default_code + "\"")
@@ -139,26 +137,28 @@ class CreatePickingMove(models.TransientModel):
 
         partners = moves.mapped('partner_id.id')
         pickings = []
-        for (key, value) in all_moves.items():
-            picking_vals = {
-                'picking_type_id': type_id.id,
-                'move_lines': [(6, 0, [x.id for x in value])],
-                'origin': ', '.join(value.mapped('purchase_line_id.order_id.name')),
-                'scheduled_date': self.date_picking,
-                'location_id': type_id.default_location_src_id.id,
-                'location_dest_id': type_id.default_location_dest_id.id,
-                'temp': True
-            }
-            if self.supplier_mode and key in partners:
-                picking_vals['partner_id'] = key
-            else:
-                picking_vals['partner_id'] = all_moves[key][0].partner_id.id
-            picking_id = self.env['stock.picking'].create(picking_vals)
-            picking_id.action_confirm()
-            # We don't use all_moves because when it is a kit, one of the moves is deleted and several ones are created instead
-            picking_id.move_lines._force_assign()
-            pickings.append(picking_id.id)
-        context2 = dict(context)
-        context2['picking_ids'] = pickings
-        return self.with_context(context2)._view_picking()
-
+        if all_moves:
+            for (key, value) in all_moves.items():
+                picking_vals = {
+                    'picking_type_id': type_id.id,
+                    'move_lines': [(6, 0, [x.id for x in value])],
+                    'origin': ', '.join(value.mapped('purchase_line_id.order_id.name')),
+                    'scheduled_date': self.date_picking,
+                    'location_id': type_id.default_location_src_id.id,
+                    'location_dest_id': type_id.default_location_dest_id.id,
+                    'temp': True
+                }
+                if self.supplier_mode and key in partners:
+                    picking_vals['partner_id'] = key
+                else:
+                    picking_vals['partner_id'] = all_moves[key][0].partner_id.id
+                picking_id = self.env['stock.picking'].create(picking_vals)
+                picking_id.action_confirm()
+                # We don't use all_moves because when it is a kit, one of the moves is deleted and several ones are created instead
+                picking_id.move_lines._force_assign()
+                pickings.append(picking_id.id)
+            context2 = dict(context)
+            context2['picking_ids'] = pickings
+            return self.with_context(context2)._view_picking()
+        else:
+            raise UserError(_("Picking already created"))

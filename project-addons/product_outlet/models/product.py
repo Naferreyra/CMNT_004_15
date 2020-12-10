@@ -55,7 +55,6 @@ class ProductProduct(models.Model):
             standard_price = origin_product.standard_price * (1 - product_o.categ_id.percent / 100)
             standard_price_2 = origin_product.standard_price_2 * (1 - product_o.categ_id.percent / 100)
 
-            stock = (product_o.qty_available + product_o.qty_available_external)>0
             # update all prices
             for item in product_o.item_ids:
                 item.fixed_price = origin_product.with_context(pricelist=item.pricelist_id.id).price * \
@@ -66,7 +65,7 @@ class ProductProduct(models.Model):
                 'standard_price': standard_price,
                 'standard_price_2': standard_price_2,
                 'commercial_cost': origin_product.commercial_cost,
-                'sale_ok': stock
+                'sale_ok': product_o.qty_available>0
             })
 
             product_o.write(values)

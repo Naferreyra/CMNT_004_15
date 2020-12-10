@@ -25,7 +25,18 @@ class StockInvoiceDeposit(models.TransientModel):
 
     def _get_journal(self):
         journal_obj = self.env['account.journal']
-        journals = journal_obj.search([('type', '=', 'sale')])
+        deposit_obj = self.env['stock.deposit']
+        deposits = deposit_obj.browse(self._context['active_ids'])
+        sale_invoice_types = deposits.mapped('sale_id.invoice_type_id')
+        if len(sale_invoice_types.mapped('journal_id')) > 1 \
+                or (sale_invoice_types.mapped('journal_id')
+                    and sale_invoice_types.filtered(lambda d: not d.journal_id)):
+            raise exceptions.Warning(_('There are two or more different account journals. '
+                                       'Please, make sure to select sale orders with the same journal.'))
+        elif deposits.mapped('sale_id.invoice_type_id.journal_id'):
+            journals = deposits.mapped('sale_id.invoice_type_id.journal_id')
+        else:
+            journals = journal_obj.search([('type', '=', 'sale')])
         return journals and journals[0] or False
 
     journal_id = fields.Many2one('account.journal', 'Destination Journal',

@@ -71,9 +71,9 @@ class SaleOrder(models.Model):
     @api.multi
     def action_confirm(self):
         res = super().action_confirm()
-
-        for line in self.order_line:
-            if line.deposit:
-                line.qty_invoiced = line.product_uom_qty
-                line.invoice_status = 'invoiced'
+        if isinstance(res, bool):
+            for line in self.order_line:
+                if line.deposit:
+                    line.qty_invoiced = line.product_uom_qty
+                    line.invoice_status = 'invoiced'
         return res

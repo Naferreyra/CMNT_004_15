@@ -61,6 +61,8 @@ class BaseSynchro(models.TransientModel):
         pool = self
         sync_ids = []
         records_limit = 1000
+        sync_ids_forced = []
+        new_data_fields_forced = {}
         ctx = self.env.context.copy()
         pool1 = RPCProxy(server)
         pool2 = pool
@@ -69,6 +71,8 @@ class BaseSynchro(models.TransientModel):
         model_obj = object.model_id.model
         module_id = module.search([("name", "ilike", "base_synchro"),
                                    ('state', '=', 'installed')])
+
+        country_code = self.env['ir.config_parameter'].sudo().get_param('country_code')
         if object.context:
             ctx.update(dict(eval(object.context)))
         if not module_id:
@@ -76,56 +80,106 @@ class BaseSynchro(models.TransientModel):
                           download or both, please install
                           "Multi-DB Synchronization" module in targeted/
                         server!'''))
-        destination_inverted = False
         domain = eval(object.domain)
         if object.action in ('d', 'b'):
-            fields_data = pool1.get(object.model_id.model).\
+            fields_data = pool1.get(object.model_id.model). \
                 fields_get()
             for field in object.avoid_ids:
                 if field.name in fields_data:
                     del fields_data[field.name]
-            flds = list(fields_data.keys())
-            res_ids = pool1.get('base.synchro.obj').\
-                get_ids(model_obj, dt, domain, {'action': 'd'},
-                        object.only_create_date, flds, records_limit)
-            sync_ids += res_ids
-            while len(res_ids) >= records_limit:
-                domain += [('id', 'not in', [x[1] for x in res_ids])]
-                res_ids = pool1.get('base.synchro.obj').\
-                    get_ids(model_obj, dt, domain,
-                            {'action': 'd'}, object.only_create_date, flds,
-                            records_limit)
-                sync_ids += res_ids
 
-            pool_src = pool1
-            pool_dest = pool2
+            if object.model_id.model == 'product.product' and country_code == 'IT' and not fields_data.get(
+                    'virtual_stock_conservative', False):
+                fields_data['virtual_stock_conservative'] = {'type': 'float'}
+
+            flds = list(fields_data.keys())
+            sync_ids, domain = self.download_get_items(pool1, model_obj, dt, domain, object, flds, sync_ids,
+                                                       records_limit, False)
         domain = eval(object.domain)
         if object.action in ('u', 'b'):
             _logger.debug("Getting ids to synchronize [%s] (%s)",
                           object.synchronize_date, object.domain)
-            fields_data = pool2.get(object.model_id.model).\
+            fields_data = pool2.get(object.model_id.model). \
                 fields_get()
+
             for field in object.avoid_ids:
                 if field.name in fields_data:
                     del fields_data[field.name]
-            flds = list(fields_data.keys())
-            res_ids = pool2.env['base.synchro.obj'].\
-                get_ids(model_obj, dt, domain, {'action': 'u'},
-                        object.only_create_date, flds, records_limit)
-            sync_ids += res_ids
-            while len(res_ids) >= records_limit:
-                domain += [('id', 'not in', [x[1] for x in res_ids])]
-                res_ids = pool2.env['base.synchro.obj'].\
-                    get_ids(model_obj, dt, domain, {'action': 'u'},
-                            object.only_create_date, flds, records_limit)
-                sync_ids += res_ids
 
-            pool_src = pool2
-            pool_dest = pool1
-            destination_inverted = True
+            if object.model_id.model == 'product.product' and country_code == 'ES' and not fields_data.get(
+                    'virtual_stock_conservative', False):
+                fields_data['virtual_stock_conservative'] = {'type': 'float'}
+
+            flds = list(fields_data.keys())
+            sync_ids, domain = pool2.upload_get_items(model_obj, dt, domain, object, flds, sync_ids, records_limit,
+                                                      False)
+
+        if object.force_ids:
+            flds = object.force_ids.mapped('name') + ['create_date']
+            force_update = True
+            sync_ids_is_empty = len(sync_ids) == 0
+            if sync_ids_is_empty:
+                if object.action in ('d', 'b'):
+                    sync_ids, domain = self.download_get_items(pool1, model_obj, dt, domain, object, flds, sync_ids,
+                                                               records_limit,
+                                                               force_update)
+                if object.action in ('u', 'b'):
+                    sync_ids, domain = pool2.upload_get_items(model_obj, dt, domain, object, flds, sync_ids,
+                                                              records_limit,
+                                                              force_update)
+            else:
+                if len(sync_ids) <= records_limit:
+                    domain += [('id', 'not in', [x[1] for x in sync_ids])]
+                if object.action in ('d', 'b'):
+                    sync_ids_forced, domain = self.download_get_items(pool1, model_obj, dt, domain, object, flds,
+                                                                      sync_ids_forced, records_limit, force_update)
+                if object.action in ('u', 'b'):
+                    sync_ids_forced, domain = pool2.upload_get_items(model_obj, dt, domain, object, flds,
+                                                                     sync_ids, records_limit, force_update)
+            for field in flds:
+                new_data_fields_forced[field] = fields_data[field]
+            if sync_ids_is_empty:
+                fields_data = new_data_fields_forced
+
         sorted(sync_ids, key=lambda x: str(x[0]))
         _logger.debug("SORTED SYNC_IDS {}".format(sync_ids))
         _logger.debug("{} REGS no: {}".format(model_obj, len(sync_ids)))
+        self.update_elements(pool1, pool2, sync_ids, object, fields_data, ctx)
+        if sync_ids_forced and new_data_fields_forced:
+            sorted(sync_ids_forced, key=lambda x: str(x[0]))
+            _logger.debug("SORTED SYNC_IDS_FORCED {}".format(sync_ids_forced))
+            _logger.debug("{} REGS no: {}".format(model_obj, len(sync_ids_forced)))
+            self.update_elements(pool1, pool2, sync_ids_forced, object, new_data_fields_forced, ctx, False)
+
+        return True
+
+    def upload_get_items(self, model_obj, dt, domain, object, flds, sync_ids, records_limit, force_update):
+        res_ids = self.env['base.synchro.obj']. \
+            get_ids(model_obj, dt, domain, {'action': 'u'},
+                    object.only_create_date, flds, records_limit, force_update)
+        sync_ids += res_ids
+        while len(res_ids) >= records_limit:
+            domain += [('id', 'not in', [x[1] for x in res_ids])]
+            res_ids = self.env['base.synchro.obj']. \
+                get_ids(model_obj, dt, domain, {'action': 'u'},
+                        object.only_create_date, flds, records_limit, force_update)
+            sync_ids += res_ids
+        return sync_ids, domain
+
+    @staticmethod
+    def download_get_items(pool1, model_obj, dt, domain, object, flds, sync_ids, records_limit, force_update):
+        res_ids = pool1.get('base.synchro.obj').get_ids(model_obj, dt, domain, {'action': 'd'},
+                                                        object.only_create_date, flds, records_limit, force_update)
+        sync_ids += res_ids
+        while len(res_ids) >= records_limit:
+            domain += [('id', 'not in', [x[1] for x in res_ids])]
+            res_ids = pool1.get('base.synchro.obj'). \
+                get_ids(model_obj, dt, domain, {'action': 'd'},
+                        object.only_create_date, flds, records_limit, force_update)
+            sync_ids += res_ids
+        return sync_ids, domain
+
+    def update_elements(self, pool1, pool2, sync_ids, object, fields_data, ctx, create=True):
         for dt, id, action, value in sync_ids:
             if action == 'd':
                 pool_src = pool1
@@ -135,6 +189,9 @@ class BaseSynchro(models.TransientModel):
                 pool_src = pool2
                 pool_dest = pool1
                 destination_inverted = True
+            if object.model_id.model == 'product.product' and 'virtual_stock_conservative' in value:
+                value['virtual_stock_conservative_es'] = value['virtual_stock_conservative']
+                del value['virtual_stock_conservative']
             if 'create_date' in value:
                 del value['create_date']
             if 'write_date' in value:
@@ -153,22 +210,22 @@ class BaseSynchro(models.TransientModel):
                 _logger.debug("Updating model %s [%d]", object.model_id.name,
                               id2)
                 if not destination_inverted:
-                    pool = pool_dest.env[object.model_id.model].\
+                    pool = pool_dest.env[object.model_id.model]. \
                         with_context(ctx)
                     pool.browse([id2]).write(value)
                 else:
-                    pool_dest.get(object.model_id.model).with_context(ctx).\
+                    pool_dest.get(object.model_id.model).with_context(ctx). \
                         write([id2], value)
                 self.report_total += 1
                 self.report_write += 1
-            else:
+            elif create:
                 _logger.debug("Creating model %s", object.model_id.name)
                 if not destination_inverted:
-                    idnew = pool_dest.env[object.model_id.model].\
+                    idnew = pool_dest.env[object.model_id.model]. \
                         with_context(ctx).create(value)
                     new_id = idnew.id
                 else:
-                    idnew = pool_dest.get(object.model_id.model).\
+                    idnew = pool_dest.get(object.model_id.model). \
                         with_context(ctx).create(value)
                     new_id = idnew
                 self.env['base.synchro.obj.line'].create({
@@ -178,7 +235,6 @@ class BaseSynchro(models.TransientModel):
                 })
                 self.report_total += 1
                 self.report_create += 1
-        return True
 
     @api.model
     def get_id(self, object_id, id, action):
@@ -262,10 +318,10 @@ class BaseSynchro(models.TransientModel):
             elif ftype == 'many2many':
                 res = \
                     map(lambda x: self.relation_transform(pool_src,
-                        pool_dest,
-                        fields[f]['relation'],
-                        x, action,
-                        destination_inverted),
+                                                          pool_dest,
+                                                          fields[f]['relation'],
+                                                          x, action,
+                                                          destination_inverted),
                         data[f])
                 data[f] = [(6, 0, [x for x in res if x])]
         del data['id']

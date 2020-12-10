@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<odoo noupdate="1">
+    <record id="ftp_edi_dir" model="ir.config_parameter">
+        <field name="key">ftp_edi_dir</field>
+        <field name="value"></field>
+    </record>
+    <record id="ftp_edi_user" model="ir.config_parameter">
+        <field name="key">ftp_edi_user</field>
+        <field name="value"></field>
+    </record>
+    <record id="ftp_edi_pass" model="ir.config_parameter">
+        <field name="key">ftp_edi_pass</field>
+        <field name="value"></field>
+    </record>
+    <record id="ftp_edi_folder" model="ir.config_parameter">
+        <field name="key">ftp_edi_folder</field>
+        <field name="value"></field>
+    </record>
+    <record id="ftp_edi_folder_out" model="ir.config_parameter">
+        <field name="key">ftp_edi_folder_out</field>
+        <field name="value"></field>
+    </record>
+</odoo>

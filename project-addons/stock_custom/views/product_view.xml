@@ -194,7 +194,6 @@
                 <field name="biggest_sale_qty"/>
                 <field name="remaining_days_sale"/>
                 <field name="qty_available_input_loc"/>
-                <field name="qty_available_external"/>
                 <field name="average_margin"/>
                 <field name="standard_price"/>
                 <field name="last_purchase_price"/>

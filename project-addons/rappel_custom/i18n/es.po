@@ -193,3 +193,19 @@ msgstr "<html>\n"
 "                        </div>\n"
 "</body>\n"
 "</html>"
+
+#. module: rappel_custom
+#: model:ir.actions.act_window,name:rappel_custom.action_rappel_info_calculated
+msgid "Rappels computed"
+msgstr "Rappels calculados"
+
+#. module: rappel_custom
+#: model:ir.model.fields,field_description:rappel_custom.field_rappel_calculated_invoice_line_ids
+#: model:ir.model.fields,field_description:rappel_custom.field_rappel_current_info_invoice_line_ids
+msgid "Invoice Line"
+msgstr "Líneas Facturas"
+
+#. module: rappel_custom
+#: model:ir.ui.view,arch_db:rappel_custom.view_partner_form_add_rappel_info
+msgid "Current Rappel"
+msgstr "Rappel Actual"

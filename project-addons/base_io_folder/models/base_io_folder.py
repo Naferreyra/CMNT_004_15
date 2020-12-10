@@ -13,7 +13,6 @@ def source_name(directory, file_name):
 
 
 class BaseIOFolder(models.Model):
-
     _name = "base.io.folder"
 
     name = fields.Char(required=True)
@@ -34,22 +33,31 @@ class BaseIOFolder(models.Model):
                                  default="import")
 
     @api.model
-    def _scheduler_import_file(self):
+    def _scheduler_import_file(self, max_commit_length=False):
         """
             Launch the scanning for all configurations defined
         :return:
         """
         for config in self.search([('direction', '=', 'import')]):
-            config._iter_directory()
+            continue_search = True
+            while continue_search:
+                imported_files, continue_search = config._iter_directory(max_commit_length)
+                self.env.cr.commit()
+                for file_imported, file_full_name in imported_files:
+                    config._after_import(file_imported, file_full_name)
 
     @api.multi
-    def _get_files_in_directory(self):
+    def _get_files_in_directory(self, max_commit_length=False):
         """
             Load a list of all file names existing in the directory
         :return: list of file names
         """
         self.ensure_one()
-        return [f for f in os.listdir(self.directory_path)]
+        list = os.listdir(self.directory_path)
+        continue_search = max_commit_length and len(list) > max_commit_length
+        if continue_search:
+            list = list[:max_commit_length]
+        return list, continue_search
 
     @api.multi
     def _after_import(self, file_name, file_path):
@@ -73,7 +81,7 @@ class BaseIOFolder(models.Model):
             os.remove(file_path)
 
     @api.multi
-    def _iter_directory(self):
+    def _iter_directory(self, max_commit_length=False):
         """
             Scan the directory linked to the current configuration and launch
             a queue job for each file found. Each job will call the invoice
@@ -81,19 +89,20 @@ class BaseIOFolder(models.Model):
         :return: None
         """
         self.ensure_one()
+        imported_files = []
         if not os.path.exists(self.directory_path):
             raise ValidationError(_('Unknown path provided: %s'
                                     % self.directory_path))
-        files = self._get_files_in_directory()
+        files, continue_search = self._get_files_in_directory(max_commit_length)
 
         for file_imported in files:
             file_full_name = source_name(self.directory_path,
                                          file_imported)
             with open(file_full_name, "rb") as fileobj:
                 data = fileobj.read()
-            description = 'Import data from file %s' % file_imported
             self.action_batch_import(file_imported, b64encode(data))
-            self._after_import(file_imported, file_full_name)
+            imported_files.append((file_imported, file_full_name))
+        return imported_files, continue_search
 
     @api.multi
     def export_file(self, b64data, filename):

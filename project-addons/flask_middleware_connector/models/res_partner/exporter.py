@@ -33,7 +33,8 @@ class ResPartnerExporter(Component):
             "phone1": binding.phone,
             "phone2": binding.mobile,
             "is_prepaid_payment_term":  binding.prepaid_payment_term(),
-            "last_sale_date": binding.last_sale_date
+            "last_sale_date": binding.last_sale_date,
+            "csv_connector_access": binding.csv_connector_access
         }
         if not vals['is_company']:
             vals.update({"type": binding.type, "parent_id": binding.parent_id.id, "email": binding.email})

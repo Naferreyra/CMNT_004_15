@@ -174,6 +174,10 @@ class ClaimMakePicking(models.TransientModel):
              'note': note,
              'claim_line_id': claim_line.id
              })
+        # In Italy, need to purchase the stock first
+        if picking_id.origin.startswith('IT-RMA') \
+                and picking_id.location_id == self.env.ref('stock.stock_location_stock'):
+            move_id.procure_method = 'make_to_order'
         if p_type == 'outgoing' and claim_line.product_id.type == 'product':
             reserv_vals = {
                 'product_id': product.id,

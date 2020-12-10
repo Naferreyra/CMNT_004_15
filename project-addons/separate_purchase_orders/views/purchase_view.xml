@@ -10,7 +10,8 @@
                     <button name="%(separate_purchase_orders.separate_purchase_orders)d" string="Separate" type="action"
                             attrs="{'invisible': [('state','!=','purchase_order')]}"
                             class="oe_highlight"/>
-
+                    <button name="button_cancel" states="purchase_order" string="Cancel" type="object"/>
+                    <button name="button_purchase_order" states="cancel" string="Set to Purchase Order" type="object"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
@@ -59,8 +60,9 @@
                     </group>
                     <notebook>
                         <page string="Products">
+                            <field name="fiscal_position_id" options="{'no_create': True}" invisible="1"/>
                             <field name="order_line" attrs="{'readonly': [('state', 'in', ('done', 'cancel'))]}">
-                                <tree string="Purchase Order Lines" editable="bottom">
+                                <tree string="Purchase Order Lines" editable="bottom" limit="1000">
                                     <field name="currency_id" invisible="1"/>
                                     <field name="state" invisible="1"/>
                                     <field name="sequence" widget="handle"/>
@@ -80,6 +82,7 @@
                                            attrs="{'readonly': [('state', 'in', ('purchase', 'done', 'cancel'))]}"
                                            force_save="1"/>
                                     <field name="price_unit"/>
+                                    <field name="discount"/>
                                     <field name="taxes_id" widget="many2many_tags"
                                            domain="[('type_tax_use','=','purchase')]"
                                            context="{'default_type_tax_use': 'purchase'}"
@@ -91,6 +94,8 @@
                             <group class="oe_subtotal_footer oe_right">
                                 <field name="amount_untaxed" widget="monetary"
                                        options="{'currency_field': 'currency_id'}"/>
+                                <field name="total_no_disc" widget="monetary"/>
+                                <field name="total_disc" widget="monetary"/>
                                 <field name="amount_tax" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                                 <div class="oe_subtotal_footer_separator oe_inline">
                                     <label for="amount_total"/>
@@ -114,7 +119,7 @@
         <field name="name">purchase.order.tree.custom</field>
         <field name="model">purchase.order</field>
         <field name="arch" type="xml">
-            <tree string="Purchase Order">
+            <tree string="Purchase Order" decoration-muted="state == 'cancel'">
                 <field name="name" string="Reference"/>
                 <field name="date_order"/>
                 <field name="partner_id"/>
@@ -141,8 +146,8 @@
                                       (0, 0, {'view_mode': 'form', 'view_id': ref('purchase_order_form_custom')}),
                                       (0, 0, {'view_mode': 'graph', 'view_id': ref('purchase.purchase_order_graph')}),
                                       (0, 0, {'view_mode': 'pivot', 'view_id': ref('purchase.purchase_order_pivot')})]"/>
-        <field name="context">{'default_state':'purchase_order'}</field>
-        <field name="domain">[('state','=','purchase_order')]</field>
+        <field name="context">{'default_state':'purchase_order','search_default_not_cancelled':1}</field>
+        <field name="domain">['|',('state','=','purchase_order'),('name','=like','OC%')]</field>
         <field name="help" type="html">
             <p class="oe_view_nocontent_create">
                 Click to create a request for purchase order in state purchase order
@@ -163,7 +168,8 @@
         <field name="inherit_id" ref="purchase.purchase_order_form"/>
         <field name="arch" type="xml">
             <field name="company_id" position="after">
-                <field name="parent_id" readonly="1" force_save="1" attrs="{'invisible':[('parent_id','=',False)]}"/>
+                <field name="parent_id" readonly="1" force_save="1" attrs="{'invisible':[('parent_id','=',False)]}"
+                       context="{'form_view_ref':'separate_purchase_orders.purchase_order_form_custom'}"/>
             </field>
         </field>
 
@@ -173,12 +179,24 @@
         <field name="domain">[('state','not in',('draft','sent', 'confirmed','purchase_order'))]</field>
     </record>
 
+    <record id="purchase_order_line_tree_add_production_qty" model="ir.ui.view">
+        <field name="name">purchase.order.line.tree</field>
+        <field name="model">purchase.order.line</field>
+        <field name="inherit_id" ref="purchase.purchase_order_line_tree"/>
+        <field name="arch" type="xml">
+            <field name="product_qty" position="before">
+                <field name="state" invisible="1"/>
+                <field name="production_qty" attrs="{'invisible':[('state','!=','purchase_order')]}"/>
+            </field>
+        </field>
+    </record>
+
     <record model="ir.actions.act_window" id="action_split_purchase_line_product_tree_2">
         <field name="context">{}</field>
         <field name="domain">[('product_id.id','in',active_ids), ('order_id.state', '=', 'purchase_order')]</field>
         <field name="name">Purchase orders to split</field>
         <field name="res_model">purchase.order.line</field>
-        <field name="view_id" ref="purchase.purchase_order_line_tree"/>
+        <field name="view_id" ref="separate_purchase_orders.purchase_order_line_tree_add_production_qty"/>
     </record>
 
     <record id="view_product_product_split_purchase_buttons_from" model="ir.ui.view">
@@ -196,5 +214,11 @@
         </field>
     </record>
 
-
+    <record id="purchase.purchase_rfq" model="ir.actions.act_window">
+        <field name="name">Requests for Quotation</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">purchase.order</field>
+        <field name="domain">[('state','in',('draft','sent','bid','cancel', 'confirmed')),('name','=like','PO%')]
+        </field>
+    </record>
 </odoo>

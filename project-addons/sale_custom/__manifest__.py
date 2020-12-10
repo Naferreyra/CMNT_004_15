@@ -14,6 +14,7 @@
         "base",
         "sale",
         "purchase",
+        "account",
         "sale_stock",
         "sale_display_stock",
         "sale_margin_percentage",

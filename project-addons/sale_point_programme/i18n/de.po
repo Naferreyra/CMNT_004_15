@@ -173,6 +173,7 @@ msgstr "Angelegt am"
 #. module: sale_point_programme
 #: model:ir.model.fields,field_description:sale_point_programme.field_res_partner_point_programme_bag_name
 #: model:ir.model.fields,field_description:sale_point_programme.field_sale_point_programme_rule_name
+#: model:ir.model.fields,field_description:sale_point_programme.field_res_partner_point_programme_bag_accumulated_name
 msgid "Description"
 msgstr "Beschreibung"
 
@@ -381,3 +382,16 @@ msgstr "res.partner.point.programme.bag"
 #: model:ir.model,name:sale_point_programme.model_sale_point_programme_rule
 msgid "sale.point.programme.rule"
 msgstr "sale.point.programme.rule"
+
+#. module: sale_point_programme
+#: model:ir.actions.act_window,name:sale_point_programme.action_open_partner_points_acc
+#: model:ir.actions.act_window,name:sale_point_programme.action_points_traceability_acc
+#: model:ir.ui.menu,name:sale_point_programme.points_traceability_acc_menu
+#: model:ir.ui.view,arch_db:sale_point_programme.res_partner_point_programme_bag_acc_tree
+msgid "Points traceability Accumulated"
+msgstr "Rückverfolgbarkeit von Punkten akkumuliert"
+
+#. module: sale_point_programme
+#: model:ir.ui.view,arch_db:sale_point_programme.view_partner_form_add_points_widget
+msgid "Points accumulated"
+msgstr "Punkte gesammelt"

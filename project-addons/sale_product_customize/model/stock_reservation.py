@@ -64,7 +64,7 @@ class StockPicking(models.Model):
                     mrp_product.picking_in = pick_in.id
                     cost_moves = sum(picking.move_lines.mapped('price_unit'))
                     production = production_obj.search([('name', '=', picking.origin)])
-                    production.move_finished_ids.write({'price_unit': cost_moves,
+                    production.move_finished_ids.write({'price_unit': -cost_moves,
                                                         'picking_id': pick_in.id})
                     production.move_finished_ids.mapped('move_line_ids').write({'picking_id': pick_in.id})
                     pick_in.action_assign()

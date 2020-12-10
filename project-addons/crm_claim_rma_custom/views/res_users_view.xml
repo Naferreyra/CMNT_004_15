@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_users_form_simple_modif" model="ir.ui.view">
+        <field name="name">Add warehouse to user preferences form</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base_technical_features.view_users_form_simple_modif" />
+        <field name="arch" type="xml">
+            <field name="technical_features" position="after">
+                <field name="warehouse_location" />
+            </field>
+        </field>
+    </record>
+</odoo>

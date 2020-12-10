@@ -108,6 +108,8 @@ class PromotionsRulesActions(models.Model):
              _('Discount % on Brand')),
             ('brand_disc_perc_accumulated',
              _('Discount % on Brand accumulated')),
+            ('brand_price_disc_accumulated',
+             _('Discount % on Brand accumulated (Price Unit)')),
             ('web_disc_accumulated',
              _('Web Discount % on Product accumulated')),
             ('a_get_b_product_tag',
@@ -117,7 +119,9 @@ class PromotionsRulesActions(models.Model):
             ('prod_fixed_price',
              _('Fixed price on Product')),
             ('prod_free_per_unit',
-             _('Products free per unit'))
+             _('Products free per unit')),
+            ('sale_points_programme_discount_on_brand',
+             _('Sale points programme discount on Brand'))
             ])
 
     def on_change(self):
@@ -136,7 +140,8 @@ class PromotionsRulesActions(models.Model):
             self.arguments = '0.00'
 
         elif self.action_type in [
-                'brand_disc_perc', 'brand_disc_perc_accumulated']:
+                'brand_disc_perc', 'brand_disc_perc_accumulated',
+                'brand_price_disc_accumulated']:
             self.product_code = 'brand_code'
             self.arguments = '0.00'
 
@@ -159,6 +164,10 @@ class PromotionsRulesActions(models.Model):
             self.product_code = '"product_reference",..."'
             self.arguments = '{"product":qty, ...}'
 
+        elif self.action_type == 'sale_points_programme_discount_on_brand':
+            self.product_code = 'brand_code'
+            self.arguments = 'sale_point_rule_name'
+
         return super().on_change()
 
     def apply_perc_discount_accumulated(self, order_line):
@@ -176,6 +185,18 @@ class PromotionsRulesActions(models.Model):
             order_line.write({'discount': final_discount,
                               'old_discount': order_line.discount,
                               'accumulated_promo': True})
+
+    def apply_perc_discount_price_accumulated(self, order_line):
+        discount = eval(self.arguments)
+
+        promo_price = order_line.price_unit * (1 - (discount / 100))
+
+        if not order_line.old_price:
+            order_line.write({'old_price': order_line.price_unit,
+                              'price_unit': promo_price})
+        else:
+            order_line.write({'price_unit': promo_price})
+
 
     def action_tag_disc_perc_accumulated(self, order):
         """
@@ -325,6 +346,81 @@ class PromotionsRulesActions(models.Model):
                 self.create_y_line(order, qty * line.product_qty, prod.id)
 
         return True
+
+
+    def create_y_line_sale_points_programme(self, order, price_unit,bags_ids):
+        product_id = self.env.ref('commercial_rules.product_discount')
+        vals = {
+            'order_id': order.id,
+            'product_id': product_id.id ,
+            'name': '%s' % self.promotion.line_description,
+            'price_unit': -price_unit,
+            'promotion_line': True,
+            'product_uom_qty': 1,
+            'product_uom': product_id.uom_id.id,
+            'bag_ids': [(6, 0, [x.id for x in bags_ids])]
+
+        }
+        self.create_line(vals)
+        return True
+
+    def action_sale_points_programme_discount_on_brand(self, order):
+        """
+        Action for: Sale points programme discount on a selected brand
+        """
+        bag_obj = self.env['res.partner.point.programme.bag']
+        rule_obj = self.env['sale.point.programme.rule']
+        price_subtotal = 0
+        for order_line in order.order_line:
+            if eval(self.product_code) == \
+            order_line.product_id.product_brand_id.code:
+                price_subtotal += order_line.price_subtotal
+        if price_subtotal == 0:
+            return True
+        rule = rule_obj.search([('name', 'ilike', self.arguments)])
+        bags = bag_obj.search([('partner_id','=',order.partner_id.id),('point_rule_id','=',rule.id),('applied_state','=','no')])
+        points = sum([x.points for x in bags])
+        if points <= 0:
+            return True
+
+        if points <= price_subtotal:
+            self.create_y_line_sale_points_programme(order, points,bags)
+            bags.write({'applied_state':'applied', 'order_applied_id':order.id})
+        else:
+            bags_to_change_status = self.env['res.partner.point.programme.bag']
+            cont_point_applied = 0
+            if rule.integer_points:
+                price_subtotal = int(price_subtotal)
+            for bag in bags:
+                if price_subtotal<=cont_point_applied:
+                    break
+                bag_points=bag.points
+                if cont_point_applied + bag_points <= price_subtotal:
+                    cont_point_applied += bag_points
+                    bags_to_change_status += bag
+                else:
+                    diff = price_subtotal - cont_point_applied
+                    old_points = bag.points
+                    bag.points = diff
+                    bag_obj.create({'name': rule.name,
+                                    'point_rule_id': rule.id,
+                                    'order_id': bag.order_id.id,
+                                    'points': old_points-diff,
+                                    'partner_id': bag.partner_id.id})
+                    cont_point_applied = price_subtotal
+                    bags_to_change_status += bag
+            bags_to_change_status.write({'applied_state': 'applied', 'order_applied_id': order.id})
+            self.create_y_line_sale_points_programme(order, price_subtotal,bags_to_change_status)
+
+        return True
+
+    def action_brand_price_disc_accumulated(self, order):
+        for order_line in order.order_line:
+            if eval(self.product_code) == \
+                    order_line.product_id.product_brand_id.code:
+                self.apply_perc_discount_price_accumulated(order_line)
+        return {}
+
 
 
 class PromotionsRules(models.Model):
