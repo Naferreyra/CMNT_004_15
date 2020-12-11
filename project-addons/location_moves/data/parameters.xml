@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="max_commit_len" model="ir.config_parameter">
+        <field name="key">max_commit_len</field>
+        <field name="value">25</field>
+    </record>
+</odoo>

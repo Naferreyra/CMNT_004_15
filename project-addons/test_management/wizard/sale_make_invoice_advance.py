@@ -31,44 +31,46 @@ class SaleAdvancePaymentInv(models.TransientModel):
             orders = self.env['sale.order']
             for invoice_id in sale_orders.mapped('invoice_ids')._ids:
                 invoice = self.env['account.invoice'].sudo().browse(invoice_id)
-                test_company_id = self.env.user.company_id.test_company_id.id
-                test_account = self.env["account.account"].sudo().search(
-                    [('code', 'like', invoice.account_id.code),
-                     ('company_id', '=', test_company_id)], limit=1)
-                test_journal = self.env['account.journal'].sudo().\
-                    search([('type', '=', 'sale'),
-                            ('company_id', '=', test_company_id)], limit=1)
-                invoice.write({
-                    'company_id': test_company_id,
-                    'fiscal_position_id': False,
-                    'payment_term_id': False,
-                    'payment_mode_id': False,
-                    'partner_bank_id': False,
-                    'mandate_id': False,
-                    'journal_id': test_journal.id,
-                    'tax_line_ids': [(6, 0, [])],
-                    'account_id': test_account.id,
-                    'not_send_email': True,
-                    'allow_confirm_blocked': True
-                })
-
-                invoice.partner_id.company_id = False
-                invoice.commercial_partner_id.company_id = False
-                for line in invoice.invoice_line_ids:
-                    accounts = self.env["account.account"].sudo().search(
-                        [('code', 'like', line.account_id.code),
+                if invoice.state == 'draft':
+                    test_company_id = self.env.user.company_id.test_company_id.id
+                    test_account = self.env["account.account"].sudo().search(
+                        [('code', 'like', invoice.account_id.code),
                          ('company_id', '=', test_company_id)], limit=1)
-                    orders |= line.sale_line_ids.mapped('order_id')
-                    line.write({'sale_line_ids': [(6, 0, [])],
-                                'invoice_line_tax_ids': [(6, 0, [])],
-                                'company_id': test_company_id,
-                                'account_id': accounts.id,
-                                'account_analytic_id': False})
-                    if line.product_id:
-                        line.product_id.company_id = False
+                    test_journal = self.env['account.journal'].sudo().\
+                        search([('type', '=', 'sale'),
+                                ('company_id', '=', test_company_id)], limit=1)
+                    invoice.write({
+                        'company_id': test_company_id,
+                        'fiscal_position_id': False,
+                        'payment_term_id': False,
+                        'payment_mode_id': False,
+                        'partner_bank_id': False,
+                        'mandate_id': False,
+                        'journal_id': test_journal.id,
+                        'tax_line_ids': [(6, 0, [])],
+                        'account_id': test_account.id,
+                        'not_send_email': True,
+                        'allow_confirm_blocked': True
+                    })
 
-                invoice._onchange_invoice_line_ids()
+                    invoice.partner_id.company_id = False
+                    invoice.commercial_partner_id.company_id = False
+                    for line in invoice.invoice_line_ids:
+                        accounts = self.env["account.account"].sudo().search(
+                            [('code', 'like', line.account_id.code),
+                             ('company_id', '=', test_company_id)], limit=1)
+                        orders |= line.sale_line_ids.mapped('order_id')
+                        line.write({'sale_line_ids': [(6, 0, [])],
+                                    'invoice_line_tax_ids': [(6, 0, [])],
+                                    'company_id': test_company_id,
+                                    'account_id': accounts.id,
+                                    'account_analytic_id': False})
+                        if line.product_id:
+                            line.product_id.company_id = False
+
+                    invoice._onchange_invoice_line_ids()
             orders.write({'force_invoiced':  True})
+            orders.mapped('order_line').filtered(lambda l:l.invoice_status=='to invoice').write({'invoice_status': 'no'})
         orders_to_done = self.env['sale.order']
         for order in sale_orders:
             if not order.order_line.mapped('product_id').filtered(lambda x: x.type != 'service'):

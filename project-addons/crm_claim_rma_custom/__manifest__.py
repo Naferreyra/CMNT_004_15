@@ -47,6 +47,7 @@
              'wizard/claim_make_picking_from_picking_view.xml',
              'report/crm_claim_report_view.xml',
              'data/stage_data.xml',
-             'wizard/equivalent_products_wizard_view.xml'],
+             'wizard/equivalent_products_wizard_view.xml',
+             'views/res_users_view.xml'],
     "installable": True
 }

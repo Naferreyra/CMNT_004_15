@@ -15,6 +15,13 @@
                         type="action">
                         <field string="Points" name="points_in_bag" widget="statinfo"/>
                    </button>
+                   <button
+                        class="oe_stat_button"
+                        icon="fa-shopping-cart"
+                        string="Points accumulated"
+                        name="%(action_open_partner_points_acc)d"
+                        type="action">
+                   </button>
                 </xpath>
             </field>
         </record>

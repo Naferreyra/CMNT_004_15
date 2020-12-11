@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="edif_file_sales_tree" model="ir.ui.view">
+        <field name="name">edif.file.sales.tree</field>
+        <field name="model">edif.file</field>
+        <field name="arch" type="xml">
+            <tree string="EDI Files" create="false" decoration-danger="error" >
+                <field name="file_name"/>
+                <field name="read_date"/>
+                <field name="error"/>
+                <button type="object" name="retry_file" string="Retry" icon="fa-repeat"
+                        attrs="{'invisible': ['|',('error','=',False),('error','=','')]}"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_edi_sale_files" model="ir.actions.act_window">
+        <field name="name">EDI Files</field>
+        <field name="res_model">edif.file</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help">EDIFACT Files</field>
+        <field name="view_id" ref="edif_file_sales_tree"/>
+    </record>
+
+    <menuitem name="EDI" parent="sale.menu_sale_config" id="edi_sales_menu"/>
+    <menuitem name="EDI Files" parent="edi_sales_menu" action="action_edi_sale_files" id="edi_sales_files"/>
+
+</odoo>

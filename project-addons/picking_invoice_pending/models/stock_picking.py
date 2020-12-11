@@ -59,10 +59,8 @@ class StockPicking(models.Model):
         obj_precision = self.env['decimal.precision']
         for move_line in self.move_lines:
             name = move_line.name or origin
-
-            amount_line = round(move_line._get_price_unit(), obj_precision.
-                                precision_get('Account')) * \
-                move_line.product_qty
+            amount_line = round(move_line._get_price_unit()*move_line.product_qty, obj_precision.
+                                precision_get('Account'))
             vals = {
                 'name': name,
                 'ref': origin,
@@ -243,9 +241,14 @@ class StockPicking(models.Model):
                 pick.pending_stock_reverse_move_id.button_cancel()
                 pick.pending_stock_reverse_move_id.unlink()
             if pick.sale_id:
-                states=[state in ['done', 'cancel'] for state in pick.sale_id.picking_ids.mapped('state')]
-                if states and all(states):
-                    pick.sale_id.state="done"
+                picking_states = self.env['stock.picking'].search_read([('sale_id', '=', pick.sale_id.id)],
+                                                                       ['state'])
+
+                if all(picking['state'] in ('done', 'cancel') for picking in picking_states):
+                    if all(picking['state'] == 'cancel' for picking in picking_states):
+                        pick.sale_id.state = 'cancel'
+                    else:
+                        pick.sale_id.action_done()
         return res
 
     @api.multi
@@ -261,3 +264,38 @@ class StockPicking(models.Model):
                 pick.pending_stock_reverse_move_id.button_cancel()
                 pick.pending_stock_reverse_move_id.unlink()
         return super().unlink()
+
+
+class StockMove(models.Model):
+
+    _inherit = 'stock.move'
+
+    @api.multi
+    def _get_price_unit(self):
+        """ Returns the unit price for the move"""
+        self.ensure_one()
+        if self.purchase_line_id and self.product_id.id == self.purchase_line_id.product_id.id:
+            line = self.purchase_line_id
+            order = line.order_id
+            price_unit = line.price_unit
+            if line.taxes_id:
+                price_unit = line.taxes_id.\
+                    with_context(round=False).\
+                    compute_all(price_unit, currency=line.order_id.currency_id, quantity=1.0)['total_excluded']
+            if line.product_uom.id != line.product_id.uom_id.id:
+                price_unit *= line.product_uom.factor / line.product_id.uom_id.factor
+            if order.currency_id != order.company_id.currency_id:
+                # Set date as picking creation date
+                if self.picking_id and self.picking_id.picking_type_id.code == "incoming":
+                    picking = self.picking_id
+                    if picking.backorder_id:
+                        date = picking.backorder_id.date
+                    else:
+                        date = picking.date
+                else:
+                    date = fields.Date.context_today(self)
+                price_unit = order.currency_id.with_context(date=date).\
+                    compute(price_unit, order.company_id.currency_id, round=False)
+            return price_unit
+        return super(StockMove, self)._get_price_unit()
+

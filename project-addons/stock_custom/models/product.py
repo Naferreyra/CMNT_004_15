@@ -31,17 +31,20 @@ class ProductTemplate(models.Model):
     stock_graphic = fields.Binary("Graph")
     name = fields.Char(translate=False)
     description_sale = fields.Text(translate=False)
-
-    # this doesn't seem to work
-    property_valuation = fields.Selection(default='real_time')
-
     currency_purchase_id = fields.Many2one('res.currency', 'Currency',
                                            default=lambda self: self.env.user.company_id.currency_id.id)
 
     @api.model
     def create(self, vals):
         prod = super().create(vals)
-        prod.property_valuation = 'real_time'
+        prod.property_valuation = prod.categ_id.property_valuation
+        if self.env['ir.config_parameter'].sudo().get_param('country_code') == 'IT' \
+                and not prod.seller_ids:
+            supplierinfo = self.env['product.supplierinfo'].create({
+                'name': 27,
+                'min_qty': 1
+            })
+            prod.seller_ids = supplierinfo
         return prod
 
     def set_product_template_currency_purchase(self, currency):
@@ -330,6 +333,14 @@ class ProductProduct(models.Model):
             # Set related product template values
             product.product_tmpl_id.set_product_template_currency_purchase(currency_purchase_id)
         return res
+
+    @api.onchange('type')
+    def onchange_product_type(self):
+        for product in self:
+            if product.type=='service':
+                product.invoice_policy = 'order'
+            elif product.type=='product':
+                product.invoice_policy = 'delivery'
 
 
 class StockQuantityHistory(models.TransientModel):

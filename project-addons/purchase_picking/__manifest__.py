@@ -36,6 +36,7 @@
              'views/stock_view.xml',
              'security/ir.model.access.csv',
              'security/purchase_picking_security.xml',
-             'wizard/assign_container_view.xml'],
+             'wizard/assign_container_view.xml',
+             'wizard/cancel_moves_view.xml'],
     "installable": True
 }

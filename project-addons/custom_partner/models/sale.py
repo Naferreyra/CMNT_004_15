@@ -109,3 +109,12 @@ class SaleOrder(models.Model):
         orders_to_done.write({'state': 'done'})
         return res
 
+    @api.multi
+    def _prepare_invoice(self):
+        res = super(SaleOrder, self)._prepare_invoice()
+        invoice_type = (self.invoice_type_id
+                        or self.partner_id.commercial_partner_id.invoice_type_id)
+        if invoice_type and invoice_type.journal_id:
+            res['journal_id'] = invoice_type.journal_id.id
+        return res
+

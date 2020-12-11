@@ -9,9 +9,12 @@
                 <tree string="Points traceability">
                     <field name="partner_id"/>
                     <field name="order_id"/>
+                    <field name="order_applied_id"/>
                     <field name="name"/>
                     <field name="points"/>
                     <field name="email_sent"/>
+                    <field name="applied_state"/>
+                    <field name="line_id" invisible="1"/>
                 </tree>
             </field>
         </record>
@@ -51,6 +54,20 @@
                </search>
             </field>
         </record>
+        <record id="res_partner_point_programme_bag_acc_filter" model="ir.ui.view">
+            <field name="name">res.partner.point.programme.bag.acc.search</field>
+            <field name="model">res.partner.point.programme.bag.accumulated</field>
+            <field name="arch" type="xml">
+                <search string="Points">
+                    <field name="name"/>
+                    <field name="partner_id"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Partner" domain="[]" context="{'group_by':'partner_id'}"/>
+                        <filter string="Reward rule" domain="[]" context="{'group_by':'point_rule_id'}"/>
+                    </group>
+               </search>
+            </field>
+        </record>
 
         <record model="ir.actions.act_window" id="action_points_tracebility">
             <field name="name">Points traceability</field>
@@ -64,11 +81,42 @@
         <menuitem name="Point programmes" parent="sale.menu_sale_config" id="point_programme_menu"/>
         <menuitem name="Points traceability" parent="point_programme_menu" action="action_points_tracebility" id="points_traceability_menu"/>
 
+        <record id="res_partner_point_programme_bag_acc_tree" model="ir.ui.view">
+            <field name="name">res.partner.point.programme.bag.acc.tree</field>
+            <field name="model">res.partner.point.programme.bag.accumulated</field>
+            <field name="arch" type="xml">
+                <tree string="Points traceability Accumulated">
+                    <field name="partner_id"/>
+                    <field name="name"/>
+                    <field name="points"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_points_traceability_acc">
+            <field name="name">Points traceability Accumulated</field>
+            <field name="res_model">res.partner.point.programme.bag.accumulated</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="res_partner_point_programme_bag_acc_tree"/>
+            <field name="search_view_id" ref="res_partner_point_programme_bag_acc_filter"/>
+        </record>
+
+        <menuitem name="Points traceability Accumulated" parent="point_programme_menu" action="action_points_traceability_acc" id="points_traceability_acc_menu"/>
+
         <record model="ir.actions.act_window" id="action_open_partner_points">
             <field name="context">{'search_default_partner_id': active_id, 'default_partner_id': active_id}</field>
             <field name="name">Points traceability</field>
             <field name="res_model">res.partner.point.programme.bag</field>
             <field name="view_id" ref="res_partner_point_programme_bag_tree"/>
+
+        </record>
+
+        <record model="ir.actions.act_window" id="action_open_partner_points_acc">
+            <field name="context">{'search_default_partner_id': active_id, 'default_partner_id': active_id}</field>
+            <field name="name">Points traceability Accumulated</field>
+            <field name="res_model">res.partner.point.programme.bag.accumulated</field>
+            <field name="view_id" ref="res_partner_point_programme_bag_acc_tree"/>
         </record>
 
     </data>

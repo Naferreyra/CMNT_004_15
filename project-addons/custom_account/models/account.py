@@ -17,7 +17,7 @@ class AccountMoveLine(models.Model):
     last_rec_date = fields.Date(
         compute='_compute_last_rec_date',
         store=True,
-        index=True,
+        index=False,
         string='Last reconciliation date',
         help="The date of the last reconciliation (full) "
              "account move line."
@@ -84,7 +84,7 @@ class AccountInvoice(models.Model):
     reference = fields.Char(string='N. Supplier Invoice (SII)')
 
     @api.multi
-    @api.depends('state', 'payment_mode_id', 'payment_move_line_ids')
+    @api.depends('state', 'payment_mode_id', 'payment_move_line_ids','payment_move_line_ids.move_id.line_ids.full_reconcile_id')
     def _get_state_web(self):
         for invoice in self:
             res = ''
@@ -155,6 +155,10 @@ class AccountInvoice(models.Model):
             if vals.get('type', False) == "out_refund":
                 # vencimiento inmediato en rectificativas
                 vals["payment_term_id"] = self.env.ref('account.account_payment_term_immediate').id
+            invoice_type = (partner.invoice_type_id
+                            or partner.commercial_partner_id.invoice_type_id)
+            if invoice_type and invoice_type.journal_id:
+                vals['journal_id'] = invoice_type.journal_id.id
         return super().create(vals)
 
     @api.onchange('partner_id', 'company_id')
@@ -174,6 +178,11 @@ class AccountInvoice(models.Model):
                 self.payment_term_id = False
                 self.date_due = fields.Date.today()
                 self.payment_mode_id = self.partner_id.commercial_partner_id.customer_payment_mode_id
+            invoice_type = (p.invoice_type_id or p.commercial_partner_id.invoice_type_id)
+            if invoice_type and invoice_type.journal_id:
+                self.journal_id = invoice_type.journal_id.id
+            else:
+                self.journal_id = self.with_context(type=self.type)._default_journal()
         return result
 
     @api.multi
@@ -269,6 +278,13 @@ class AccountInvoice(models.Model):
     def _onchange_payment_mode_id(self):
         super()._onchange_payment_mode_id()
         self.move_id.line_ids.filtered(lambda l: l.account_id.code == '43000000').write({'payment_mode_id': self.payment_mode_id.id})
+
+    def _get_currency_rate_date(self):
+        res = super()._get_currency_rate_date()
+        if self.picking_ids and self.type in ('in_invoice', 'in_refund'):
+            # Use first picking date of the purchase order to invoice
+            res = self.picking_ids.sorted(key=lambda p: p.date)[0].date
+        return res
 
     scheme = fields.Selection(related="mandate_id.scheme")
 

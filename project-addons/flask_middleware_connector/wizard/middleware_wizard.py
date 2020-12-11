@@ -27,7 +27,9 @@ class MiddlewareBackend(models.TransientModel):
             ('product_tag_product_rel', 'Product Tags Rel'),
             ('product_brand', 'Product Brand'),
             ('product_brand_product_rel', 'Product Brand Rel'),
-            ('product_category', 'Product Category')
+            ('product_category', 'Product Category'),
+            ('point_programme_rule', 'Sale Point Programme Rule'),
+            ('point_programme_bag', 'Sale Point Programme Bag')
         ],
         string='Export type',
         required=True,
@@ -78,7 +80,9 @@ class MiddlewareBackend(models.TransientModel):
             'country': self.export_countries,
             'product_brand': self.export_product_brand,
             'product_brand_product_rel': self.export_product_brand_product_rel,
-            'product_category': self.export_product_category
+            'product_category': self.export_product_category,
+            'point_programme_rule': self.export_sale_point_programme_rule,
+            'point_programme_bag': self.export_sale_point_programme_bag
         }
         switcher.get(self.type_export)(object_ids)
 
@@ -537,3 +541,35 @@ class MiddlewareBackend(models.TransientModel):
         else:
             for product_category in product_category_ids:
                 product_category.with_delay().unlink_product_category()
+
+    def export_sale_point_programme_rule(self, object_ids):
+        rule_obj = self.env['sale.point.programme.rule']
+        if object_ids:
+            rule_ids = rule_obj.browse(object_ids)
+        else:
+            rule_ids = rule_obj.search([])
+        if self.mode_export == 'export':
+            for rule in rule_ids:
+                rule.with_delay(priority=1).export_rule()
+        elif self.mode_export == 'update':
+            for rule in rule_ids:
+                rule.with_delay().update_rule()
+        else:
+            for rule in rule_ids:
+                rule.with_delay().unlink_rule()
+
+    def export_sale_point_programme_bag(self, object_ids):
+        bag_obj = self.env['res.partner.point.programme.bag.accumulated']
+        if object_ids:
+            bag_ids = bag_obj.browse(object_ids)
+        else:
+            bag_ids = bag_obj.search([])
+        if self.mode_export == 'export':
+            for bag in bag_ids:
+                bag.with_delay(priority=1).export_point_programme_bag_acc()
+        elif self.mode_export == 'update':
+            for bag in bag_ids:
+                bag.with_delay().update_point_programme_bag_acc()
+        else:
+            for bag in bag_ids:
+                bag.with_delay().unlink_point_programme_bag_acc()

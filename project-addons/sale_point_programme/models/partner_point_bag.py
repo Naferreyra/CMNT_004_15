@@ -28,6 +28,23 @@ class PartnerPointProgrammeBag(models.Model):
     name = fields.Char('Description', size=128, readonly=True)
     point_rule_id = fields.Many2one('sale.point.programme.rule', 'Rule', readonly=True)
     order_id = fields.Many2one('sale.order', 'Sale order', readonly=True)
-    points = fields.Integer('Points', readonly=True)
+    points = fields.Float('Points', readonly=True)
     partner_id = fields.Many2one('res.partner', 'Partner', readonly=True)
     email_sent = fields.Boolean('Email sent', default=False)
+    order_applied_id = fields.Many2one('sale.order', 'Sale order applied', readonly=True)
+    applied_state = fields.Selection([
+        ('no', 'No'),
+        ('applied', 'Applied'),
+    ], string='State', default='no')
+    line_id = fields.Many2one('sale.order.line', 'Sale order line', readonly=True)
+
+
+class PartnerPointProgrammeBagAccumulated(models.Model):
+
+    _name = 'res.partner.point.programme.bag.accumulated'
+
+    name = fields.Char('Description', size=128, readonly=True)
+    point_rule_id = fields.Many2one('sale.point.programme.rule', 'Rule', readonly=True)
+    points = fields.Float('Points', readonly=True)
+    partner_id = fields.Many2one('res.partner', 'Partner', readonly=True)
+

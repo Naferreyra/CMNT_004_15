@@ -766,7 +766,7 @@ SWIFT/BIC: BESCPTPL
                         <div style="width: 0.08in; height: 0.32in; background-color: white;"/>
                     </div>
                     <!-- Comprobacion del tipo de factura -->
-                    <span t-if="o.type == 'out_invoice' and (o.state == 'open' or o.state == 'paid')">
+                    <span t-if="o.type == 'out_invoice' and (o.state == 'open' or o.state == 'paid') and o.journal_id.code != 'SIAJ'">
                         <div>Invoice</div>
                         <span t-if="lang == 'de_DE'">
                             <div class="pull-right"
@@ -776,6 +776,11 @@ SWIFT/BIC: BESCPTPL
                             <div class="pull-right"
                                  style="width: 7.5in; height: 0.08in; margin-top: -2.2%; background-color: #da1f2e;"/>
                         </span>
+                    </span>
+                    <span t-if="o.type == 'out_invoice' and (o.state == 'open' or o.state == 'paid') and o.journal_id.code == 'SIAJ'">
+                        <div>Simplified Invoice</div>
+                        <div class="pull-right"
+                             style="width: 6in; height: 0.08in; margin-top: -2.2%; background-color: #da1f2e;"/>
                     </span>
                     <span t-if="o.type == 'out_invoice' and o.state == 'proforma2'">
                         <div>PRO-FORMA</div>

@@ -49,7 +49,7 @@ class CrmClaimRma(models.Model):
                                                                        ('3', 'Critical')])
     comercial = fields.Many2one("res.users", string="Comercial")
     country = fields.Many2one("res.country", string="Country")
-    date = fields.Date('Claim Date', index=True,
+    date = fields.Date('Claim Date', index=False,
                        default=fields.Date.context_today)
     write_date = fields.Datetime("Update date", readonly=True)
     date_received = fields.Date('Received Date')
@@ -60,6 +60,10 @@ class CrmClaimRma(models.Model):
     allow_confirm_blocked = fields.Boolean('Allow confirm', copy=False)
     transport_incidence = fields.Boolean('Transport incidence')
     t_incidence_picking = fields.Char('Trp. inc. picking')
+    warehouse_location = fields.Selection([('madrid1', 'Madrid - Avd. del Sol'),
+                                           ('madrid2', 'Madrid - Casablanca'),
+                                           ('italia', 'Italia - Arcore'),
+                                           ('transit', 'In transit')], "Warehouse Location")
 
     check_states = ['substate_received', 'substate_process', 'substate_due_receive']
 
@@ -71,6 +75,12 @@ class CrmClaimRma(models.Model):
             stage_ids.append(stage_repaired_id)
             stage_pending_shipping_id = self.env.ref('crm_claim_rma_custom.stage_claim6').id
             stage_ids.append(stage_pending_shipping_id)
+
+            stage_received_id = self.env['crm.claim.stage'].search([('name', '=', 'Recibido')]).id
+            if vals['stage_id'] == stage_received_id and \
+                    not (self.warehouse_location or vals.get('warehouse_location', False)):
+                raise exceptions.UserError(_('Please, select the warehouse location of the RMA'))
+
             if vals['stage_id'] in stage_ids:
                 for line in self.claim_line_ids:
                     line_state = self.env['ir.model.data'].search([('model', '=', 'substate.substate'),
@@ -169,11 +179,6 @@ class CrmClaimRma(models.Model):
     @api.multi
     def make_refund_invoice(self):
         for claim_obj in self:
-            domain_acc_inv = [('type', '=', 'out_refund'),
-                              ('partner_id', '=', claim_obj.partner_id.id)]
-            accinv_refund_obj = self.env['account.invoice']
-            accinv_refund_ids = accinv_refund_obj.search(domain_acc_inv)
-
             invoice = False
             invoice_name = set()
             for line in claim_obj.claim_inv_line_ids:
@@ -214,13 +219,10 @@ class CrmClaimRma(models.Model):
             }
             inv_obj = self.env['account.invoice']
             invoice_id = inv_obj.create(header_vals)
-            rectified_invoice_ids = []
             fp_obj = self.env['account.fiscal.position']
             for line in claim_obj.claim_inv_line_ids:
                 if line.invoiced:
                     continue
-                if line.invoice_id:
-                    rectified_invoice_ids.append(line.invoice_id.id)
                 if line.product_id:
                     account_id = line.product_id.property_account_income_id.id
                     if not account_id:
@@ -259,7 +261,6 @@ class CrmClaimRma(models.Model):
 
                 line.invoiced = True
 
-            invoice_id.write({'origin_invoices_ids': [(6, 0, list(set(rectified_invoice_ids)))]})
             invoice_id.compute_taxes()
             invoice_id.action_invoice_open()
 

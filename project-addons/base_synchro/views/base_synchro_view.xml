@@ -95,6 +95,12 @@
                             <field name="name"/>
                         </tree>
                     </field>
+                    <separator string="Fields Force Sync."/>
+                    <field name="force_ids">
+                        <tree string="Fields" editable="bottom">
+                            <field name="name"/>
+                        </tree>
+                    </field>
                 </sheet>
             </form>
         </field>

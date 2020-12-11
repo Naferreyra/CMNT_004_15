@@ -7,6 +7,7 @@
     'author': 'Nadia Ferreyra',
     'website': '',
     "depends": ['account', 'payment', 'account_payment_partner', 'account_banking_mandate'],
-    "data": ['wizard/invoice_update_payment_data_view.xml'],
+    "data": ['wizard/invoice_update_payment_data_view.xml',
+             'data/parameters.xml'],
     "installable": True
 }

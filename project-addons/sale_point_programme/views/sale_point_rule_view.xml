@@ -13,9 +13,11 @@
                     <field name="category_id"/>
                     <field name="product_id"/>
                     <field name="product_brand_id"/>
+                    <field name="partner_category_id"/>
                     <field name="modality"/>
                     <field name="attribute"/>
                     <field name="operator"/>
+                    <field name="integer_points"/>
                     <field name="value"/>
                     <field name="points"/>
                 </tree>

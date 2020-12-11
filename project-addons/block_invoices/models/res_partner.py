@@ -31,14 +31,13 @@ class ResPartner(models.Model):
             date.today() + timedelta(days=-int(
                 self.env.user.company_id.block_customer_days)))
 
+        debit_receipt_param = self.env['ir.config_parameter'].sudo().get_param('debit.receipt.account.ids')
+        account_id = int(debit_receipt_param.split(',')[1])
+
         # Buscamos efectos no conciliados, con fecha anterior a la fecha
         # limite, de tipo 'receivable'
-        cust_account = self.env['account.account'].search(
-            [('company_id', '=', self.env.user.company_id.id),
-             ('internal_type', '=', 'receivable'),
-             ('code', 'like', '430%')])
         move_lines = self.env['account.move.line'].search(
-            [('account_id', 'in', cust_account._ids),
+            [('account_id', '=', account_id),
              ('date_maturity', '<', limit_customer_date),
              ('full_reconcile_id', '=', False),
              ('invoice_id.state', '!=', 'paid')])  # <- to avoid partial reconciles
@@ -62,12 +61,12 @@ class ResPartner(models.Model):
                 if partner.blocked_sales:
                     partner.blocked_sales = False
                 continue
-            cust_accounts = self.env['account.account'].search(
-                [('company_id', '=', self.env.user.company_id.id),
-                 ('internal_type', '=', 'receivable'),
-                 ('code', 'like', '430%')])
+
+            debit_receipt_param = self.env['ir.config_parameter'].sudo().get_param('debit.receipt.account.ids')
+            account_id = int(debit_receipt_param.split(',')[1])
+
             move_lines = self.env['account.move.line'].search(
-                [('account_id', 'in', cust_accounts._ids),
+                [('account_id', '=', account_id),
                  '|', ('date_maturity', '<', limit_customer_date),
                  ('date_maturity', '=', False),
                  ('full_reconcile_id', '=', False),

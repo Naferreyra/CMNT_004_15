@@ -52,44 +52,47 @@ class ClaimMakePicking(models.TransientModel):
     @api.multi
     def create_move(self, claim_line, p_type, picking_id, claim, note, write_field):
         type_ids = self.env['stock.picking.type'].search([('code', '=', p_type)]).ids
-
         if claim_line.product_id.bom_ids:
             partner_id = claim.delivery_address_id and claim.delivery_address_id.id or claim.partner_id.id
             for bom in claim_line.product_id.bom_ids:
-                for bom_line in bom.bom_line_ids:
-                    move = self.env['stock.move'].create(
-                        {'name': bom_line.product_id.default_code,
-                         'priority': '0',
-                         'date': time.strftime(DEFAULT_SERVER_DATETIME_FORMAT),
-                         'date_expected': time.strftime(DEFAULT_SERVER_DATETIME_FORMAT),
-                         'product_id': bom_line.product_id.id,
-                         'picking_type_id': type_ids and type_ids[0],
-                         'product_uom_qty': bom_line.product_qty * claim_line.product_returned_quantity,
-                         'product_uom': bom_line.product_id.uom_id.id,
-                         'partner_id': partner_id,
-                         'picking_id': picking_id.id,
-                         'state': 'draft',
-                         'company_id': claim.company_id.id,
-                         'location_id': self.claim_line_source_location.id,
-                         'location_dest_id': self.claim_line_dest_location.id,
-                         'note': note,
-                         'claim_line_id': claim_line.id
-                         })
-                    if p_type == 'outgoing' and bom_line.product_id.type == 'product':
-                        reserv_vals = {
-                            'product_id': bom_line.product_id.id,
-                            'product_uom': bom_line.product_id.uom_id.id,
-                            'product_uom_qty': bom_line.product_qty * claim_line.product_returned_quantity,
-                            'date_validity': False,
-                            'name': u"{}".format(claim_line.claim_id.number),
-                            'location_id': self.claim_line_source_location.id,
-                            'location_dest_id': self.claim_line_dest_location.id,
-                            'move_id': move.id,
-                            'claim_id': claim_line.claim_id.id,
-                        }
-                        reserve = self.env['stock.reservation'].create(reserv_vals)
-                        reserve.reserve()
-                    claim_line.write({write_field: move.id})
+                if bom.type == 'phantom':
+                    for bom_line in bom.bom_line_ids:
+                        move = self.env['stock.move'].create(
+                            {'name': bom_line.product_id.default_code,
+                             'priority': '0',
+                             'date': time.strftime(DEFAULT_SERVER_DATETIME_FORMAT),
+                             'date_expected': time.strftime(DEFAULT_SERVER_DATETIME_FORMAT),
+                             'product_id': bom_line.product_id.id,
+                             'picking_type_id': type_ids and type_ids[0],
+                             'product_uom_qty': bom_line.product_qty * claim_line.product_returned_quantity,
+                             'product_uom': bom_line.product_id.uom_id.id,
+                             'partner_id': partner_id,
+                             'picking_id': picking_id.id,
+                             'state': 'draft',
+                             'company_id': claim.company_id.id,
+                             'location_id': self.claim_line_source_location.id,
+                             'location_dest_id': self.claim_line_dest_location.id,
+                             'note': note,
+                             'claim_line_id': claim_line.id
+                             })
+                        if p_type == 'outgoing' and bom_line.product_id.type == 'product':
+                            reserv_vals = {
+                                'product_id': bom_line.product_id.id,
+                                'product_uom': bom_line.product_id.uom_id.id,
+                                'product_uom_qty': bom_line.product_qty * claim_line.product_returned_quantity,
+                                'date_validity': False,
+                                'name': u"{}".format(claim_line.claim_id.number),
+                                'location_id': self.claim_line_source_location.id,
+                                'location_dest_id': self.claim_line_dest_location.id,
+                                'move_id': move.id,
+                                'claim_id': claim_line.claim_id.id,
+                            }
+                            reserve = self.env['stock.reservation'].create(reserv_vals)
+                            reserve.reserve()
+                        claim_line.write({write_field: move.id})
+                else:
+                    super(ClaimMakePicking, self).create_move(
+                        claim_line, p_type, picking_id, claim, note, write_field)
         else:
             return super(ClaimMakePicking, self).create_move(
                 claim_line, p_type, picking_id, claim, note, write_field)

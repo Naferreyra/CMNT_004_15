@@ -14,6 +14,11 @@ class AccountInvoice(models.Model):
                 try:
                     template = invoice.env.\
                         ref('account.email_template_edi_invoice')
+                    report_template ='custom_report_link.action_report_invoice_custom'
+                    if invoice.partner_id.send_hs_code_invoice or invoice.partner_id.commercial_partner_id.send_hs_code_invoice:
+                        report_template += '_2'
+                    template.report_template = invoice.env.ref(report_template)
+
                 except ValueError:
                     template = False
 

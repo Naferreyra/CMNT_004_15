@@ -17,6 +17,7 @@ class PurchaseOrder(models.Model):
                                 'some receptions have already been done.') %
                               (purchase.name))
             else:
+                purchase.picking_ids.action_cancel()
                 purchase.order_line.mapped('move_ids').\
                     write({'state': 'cancel'})
         super().button_cancel()

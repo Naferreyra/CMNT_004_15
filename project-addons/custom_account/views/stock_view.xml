@@ -43,7 +43,7 @@
           <field name="inherit_id" ref="sale_advance_payment.view_order_form_change_button"/>
           <field name="arch" type="xml">
             <button name="%(sale_advance_payment.action_view_account_voucher_wizard)d" position="attributes">
-                <attribute name="attrs">{'invisible': ['|',('state', '=', 'cancel'),('invoice_status', 'in', ['invoiced'])]}</attribute>
+                <attribute name="attrs">{'invisible': ['|',('state', '=', 'cancel')]}</attribute>
             </button>
           </field>
       </record>

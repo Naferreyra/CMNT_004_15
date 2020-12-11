@@ -51,6 +51,18 @@
                                                     <td class="text-center"></td>
                                                     <td class="text-center"></td>
                                                     <td class="text-center"></td>
+                                                    <t t-if="move.lots_text">
+                                                        <tr>
+                                                            <td class="text-center"></td>
+                                                            <td colspan="1" style="font-size:10px; font-weight: bold; color:#6D6E70;"><strong>Serial</strong></td>
+                                                            <td colspan="1" style="color:#6D6E70; font-size:10px"><span t-field="move.lots_text"></span></td>
+                                                            <td class="text-center"></td>
+                                                            <td class="text-center"></td>
+                                                            <td class="text-center"></td>
+                                                            <td class="text-center"></td>
+                                                            <td class="text-center"></td>
+                                                        </tr>
+                                                    </t>
                                                 </tr>
                                             </t>
                                     </t>
@@ -73,6 +85,18 @@
                                                 <td class="text-center"></td>
                                                 <td class="text-center"></td>
                                                 <td class="text-center"></td>
+                                                <t t-if="move.lots_text">
+                                                    <tr>
+                                                    <td class="text-center"></td>
+                                                    <td colspan="1" style="font-size:10px; font-weight: bold; color:#6D6E70;"><strong>Serial</strong></td>
+                                                    <td colspan="1" style="color:#6D6E70; font-size:10px"><span t-field="move.lots_text"></span></td>
+                                                    <td class="text-center"></td>
+                                                    <td class="text-center"></td>
+                                                    <td class="text-center"></td>
+                                                    <td class="text-center"></td>
+                                                    <td class="text-center"></td>
+                                                    </tr>
+                                                </t>
                                             </t>
                                     </tr>
                                 </tbody>

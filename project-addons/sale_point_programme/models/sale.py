@@ -18,56 +18,59 @@
 #
 ##############################################################################
 
-from odoo import models, api
+from odoo import models, api, fields
 
 
 class SaleOrder(models.Model):
-
     _inherit = 'sale.order'
 
-    @api.multi
-    def action_confirm(self):
-        res = super().action_confirm()
-        rule_obj = self.env['sale.point.programme.rule']
-        bag_obj = self.env['res.partner.point.programme.bag']
-        for order in self:
-            total_product_qty = 0.0
-            categories = {}
-            products = {}
-            brands = {}
-            rules = rule_obj.search(['|', ('date_start', '<=', order.date_order[:10]),
-                                          ('date_start', '=', False),
-                                     '|', ('date_end', '>=', order.date_order[:10]),
-                                          ('date_end', '=', False)])
+    def compute_points_programme_bag(self, lines, rules, mode="order"):
+        total_product_qty = 0.0
+        categories = {}
+        products = {}
+        brands = {}
 
-            if rules:
-                for line in order.order_line:
-                    if line.product_id:
-                        pkey = line.product_id.id
-                        ckey = line.product_id.categ_id.id
-                        bkey = line.product_id.product_brand_id.id
-                        if products.get(pkey):
-                            products[pkey]['qty'] += line.product_uom_qty
-                            products[pkey]['amount'] += line.price_subtotal
-                        else:
-                            products[pkey] = {'qty': line.product_uom_qty,
-                                              'amount': line.price_subtotal}
-                        if categories.get(ckey):
-                            categories[ckey]['qty'] += line.product_uom_qty
-                            categories[ckey]['amount'] += line.price_subtotal
-                        else:
-                            categories[ckey] = {'qty': line.product_uom_qty,
-                                                'amount': line.price_subtotal}
-                        if brands.get(bkey):
-                            brands[bkey]['qty'] += line.product_uom_qty
-                            brands[bkey]['amount'] += line.price_subtotal
-                        else:
-                            brands[bkey] = {'qty': line.product_uom_qty,
-                                            'amount': line.price_subtotal}
-                    total_product_qty += line.product_uom_qty
+        rules_with_points = {}
 
-                for rule in rules:
-                    modality_type = rule.modality
+        if rules:
+            for line in lines:
+                if line.product_id:
+                    pkey = line.product_id.id
+                    ckey = line.product_id.categ_id.id
+                    bkey = line.product_id.product_brand_id.id
+                    if mode == "claim":
+                        qty = line.qty
+                    else:
+                        qty = line.product_uom_qty
+                    if mode == "move":
+                        amount = line.sale_line_id.price_subtotal / line.sale_line_id.product_uom_qty * line.product_uom_qty
+                    else:
+                        amount = line.price_subtotal
+                    if products.get(pkey):
+                        products[pkey]['qty'] += qty
+                        products[pkey]['amount'] += amount
+                    else:
+                        products[pkey] = {'qty': qty,
+                                          'amount': amount}
+                    if categories.get(ckey):
+                        categories[ckey]['qty'] += qty
+                        categories[ckey]['amount'] += amount
+                    else:
+                        categories[ckey] = {'qty': qty,
+                                            'amount': amount}
+                    if brands.get(bkey):
+                        brands[bkey]['qty'] += qty
+                        brands[bkey]['amount'] += amount
+                    else:
+                        brands[bkey] = {'qty': qty,
+                                        'amount': amount}
+                    total_product_qty += qty
+
+            for rule in rules:
+                apply_rule = True
+                if rule.partner_category_id:
+                    apply_rule = rule.partner_category_id in self.partner_id.category_id
+                if apply_rule:
                     points = False
                     if rule.product_id:
                         if rule.product_id.id in products:
@@ -91,66 +94,81 @@ class SaleOrder(models.Model):
                             else:
                                 points = rule.evaluate(record['amount'])
                     elif rule.attribute == 'amount_untaxed':
-                        points = rule.evaluate(order.amount_untaxed)
+                        points = rule.evaluate(self.amount_untaxed)
                     else:
                         points = rule.evaluate(total_product_qty)
+                    rules_with_points[rule] = points
+        return rules_with_points, brands, products, categories
 
-                    # Ahora tiene en cuenta la modalidad establecida en la regla
-                    if (rule.product_brand_id.id in brands) | (rule.product_id.id in products) | (rule.category_id.id in categories):
+    @api.multi
+    def action_confirm(self):
+        res = super().action_confirm()
+        if isinstance(res, bool):
+            bag_obj = self.env['res.partner.point.programme.bag']
+            for order in self:
+                rule_obj = self.env['sale.point.programme.rule']
+                rules = rule_obj.search(['|', ('date_start', '<=', self.date_order[:10]),
+                                         ('date_start', '=', False),
+                                         '|', ('date_end', '>=', self.date_order[:10]),
+                                         ('date_end', '=', False)])
+                rules_with_points, brands, products, categories = order.compute_points_programme_bag(self.order_line,
+                                                                                                     rules)
+                for rule, points in rules_with_points.items():
+                    modality_type = rule.modality
+                    if modality_type == 'participation':
+                        reg = bag_obj.search_read([('point_rule_id', '=', rule.id)], ['points'],
+                                                  order='id desc', limit=1)
+                        if not reg:
+                            last_number = 0
+                        else:
+                            last_number = reg[0]['points']
 
-                        if modality_type == 'participation':
-                            registro = bag_obj.search_read([('point_rule_id', '=', rule.id)], ['points'],
-                                                           order='id desc', limit=1)
-                            if registro == []:
-                                last_number = 0
+                        control = 0
+                        while points > control:
+                            participation = last_number + 1
+
+                            if order.partner_id.is_company or not order.partner_id.parent_id:
+                                partner_id = order.partner_id.id
                             else:
-                                last_number = registro[0]['points']
+                                partner_id = order.partner_id.parent_id.id
 
-                            control = 0
-                            while points > control:
-                                participation = last_number + 1
+                            bag_obj.create({'name': rule.name,
+                                            'point_rule_id': rule.id,
+                                            'order_id': order.id,
+                                            'points': participation,
+                                            'partner_id': partner_id})
+                            last_number = participation
+                            control += 1
+                    elif modality_type == 'point':
+                        if points:
+                            if order.partner_id.is_company or not order.partner_id.parent_id:
+                                partner_id = order.partner_id.id
+                            else:
+                                partner_id = order.partner_id.parent_id.id
 
-                                if order.partner_id.is_company or not order.partner_id.parent_id:
-                                    partner_id = order.partner_id.id
-                                else:
-                                    partner_id = order.partner_id.parent_id.id
+                            bag_obj.create({'name': rule.name,
+                                            'point_rule_id': rule.id,
+                                            'order_id': order.id,
+                                            'points': points,
+                                            'partner_id': partner_id})
 
-                                bag_obj.create({'name': rule.name,
-                                                'point_rule_id': rule.id,
-                                                'order_id': order.id,
-                                                'points': participation,
-                                                'partner_id': partner_id})
-                                last_number = participation
-                                control += 1
-
-                        if modality_type == 'point':
-                            if points:
-                                if order.partner_id.is_company or not order.partner_id.parent_id:
-                                    partner_id = order.partner_id.id
-                                else:
-                                    partner_id = order.partner_id.parent_id.id
-
-                                bag_obj.create({'name': rule.name,
-                                                'point_rule_id': rule.id,
-                                                'order_id': order.id,
-                                                'points': points,
-                                                'partner_id': partner_id})
         return res
 
     @api.multi
     def action_cancel(self):
         self.ensure_one()
         res = super(SaleOrder, self).action_cancel()
-        bag_ids = self.env['res.partner.point.programme.bag'].search([('order_id', '=', self.id)])
-        bag_ids.unlink()
-
+        for line in self.order_line:
+            if line.bag_ids:
+                line.bag_ids.write({'applied_state': 'no', 'order_applied_id': False})
         return res
 
     # Para el cron que envia los emails
     @api.model
     def send_participations(self):
         bag_obj = self.env['res.partner.point.programme.bag']
-        registro = self.env['res.partner.point.programme.bag'].search_read([('email_sent', '=', False)], [('partner_id'), ('order_id'), ('points')])
+        registro = self.env['res.partner.point.programme.bag'].search_read([('email_sent', '=', False)],
+                                                                           [('partner_id'), ('order_id'), ('points')])
 
         # Obtener en diccionario los pedidos de los partners
         partners = {}
@@ -167,7 +185,6 @@ class SaleOrder(models.Model):
                 else:
                     records[order_id] = [partner['points']]
                     partners[partner_id][order_id] = [partner['points']]
-
 
         obj_partner = self.env['res.partner']
         for item in partners:
@@ -190,3 +207,20 @@ class SaleOrder(models.Model):
             line.write({'email_sent': True})
 
         return True
+
+
+class SaleOrderLine(models.Model):
+    _inherit = 'sale.order.line'
+
+    bag_ids = fields.One2many(
+        comodel_name='res.partner.point.programme.bag',
+        inverse_name='line_id',
+        string='Point Bag'
+    )
+
+    @api.multi
+    def unlink(self):
+        for line in self:
+            if line.bag_ids:
+                line.bag_ids.write({'applied_state': 'no', 'order_applied_id': False, 'line_id': False})
+        return super(SaleOrderLine, self).unlink()

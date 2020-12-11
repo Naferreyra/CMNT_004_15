@@ -35,7 +35,7 @@ class ResPartnerInvoiceType(models.Model):
     _name = 'res.partner.invoice.type'
 
     name = fields.Char("Name", required=True)
-
+    journal_id = fields.Many2one('account.journal', string="Journal")
 
 class PhoneValidationMixin(models.AbstractModel):
     _inherit = 'phone.validation.mixin'
@@ -832,17 +832,6 @@ class AccountMove(models.Model):
     _inherit = 'account.move'
 
     vref = fields.Char("Reference")
-
-
-class AccountVoucher(models.Model):
-    _inherit = 'account.voucher'
-
-    @api.multi
-    def account_move_get(self):
-        move = super(AccountVoucher, self).account_move_get()
-        move['vref'] = self.reference
-
-        return move
 
 
 class AccountPayment(models.Model):

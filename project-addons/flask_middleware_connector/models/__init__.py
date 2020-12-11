@@ -11,3 +11,5 @@ from . import product
 from . import rappel
 from . import rma
 from . import translation
+from . import account_payment
+from . import sale_point_programme

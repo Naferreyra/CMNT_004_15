@@ -170,7 +170,7 @@ msgid "Partner errore"
 msgstr "Errore azienda"
 
 #. module: purchase_picking
-#: code:addons/purchase_picking/wizard/create_picking_move.py:76
+#: code:addons/purchase_picking/wizard/create_picking_move.py:80
 #, python-format
 msgid "Picking error"
 msgstr "Errore nella bolla"
@@ -191,7 +191,7 @@ msgid "Picking created"
 msgstr "Bolla creata"
 
 #. module: purchase_picking
-#: code:addons/purchase_picking/wizard/create_picking_move.py:77
+#: code:addons/purchase_picking/wizard/create_picking_move.py:80
 #, python-format
 msgid "Picking error"
 msgstr "Errori nelle bolle"
@@ -217,7 +217,7 @@ msgid "Quantity"
 msgstr "Quantità"
 
 #. module: purchase_picking
-#: code:addons/purchase_picking/wizard/create_picking_move.py:92
+#: code:addons/purchase_picking/wizard/create_picking_move.py:101
 #, python-format
 msgid "Quantity error"
 msgstr "Errore nelle quantità"
@@ -269,7 +269,7 @@ msgid "The date planned of the reservation was changed."
 msgstr "La data di prenotazione pianificata è cambiata."
 
 #. module: purchase_picking
-#: code:addons/purchase_picking/wizard/create_picking_move.py:93
+#: code:addons/purchase_picking/wizard/create_picking_move.py:101
 #, python-format
 msgid "The quantity is greater than the original."
 msgstr "La cantidad es mayor a la original."
@@ -281,7 +281,7 @@ msgid "The sale order is already assigned."
 msgstr "L'ordine cliente è già assegnato."
 
 #. module: purchase_picking
-#: code:addons/purchase_picking/wizard/create_picking_move.py:77
+#: code:addons/purchase_picking/wizard/create_picking_move.py:80
 #, python-format
 msgid "Type not found"
 msgstr "Tipo non trovato"
@@ -351,3 +351,9 @@ msgstr "Se questo campo viene selezionato, le bolle verranno raggruppate per for
 #: model:ir.model.fields,field_description:purchase_picking.field_picking_from_moves_wizard_supplier_mode
 msgid "Create pickings grouped by supplier"
 msgstr "Crea bolle raggruppate per fornitore"
+
+#. module: purchase_picking
+#: code:addons/purchase_picking/wizard/create_picking_move.py:164
+#, python-format
+msgid "Picking already created"
+msgstr "Bolla già creata"

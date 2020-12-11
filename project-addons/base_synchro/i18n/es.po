@@ -35,6 +35,7 @@ msgstr "Servidor sincronizado"
 
 #. module: base_synchro
 #: field:base.synchro.obj.avoid,name:0
+#: field:base.synchro.obj.force,name:0
 msgid "Field Name"
 msgstr "Nombre del campo"
 
@@ -126,8 +127,15 @@ msgstr "Contraseña"
 
 #. module: base_synchro
 #: field:base.synchro.obj,avoid_ids:0
+#: model:ir.ui.view,arch_db:base_synchro.base_synchro_obj_form
 msgid "Fields Not Sync."
 msgstr "Campos no sincro."
+
+#. module: base_synchro
+#: field:base.synchro.obj,force_ids:0
+#: model:ir.ui.view,arch_db:base_synchro.base_synchro_obj_form
+msgid "Fields Force Sync."
+msgstr "Campos a forzar sincro."
 
 #. module: base_synchro
 #: selection:base.synchro.obj,action:0

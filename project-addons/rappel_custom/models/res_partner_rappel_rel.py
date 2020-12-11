@@ -138,6 +138,8 @@ class ResPartnerRappelRel(models.Model):
                         rappel, total, rappel_info, False)
                 else:
                     rappel_info['amount'] = 0.0
+            total_invoice_ids = [(6,0,(invoice_lines + refund_lines).ids)]
+            rappel_info['invoice_line_ids'] = total_invoice_ids
 
             if period[1] < fields.Date.from_string(fields.Date.today()):
                 if total_rappel:
@@ -147,7 +149,8 @@ class ResPartnerRappelRel(models.Model):
                         'date_end': period[1],
                         'quantity': total_rappel,
                         'rappel_id': rappel.rappel_id.id,
-                        'goal_percentage': goal_percentage
+                        'goal_percentage': goal_percentage,
+                        'invoice_line_ids': total_invoice_ids
                     })
                     if rappel.rappel_id.discount_voucher and total_rappel > 0:
                         rappel_to_invoice = []

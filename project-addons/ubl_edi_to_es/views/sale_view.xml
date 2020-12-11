@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_order_form_stock_es" model="ir.ui.view">
+        <field name="name">sale.order.form.deposit</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale_display_stock.view_order_form_add_dispaly_stock"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']/form//field[@name='incoming_qty']" position="after">
+                <field name="qty_available_es"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree/field[@name='incoming_qty']" position="after">
+                <field name="qty_available_es"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

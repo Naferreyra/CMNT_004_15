@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data noupdate="1">
+        <record forcecreate="True" id="ir_cron_read_edi_files" model="ir.cron">
+            <field name="name">Read EDI sales files</field>
+            <field eval="True" name="active"/>
+            <field name="user_id" ref="base.user_root"/>
+            <field name="interval_number">2</field>
+            <field name="interval_type">hours</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False"/>
+            <field name="state">code</field>
+            <field name="model_id" ref="model_edif_file"/>
+            <field name="code">model.search_for_orders()</field>
+        </record>
+
+        <record id="email_template_edi_read_error" model="mail.template">
+            <field name="name">EDI Error</field>
+            <field name="email_from">odoo_team@visiotechsecurity.com</field>
+            <field name="subject">[EDI] Reading has failed</field>
+            <field name="email_to">odoo_team@visiotechsecurity.com</field>
+            <field name="model_id" ref="edi_edifact.model_edif_file"/>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html"><![CDATA[
+                <p>EDI Reading failed for this file:</p>
+                    ${object.file_name or ''}
+                    ${object.error or ''}
+                ]]>
+             </field>
+        </record>
+
+        <record id="email_template_edi_send_error" model="mail.template">
+            <field name="name">EDI Invoice Error</field>
+            <field name="email_from">odoo_team@visiotechsecurity.com</field>
+            <field name="subject">[EDI] Invoice has failed</field>
+            <field name="email_to">odoo_team@visiotechsecurity.com</field>
+            <field name="model_id" ref="edi_edifact.model_edif_file"/>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html"><![CDATA[
+                <p>EDI Invoice failed:</p>
+                    ${object.number or ''}
+                ]]>
+             </field>
+        </record>
+    </data>
+</odoo>

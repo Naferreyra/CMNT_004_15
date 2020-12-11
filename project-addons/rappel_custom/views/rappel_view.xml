@@ -1,83 +1,157 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-        <record id="rappel_calculated_tree_add_percentage" model="ir.ui.view">
-            <field name="name">rappel.calculated.tree.add.percentage</field>
-            <field name="model">rappel.calculated</field>
-            <field name="inherit_id" ref="rappel.rappel_calculated_tree"/>
-            <field name="arch" type="xml">
-                <field name="invoice_id" position="after">
-                    <field name="goal_percentage"/>
-                </field>
+    <record id="rappel_calculated_tree_add_percentage" model="ir.ui.view">
+        <field name="name">rappel.calculated.tree.add.percentage</field>
+        <field name="model">rappel.calculated</field>
+        <field name="inherit_id" ref="rappel.rappel_calculated_tree"/>
+        <field name="arch" type="xml">
+            <field name="invoice_id" position="after">
+                <field name="goal_percentage"/>
             </field>
-        </record>
+        </field>
+    </record>
 
-         <record id="rappel_form_add_brand" model="ir.ui.view">
-            <field name="name">rappel.form.add.brand</field>
-            <field name="model">rappel</field>
-            <field name="inherit_id" ref="rappel.rappel_form"/>
-            <field name="arch" type="xml">
-                <field name="global_application" position="after">
-                    <div colspan="2">
-                        <separator attrs="{'invisible':[('global_application','=', True)]}"/>
-                        <label string="You must fill in only one of the following fields to define the validity area of rappel:"
-                               attrs="{'invisible':[('global_application','=', True)]}"
-                               style="color: red;"/>
-                        <separator attrs="{'invisible':[('global_application','=', True)]}"/>
-                    </div>
-                </field>
-                <field name="product_id" position="after">
-                    <field name="brand_ids" attrs="{'invisible':[('global_application','=', True)]}"/>
-                </field>
-                <field name="global_application" position="before">
-                    <field name="description"/>
-                    <field name="sequence" groups="base.group_system"/>
-                    <field name="discount_voucher" groups="base.group_system"/>
-                    <field name="company_id" groups="base.group_system"/>
-                    <field name="partner_add_conditions" groups="base.group_system"/>
-                    <field name="pricelist_ids" groups="base.group_system"
-                           attrs="{'invisible':[('discount_voucher','=', False)]}"/>
-                </field>
+    <record id="rappel_form_add_brand" model="ir.ui.view">
+        <field name="name">rappel.form.add.brand</field>
+        <field name="model">rappel</field>
+        <field name="inherit_id" ref="rappel.rappel_form"/>
+        <field name="arch" type="xml">
+            <field name="global_application" position="after">
+                <div colspan="2">
+                    <separator attrs="{'invisible':[('global_application','=', True)]}"/>
+                    <label string="You must fill in only one of the following fields to define the validity area of rappel:"
+                           attrs="{'invisible':[('global_application','=', True)]}"
+                           style="color: red;"/>
+                    <separator attrs="{'invisible':[('global_application','=', True)]}"/>
+                </div>
             </field>
-        </record>
-
-        <record id="view_rappel_current_info_tree_add_qty_picking" model="ir.ui.view">
-            <field name="name">rappel.current.info.tree.add_qty_picking</field>
-            <field name="model">rappel.current.info</field>
-            <field name="inherit_id" ref="rappel.view_rappel_current_info_tree"/>
-            <field name="arch" type="xml">
-                <field name="curr_qty" position="attributes">
-                    <attribute name="string">Curr. qty invoiced</attribute>
-                </field>
-                <field name="curr_qty" position="after">
-                    <field name="curr_qty_pickings"/>
-                </field>
-                <field name="amount" position="before">
-                    <field name="amount_est"/>
-                </field>
+            <field name="product_id" position="after">
+                <field name="brand_ids" attrs="{'invisible':[('global_application','=', True)]}"/>
             </field>
-        </record>
+            <field name="global_application" position="before">
+                <field name="description"/>
+                <field name="sequence" groups="base.group_system"/>
+                <field name="discount_voucher" groups="base.group_system"/>
+                <field name="company_id" groups="base.group_system"/>
+                <field name="partner_add_conditions" groups="base.group_system"/>
+                <field name="pricelist_ids" groups="base.group_system"
+                       attrs="{'invisible':[('discount_voucher','=', False)]}"/>
+            </field>
+        </field>
+    </record>
 
-        <record model="ir.actions.act_window" id="action_view_rappel_info">
-            <field name="name">Rappel Info</field>
-            <field name="res_model">rappel.current.info</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree</field>
-            <field name="view_id" ref="view_rappel_current_info_tree_add_qty_picking"/>
-        </record>
+    <record id="view_rappel_current_info_tree_add_qty_picking" model="ir.ui.view">
+        <field name="name">rappel.current.info.tree.add_qty_picking</field>
+        <field name="model">rappel.current.info</field>
+        <field name="inherit_id" ref="rappel.view_rappel_current_info_tree"/>
+        <field name="arch" type="xml">
+            <field name="curr_qty" position="attributes">
+                <attribute name="string">Curr. qty invoiced</attribute>
+            </field>
+            <field name="curr_qty" position="after">
+                <field name="curr_qty_pickings"/>
+            </field>
+            <field name="amount" position="before">
+                <field name="amount_est"/>
+            </field>
+        </field>
+    </record>
 
-        <record id="view_partner_form_add_rappel_info" model="ir.ui.view">
-            <field name="name">res.partner.rappel.button</field>
-            <field name="model">res.partner</field>
-            <field name="inherit_id" ref="base.view_partner_form"/>
-            <field name="priority" eval="80"/>
-            <field name="arch" type="xml">
-                <xpath expr="//div[@name='button_box']" position="inside">
-                    <button class="oe_inline oe_stat_button" type="action" name="%(action_view_rappel_info)d" string="Rappel"
+    <record model="ir.actions.act_window" id="action_view_rappel_info">
+        <field name="name">Rappel Info</field>
+        <field name="res_model">rappel.current.info</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_rappel_current_info_tree_add_qty_picking"/>
+    </record>
+    <record id="action_rappel_info_calculated" model="ir.actions.act_window">
+        <field name="name">Rappels computed</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">rappel.calculated</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="view_partner_form_add_rappel_info" model="ir.ui.view">
+        <field name="name">res.partner.rappel.button</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="priority" eval="80"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button class="oe_inline oe_stat_button" type="action" name="%(action_view_rappel_info)d"
+                        string="Current Rappel"
                         context="{'search_default_partner_id': active_id, 'default_partner_id': active_id}"
                         icon="fa-flag-checkered">
-                    </button>
-                </xpath>
+                </button>
+                <button class="oe_inline oe_stat_button" type="action" name="%(action_rappel_info_calculated)d"
+                        string="Rappels"
+                        context="{'search_default_partner_id': active_id, 'default_partner_id': active_id}"
+                        icon="fa-flag-checkered">
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="rappel_calculated_form_extend" model="ir.ui.view">
+        <field name="name">rappel.calculated.form.extend</field>
+        <field name="model">rappel.calculated</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="rappel.rappel_calculated_form"/>
+        <field name="arch" type="xml">
+            <field name="invoice_id" position="after">
+                <field name="invoice_line_ids">
+                    <tree create="false" delete="false" edit="false">
+                        <field name="invoice_id"/>
+                        <field name="product_id"/>
+                        <field name="quantity" sum="Total qty"/>
+                        <field name="price_subtotal" sum="Price Subtotal"/>
+                    </tree>
+                </field>
             </field>
-        </record>
+        </field>
+    </record>
+
+    <record id="rappel_current_info_form" model="ir.ui.view">
+        <field name="name">rappel.current.info.tree</field>
+        <field name="model">rappel.current.info</field>
+        <field name="arch" type="xml">
+            <form create="false" delete="false" edit="false">
+                <group>
+                    <field name="partner_id"/>
+                    <field name="rappel_id"/>
+                    <field name="date_start"/>
+                    <field name="date_end"/>
+                    <field name="calc_mode"/>
+                    <field name="qty_type"/>
+                    <field name="calc_amount"/>
+                    <field name="curr_qty"/>
+                    <field name="section_id"/>
+                    <field name="section_goal"/>
+                    <field name="amount"/>
+                    <field name="invoice_line_ids">
+                        <tree create="false" delete="false" edit="false">
+                            <field name="invoice_id"/>
+                            <field name="product_id"/>
+                            <field name="quantity" sum="Total qty"/>
+                            <field name="price_subtotal" sum="Price Subtotal"/>
+                        </tree>
+                    </field>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_account_invoice_filter_rappel" model="ir.ui.view">
+        <field name="name">account.invoice.filter.rappel</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="account.view_account_invoice_filter"/>
+        <field name="arch" type="xml">
+            <filter name="unpaid" position="after">
+                <filter name="rappel_filter" string="Rappel"
+                        domain="[('invoice_line_ids.product_id.name','ilike','Rappel')]"/>
+            </filter>
+        </field>
+    </record>
 </odoo>

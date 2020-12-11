@@ -202,8 +202,12 @@ class CreditCommunication(models.Model):
                 strbegin = "<TD>"
                 strend = "</TD>"
                 date = aml['date_maturity'] or aml['date']
+                if not aml.ref:
+                    move_ref = aml.invoice_id and aml.invoice_id.number or ''
+                else:
+                    move_ref = aml.ref
                 followup_table += "<TR>" + strbegin + datetime.datetime.strptime(aml['date'], '%Y-%m-%d').strftime('%d/%m/%Y') + strend + \
-                                  strbegin + (aml['ref'] or '') + strend + \
+                                  strbegin + move_ref + strend + \
                                   strbegin + str(datetime.datetime.strptime(date, '%Y-%m-%d').strftime('%d/%m/%Y')) + strend + strbegin + \
                                   str(aml['amount_residual']) + strend + "</TR>"
 

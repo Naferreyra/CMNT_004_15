@@ -52,11 +52,10 @@ class ReportOverduecustom(models.AbstractModel):
                 if line['mat'] and line['currency_id']:
                     line['mat'] = line['amount_currency']
                 lines_to_display[partner_id][currency].append(line)
-                if not line['blocked']:
-                    totals[partner_id][currency]['due'] += line['debit']
-                    totals[partner_id][currency]['paid'] += line['credit']
-                    totals[partner_id][currency]['mat'] += line['mat']
-                    totals[partner_id][currency]['total'] += line['debit'] - line['credit']
+                totals[partner_id][currency]['due'] += line['debit']
+                totals[partner_id][currency]['paid'] += line['credit']
+                totals[partner_id][currency]['mat'] += line['mat']
+                totals[partner_id][currency]['total'] += line['debit'] - line['credit']
         return {
             'doc_ids': docids,
             'doc_model': 'res.partner',

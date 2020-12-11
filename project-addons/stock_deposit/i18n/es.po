@@ -397,3 +397,9 @@ msgstr "Fecha"
 #: model:ir.model.fields,field_description:stock_deposit.field_stock_sale_deposit_change_qty_qty_to_sale
 msgid "Qty to sale"
 msgstr "Cantidad a vender"
+
+#. module: stock_deposit
+#: code:addons/stock_deposit/wizard/stock_invoice_deposit.py:34
+#, python-format
+msgid "There are two or more different account journals. Please, make sure to select sale orders with the same journal."
+msgstr "Hay dos o más diarios diferentes. Por favor, asegúrese de seleccionar pedidos con el mismo diario."

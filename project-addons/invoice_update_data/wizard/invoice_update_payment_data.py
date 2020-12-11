@@ -28,7 +28,10 @@ class InvoiceUpdatePaymentData(models.TransientModel):
     @api.multi
     def update_invoice_data(self):
         view = self.env.ref('invoice_update_data.update_invoice_payment_data_wizard_info').id
-        debit_receipt_mode_id = self.env['account.payment.mode'].search([('name', '=', 'Recibo domiciliado')])[0].id
+        debit_receipt_param = self.env['ir.config_parameter'].sudo().get_param('debit.receipt.account.ids')
+        debit_receipt = int(debit_receipt_param.split(',')[0])
+        account_id = int(debit_receipt_param.split(',')[1])
+        debit_receipt_mode_id = self.env['account.payment.mode'].browse([debit_receipt]).id
 
         if self.option == 'select_invoices':
             invoice_filter = self.partner_invoices_filtered.mapped('invoice_id')
@@ -36,11 +39,9 @@ class InvoiceUpdatePaymentData(models.TransientModel):
             invoice_filter = self.env['account.invoice'].search([('partner_id', 'child_of', [self.partner_id.id]),
                                                                  ('state', '=', 'open')])
         account_move_lines = self.env['account.move.line'].search([('full_reconcile_id', '=', False),
-                                                                   ('account_id', '=', 443),
+                                                                   ('account_id', '=', account_id),
                                                                    ('invoice_id', 'in', invoice_filter.ids)])
-
         valid_mandate = self.partner_id.valid_mandate_id.id
-
         if not valid_mandate:
             raise Warning(_("There is not a valid mandate for this partner"))
         else:

@@ -347,11 +347,11 @@ class CrmClaim(models.Model):
     number = fields.Char(
             'Number', readonly=True,
             required=True,
-            index=True, default='/',
+            index=False, default='/',
             help="Company internal claim unique number")
     categ_id = fields.Many2one('crm.claim.category', 'Category')
     supplier_number = fields.Char('Supplier Number',
-                                  index=True,
+                                  index=False,
                                   help="Supplier claim number")
     claim_type = fields.Many2one('crm.claim.type',
                                  string='Claim type',

@@ -15,20 +15,22 @@ class CrmClaim(models.Model):
 
         next_is_location = False
 
-        if barcode.startswith('RMA'):
+        if 'RMA' in barcode:
             claim = self.search([('number', '=', barcode)], limit=1)
             if claim:
-                if claim.stage_id.name != "Pendiente de recibir":
+                if claim.stage_id.with_context({'lang': 'es_ES'}).name != "Pendiente de recibir":
                     message = _("The {} is already received").format(claim.number)
                     self.env.user.notify_warning(message=message, sticky=True)
                     next_is_location = True
                 else:
                     claim.message_post(body="RMA scanned")
+                    claim.warehouse_location = self.env.user.warehouse_location
                     claim.stage_id = self.env["crm.claim.stage"].search([('name', '=', 'Recibido')])
                     claim.date_received = fields.Date.today()
                     message = _("{} received").format(claim.number)
                     self.env.user.notify_info(title="RMA scanned", message=message)
                     next_is_location = True
+                    claim.print_label()
             else:
                 message = _("The RMA {} doesn't exist").format(barcode)
                 self.env.user.notify_warning(message=message, sticky=True)
@@ -58,3 +60,11 @@ class CrmClaim(models.Model):
             result['context'] = json.dumps(context)
 
         return result
+
+    @api.multi
+    def print_label(self):
+        for claim in self:
+            # In our case the printer will be the default one
+            printer = self.env['printing.printer'].search([('default', '=', True)])
+            if printer:
+                self.env.ref('rma_scanner.rma_label_vt').print_label(printer, claim)

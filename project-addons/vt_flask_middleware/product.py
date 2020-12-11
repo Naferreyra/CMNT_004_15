@@ -80,6 +80,8 @@ class Product(SyncModel):
     volume = FloatField(default=0.0)
     cost_price = FloatField(default=0.0)
     real_stock = FloatField(default=0.0)
+    stock_available_es = FloatField(default=0.0)
+
 
     def __unicode__(self):
         return self.name

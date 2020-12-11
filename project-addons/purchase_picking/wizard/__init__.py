@@ -20,3 +20,4 @@
 
 from . import create_picking_move
 from . import assign_container
+from . import cancel_moves

@@ -8,7 +8,11 @@ class RappelCalculated(models.Model):
 
     _inherit = 'rappel.calculated'
 
+    _order = 'date_end desc'
+
     goal_percentage = fields.Float()
+
+    invoice_line_ids = fields.Many2many('account.invoice.line',readonly=True)
 
     @api.model
     def create_rappel_invoice(self, rappels_to_invoice):
@@ -22,10 +26,14 @@ class RappelCalculated(models.Model):
         ctx['active_id'] = rappels_to_invoice[0]
 
         rappel_invoice_wzd = self.env['rappel.invoice.wzd']
-        new_data_invoice = rappel_invoice_wzd.with_context(ctx).create(
-            {'journal_id': journal_id,
+        invoice_data = {'journal_id': journal_id,
              'group_by_partner': True,
-             'invoice_date': False})
+             'invoice_date': False}
+        today = datetime.today()
+        if today.day==1:
+            yesterday = today - timedelta(days=1)
+            invoice_data['invoice_date'] = yesterday
+        new_data_invoice = rappel_invoice_wzd.with_context(ctx).create(invoice_data)
 
         # Create invoice
         new_data_invoice.action_invoice()
@@ -64,7 +72,4 @@ class RappelCalculated(models.Model):
 
         invoice.compute_taxes()
         invoice.action_invoice_open()
-        date_invoice = datetime.strptime(invoice.date_invoice, '%Y-%m-%d') if invoice and invoice.date_invoice else ""
-        if date_invoice and date_invoice.day == 1:
-            invoice.date_invoice = date_invoice - timedelta(days=1)
         return True

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partner_add_csv_connector_access" model="ir.ui.view" >
+        <field name="name">view.partner.add.csv_connector_access</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="custom_account.view_partner_picking_email_form"/>
+        <field name="arch" type="xml">
+            <field name="email_web" position="after">
+                <field name="csv_connector_access" attrs="{'invisible': [('web', '!=', True)]}" groups="sales_team.group_sale_salesman_all_leads" />
+            </field>
+        </field>
+    </record>
+</odoo>

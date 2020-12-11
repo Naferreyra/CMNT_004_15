@@ -47,6 +47,10 @@ class ProductTemplateListener(Component):
         up_fields = [
             "name", "list_price", "categ_id", "product_brand_id",
             "show_stock_outside", "sale_ok", "weight", "volume"]
+
+        country_code = self.env['ir.config_parameter'].sudo().get_param('country_code')
+        if country_code == "IT":
+            up_fields += ['virtual_stock_conservative_es']
         if record.image or len(fields) != 1:
             for field in up_fields:
                 if field in fields:
@@ -85,6 +89,11 @@ class ProductListener(Component):
             "discontinued", "state", "item_ids", "sale_in_groups_of", "replacement_id",
             "weight", "volume", "standard_price_2_inc"
         ]
+
+        country_code = self.env['ir.config_parameter'].sudo().get_param('country_code')
+        if country_code == "IT":
+            up_fields += ['virtual_stock_conservative_es']
+
         for field in up_fields:
             if field in fields:
                 record.with_delay(priority=2, eta=30).update_product()
@@ -110,6 +119,7 @@ class ProductListener(Component):
 
 class ProductProduct(models.Model):
     _inherit = 'product.product'
+    _order = 'is_pack asc,default_code asc'
 
     @api.depends('bom_ids','bom_ids.type','bom_ids.bom_line_ids')
     def _compute_is_pack(self):

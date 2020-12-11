@@ -116,6 +116,8 @@ class StockPicking(models.Model):
                         move._do_unreserve()
                     move.state = "draft"
                     move.picking_id = False
+                pick.state = "cancel"
+
         return super(StockPicking, self).action_cancel()
 
     @api.multi

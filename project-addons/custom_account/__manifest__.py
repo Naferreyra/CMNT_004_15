@@ -22,7 +22,7 @@
                 'sale_advance_payment', 'account_banking_sepa_mail',
                 'account_credit_control', 'stock_picking_invoice_link',
                 'account_invoice_merge', 'customer_area',
-                'account_voucher', 'res_currency_rate_force'],
+                'res_currency_rate_force'],
     "data": ['views/account_view.xml',
              'views/partner_view.xml',
              'report/account_invoice_report_view.xml',

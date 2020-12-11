@@ -12,7 +12,7 @@
                         <tree create="false" delete="false" editable="top">
                             <field name="product_id" readonly="1"/>
                             <field name="production_qty" readonly="1"/>
-                            <field name="qty"/>
+                            <field name="qty" sum="Total Qty."/>
                         </tree>
                     </field>
 

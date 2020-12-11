@@ -19,7 +19,8 @@ class ProductTemplate(models.Model):
                 )
                 qty = self.env.cr.fetchall()
                 if qty:
-                    lines = self.env['purchase.order.line'].browse(qty[0])
+                    line_ids = [x[0] for x in qty]
+                    lines = self.env['purchase.order.line'].browse(line_ids)
                     product.qty_in_production += sum(lines.mapped("production_qty"))
         return res
 

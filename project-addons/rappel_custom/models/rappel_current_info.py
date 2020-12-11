@@ -12,6 +12,8 @@ class RappelCurrentInfo(models.Model):
                                           "product with no-rappel in the order are not verified)")
     amount_est = fields.Float("Estimated amount", readonly=True, default=0.0)
 
+    invoice_line_ids = fields.Many2many('account.invoice.line',readonly=True)
+
     @api.model
     def send_rappel_info_mail(self):
         mail_pool = self.env['mail.mail']

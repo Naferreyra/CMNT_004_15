@@ -56,20 +56,24 @@ class BaseSynchroObj(models.Model):
     context = fields.Text('Context',
                           help="Dictionary format. Used on create/write")
 
+    force_ids = fields.One2many('base.synchro.obj.force', 'obj_id',
+                                'Fields Force Sync.')
+
     @api.model
     def get_ids(self, model, dt, domain=None, action=None,
-                only_create_date=False, flds=[], records_limit=1000):
+                only_create_date=False, flds=[], records_limit=1000, force_update=False):
         if action is None:
             action = {}
         action = action.get('action', 'd')
         pool = self.env[model]
         result = []
         data = []
-        if dt and only_create_date:
-            domain += [('create_date', '>=', dt)]
-        elif dt:
-            domain += ['|', ('create_date', '>=', dt),
-                       ('write_date', '>=', dt)]
+        if not force_update:
+            if dt and only_create_date:
+                domain += [('create_date', '>=', dt)]
+            elif dt:
+                domain += ['|', ('create_date', '>=', dt),
+                           ('write_date', '>=', dt)]
         offset = 0
         limit = 100
         obj_rec = pool.search(domain, limit=limit, offset=offset)
@@ -90,6 +94,15 @@ class BaseSynchroObjAvoid(models.Model):
     """Class to avoid the base synchro object."""
     _name = "base.synchro.obj.avoid"
     _description = "Fields to not synchronize"
+
+    name = fields.Char('Field Name', required=True)
+    obj_id = fields.Many2one('base.synchro.obj', 'Object', required=True,
+                             ondelete='cascade')
+
+class BaseSynchroObjForce(models.Model):
+    """Class to force the base synchro object."""
+    _name = "base.synchro.obj.force"
+    _description = "Fields to force synchronize"
 
     name = fields.Char('Field Name', required=True)
     obj_id = fields.Many2one('base.synchro.obj', 'Object', required=True,

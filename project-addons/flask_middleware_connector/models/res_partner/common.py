@@ -2,7 +2,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 from odoo.addons.component.core import Component
 from odoo.addons.queue_job.job import job
-from odoo import models, api, fields
+from odoo import models, api, fields, _
 
 
 class PartnerListener(Component):
@@ -62,7 +62,7 @@ class PartnerListener(Component):
                      "country_id", "state_id", "email_web", "ref", 'user_id',
                      "property_product_pricelist", "lang", "type",
                      "parent_id", "is_company", "email",
-                     "prospective", "phone", "mobile"]
+                     "prospective", "phone", "mobile","csv_connector_access"]
         if partner.is_company:
 
             if partner.web and (partner.active or partner.prospective):
@@ -98,7 +98,7 @@ class PartnerListener(Component):
             "state_id", "email_web", "ref", "user_id",
             "property_product_pricelist", "lang", "sync", "type", "parent_id",
             "is_company", "email", "active", "prospective", "phone", "mobile",
-            "property_payment_term_id", "last_sale_date"
+            "property_payment_term_id", "last_sale_date", "csv_connector_access"
         ]
         if 'web' in fields and record.web and \
                 (partner.active or partner.prospective):
@@ -165,13 +165,18 @@ class ResPartner(models.Model):
                     discount = item.price_discount
                 partner.discount = discount
 
+    csv_connector_access = fields.Boolean("CSV Connector Access", help="System field to allow csv connector access")
+
     @api.model
     def create(self, vals):
         if vals.get('user_id', False) and 'web' in vals.keys() and vals['web']:
             user = self.env['res.users'].browse(vals['user_id'])
             if not user.web:
                 user.web = True
-        return super().create(vals)
+        res = super().create(vals)
+        if vals.get('csv_connector_access',False):
+            res.message_post(body=_('CSV connector access checked by %s')% self.env.user.name)
+        return res
 
     @api.multi
     def write(self, vals):
@@ -196,6 +201,12 @@ class ResPartner(models.Model):
                     deletea = False
                 if deletea:
                     del vals['active']
+            if 'csv_connector_access' in vals.keys():
+                partner.message_post(
+                    body=_('<p>CSV conector access has been changed by %s </p>'
+                           '<ul><li>  %s &#10137; %s </li></ul>')
+                         % (self.env.user.name, partner.csv_connector_access,vals['csv_connector_access']))
+
 
         return super().write(vals)
 

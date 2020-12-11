@@ -41,6 +41,7 @@ class SaleOrder(models.Model):
         new = view_id.create({})
         data_list = self.env['picking.rated.wizard.tree']
         content = data_list.search([('order_id', '=', self.id)])
+        message_error = ""
         if content:
             content.unlink()
         for order in self:
@@ -250,11 +251,19 @@ class SaleOrder(models.Model):
 
                         url = order.env['ir.config_parameter'].sudo().get_param('url.prod.ups.api.request')
                         json_request = rate_request
-                        response = requests.session().post(url, data=json.dumps(json_request))
+                        try:
+                            response = requests.session().post(url, data=json.dumps(json_request),timeout=5)
+                        except (requests.exceptions.ConnectionError,requests.exceptions.Timeout) as e:
+                            message_error += "UPS: Connection error on UPS webpage. %s \n" % e
+                            break
+
                         if response.status_code != 200:
-                            raise Exception(response.text)
+                            message_error += "UPS: "+ response.text+" \n"
+                            continue
                         if 'error' in response.url:
-                            raise Exception("Could not find information on url '%s'" % response.url)
+                            message_error += "UPS: Could not find information on url '%s' \n" % response.url
+                            continue
+
                         info = json.loads(response.text)
 
                         if "RateResponse" in info:
@@ -309,11 +318,18 @@ class SaleOrder(models.Model):
                                           '</ecat:tarificacionPrivadaStr>'
                                        '</soapenv:Body>'
                                     '</soapenv:Envelope>')
-                        response = requests.session().post(url, data=template, headers=headers)
+
+                        try:
+                            response = requests.session().post(url, data=template, headers=headers,timeout=5)
+                        except (requests.exceptions.ConnectionError,requests.exceptions.Timeout) as e:
+                            message_error += "SEUR: Connection error on SEUR webpage %s \n" % e
+                            break
                         if response.status_code != 200:
-                            raise Exception(response.text)
+                            message_error += "SEUR: %s \n" % response.text
+                            continue
                         if 'error' in response.url:
-                            raise Exception("Could not find information on url '%s'" % response.url)
+                            message_error += "SEUR: Could not find information on url '%s' \n" % response.url
+                            continue
                         response_data = response.text
                         concept_codes_valids = ['10', '75']
                         if '&gt;' in response.text:
@@ -335,7 +351,8 @@ class SaleOrder(models.Model):
                                         for value in children.iterfind('VALOR'):
                                             shipping_amount += float(value.text)
                         except AttributeError:
-                            raise Exception("The response is not valid or it changed")
+                            message_error += "SEUR: The response is not valid or it changed \n"
+                            continue
 
                         if shipping_amount:
                             currency = "EUR"
@@ -411,11 +428,17 @@ class SaleOrder(models.Model):
                         </priceCheck>
                     </priceRequest>
                     """
-                    response = requests.session().post(url, data=rate_request, headers=headers)
+                    try:
+                        response = requests.session().post(url, data=rate_request, headers=headers,timeout=5)
+                    except (requests.exceptions.ConnectionError,requests.exceptions.Timeout) as e:
+                        message_error += "TNT: Connection error on TNT webpage %s \n" % e
+                        break
                     if response.status_code != 200:
-                        raise Exception(response.text)
+                        message_error += "TNT: %s \n" % response.text
+                        continue
                     if 'error' in response.url:
-                        raise Exception("Could not find information on url '%s'" % response.url)
+                        message_error += "TNT: Could not find information on url '%s' \n" % response.url
+                        continue
                     response_data = response.text
                     try:
                         shipping_amount = 0.0
@@ -444,7 +467,8 @@ class SaleOrder(models.Model):
                                         try:
                                             service_name = service_codes[service_code]
                                         except KeyError:
-                                            raise Exception("The service code \"%s\" is not defined in the system." % service_code)
+                                            message_error += "TNT: The service code \"%s\" is not defined in the system." % service_code
+                                            continue
                                         rated_status = {
                                             'currency': currency,
                                             'transit_time': transit_time,
@@ -455,7 +479,8 @@ class SaleOrder(models.Model):
                                         }
                                         new.write({'data': [(0, 0, rated_status)]})
                     except AttributeError:
-                        raise Exception("The response is not valid or it changed")
+                        message_error += "TNT: The response is not valid or it changed \n"
+                        continue
 
                 elif transporter.name == 'DHL':
 
@@ -535,16 +560,24 @@ class SaleOrder(models.Model):
                             shipper_country_code, (ship_to_address_line_1 + ship_to_address_line_2), ship_to_city,
                             ship_to_postal_code, ship_to_country_code, float(package_weight))
                     decoder = json.JSONDecoder(object_pairs_hook=collections.OrderedDict)
-                    response = requests.session().post(url, headers=headers,
-                                                       data=json.dumps(decoder.decode(rate_request.replace(" ", "").replace("\n", ""))))
+                    try:
+                        response = requests.session().post(url, headers=headers,
+                                                           data=json.dumps(decoder.decode(
+                                                               rate_request.replace(" ", "").replace("\n", ""))),timeout=5)
+
+                    except (requests.exceptions.ConnectionError,requests.exceptions.Timeout) as e:
+                        message_error += "DHL: Connection error on DHL webpage. %s \n" % e
+                        break
                     if response.status_code != 200:
-                        raise Exception(response.text)
+                        message_error += "DHL: %s \n" % response.text
+                        continue
                     if 'error' in response.url:
-                        raise Exception("Could not find information on url '%s'" % response.url)
+                        message_error += "DHL: Could not find information on url '%s' \n" % response.url
+                        continue
                     info = json.loads(response.text)
                     if "RateResponse" in info:
                         if int(info["RateResponse"]["Provider"][0]["Notification"][0]["@code"]) !=0:
-                            new.message_error = "DHL: "+ info["RateResponse"]["Provider"][0]["Notification"][0]["Message"]+"\n"
+                            message_error+= "DHL: %s \n" % info["RateResponse"]["Provider"][0]["Notification"][0]["Message"]
                         else:
                             data = info["RateResponse"]["Provider"][0]["Service"]
                             if data and type(data) is list:
@@ -579,7 +612,8 @@ class SaleOrder(models.Model):
                                     }
                                     new.write({'data': [(0, 0, rated_status)]})
 
-
+        if message_error:
+            new.message_error = message_error
         return {
             'name': 'Shipping Data Information',
             'view_type': 'form',

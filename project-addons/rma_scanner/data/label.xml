@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo noupdate="1">
+    <record id="rma_label_vt" model="printing.label.zpl2">
+        <field name="name">Etiqueta RMA Recibido</field>
+        <field name="description">Etiqueta para los RMA Recibidos en SAT</field>
+        <field name="origin_x">0</field>
+        <field name="origin_y">0</field>
+        <field name="model_id" ref="model_crm_claim"/>
+        <field name="width">850</field>
+    </record>
+    <!-- Components -->
+    <record id="rma_label_vt_partner" model="printing.label.zpl2.component">
+        <field name="name">Empresa</field>
+        <field name="label_id" ref="rma_label_vt"/>
+        <field name="origin_x">0</field>
+        <field name="origin_y">0</field>
+        <field name="component_type">text</field>
+        <field name="font">F</field>
+        <field name="height">0</field>
+        <field name="width">0</field>
+        <field name="in_block">True</field>
+        <field name="block_width">850</field>
+        <field name="block_justify">C</field>
+        <field name="data">object.partner_id.name</field>
+    </record>
+    <record id="rma_label_vt_code" model="printing.label.zpl2.component">
+        <field name="name">Codigo</field>
+        <field name="label_id" ref="rma_label_vt"/>
+        <field name="origin_x">185</field>
+        <field name="origin_y">45</field>
+        <field name="component_type">code_128</field>
+        <field name="height">80</field>
+        <field name="data">object.number</field>
+    </record>
+    <record id="rma_label_vt_number" model="printing.label.zpl2.component">
+        <field name="name">RMA</field>
+        <field name="label_id" ref="rma_label_vt"/>
+        <field name="origin_x">0</field>
+        <field name="origin_y">140</field>
+        <field name="component_type">text</field>
+        <field name="font">G</field>
+        <field name="height">0</field>
+        <field name="width">0</field>
+        <field name="in_block">True</field>
+        <field name="block_width">850</field>
+        <field name="block_justify">C</field>
+        <field name="data">object.number</field>
+    </record>
+    <record id="rma_label_vt_date" model="printing.label.zpl2.component">
+        <field name="name">Fecha</field>
+        <field name="label_id" ref="rma_label_vt"/>
+        <field name="origin_x">10</field>
+        <field name="origin_y">10</field>
+        <field name="component_type">text</field>
+        <field name="font">F</field>
+        <field name="orientation">R</field>
+        <field name="height">0</field>
+        <field name="width">0</field>
+        <field name="data">object.date_received</field>
+    </record>
+    <record id="rma_label_vt_int" model="printing.label.zpl2.component">
+        <field name="name">Internacional</field>
+        <field name="label_id" ref="rma_label_vt"/>
+        <field name="origin_x">50</field>
+        <field name="origin_y">55</field>
+        <field name="component_type">text</field>
+        <field name="font">G</field>
+        <field name="height">0</field>
+        <field name="width">0</field>
+        <field name="data">'IN' if object.team_id.id != 3 else ''</field>
+    </record>
+</odoo>

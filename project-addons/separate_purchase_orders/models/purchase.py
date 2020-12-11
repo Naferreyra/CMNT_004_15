@@ -84,6 +84,15 @@ class PurchaseOrder(models.Model):
     def button_purchase_order(self):
         return self.write({'state': 'purchase_order'})
 
+    @api.multi
+    def copy(self, default=None):
+        if self.state=='purchase_order' or self.name.startswith('OC'):
+            default = dict(default or {})
+            default.update({
+                'state': 'purchase_order',
+            })
+        return super(PurchaseOrder, self).copy(default)
+
 
 class PurchaseOrderLine(models.Model):
     _inherit = 'purchase.order.line'

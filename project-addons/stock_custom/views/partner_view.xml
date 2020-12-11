@@ -8,6 +8,7 @@
         <field name="arch" type="xml">
             <field name="valued_picking" position="after">
                 <field name="not_print_picking"/>
+                <field name="send_hs_code_invoice"/>
             </field>
         </field>
     </record>

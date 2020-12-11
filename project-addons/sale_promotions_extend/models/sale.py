@@ -24,6 +24,7 @@ class SaleOrderLine(models.Model):
     original_line_id_promo = fields.Many2one('sale.order.line', "Original line", ondelete='cascade')
     promo_qty_split = fields.Integer(help="It is the minimum quantity of product for which this promo is applied")
     old_discount = fields.Float(copy=False)
+    old_price = fields.Float(copy=False)
 
 
 class SaleOrder(models.Model):
@@ -79,6 +80,9 @@ class SaleOrder(models.Model):
         for line in self.order_line:
             # if the line has an accumulated promo and the
             # discount of the partner is 0
+            if line.old_price:
+                line.write({'price_unit': line.old_price,
+                            'old_price': 0.00})
             if line.accumulated_promo and line_dict[line.id] == 0.0:
                 line.write({'discount': line.old_discount,
                             'old_discount': 0.00,
