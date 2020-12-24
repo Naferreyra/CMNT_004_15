@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="menu_secondary"
+          inherit_id="web_responsive.menu_secondary"
+          name="App Drawer - Secondary Menu"
+          >
+        <xpath expr="//li[hasclass('app-name')]/span/t" position="before">
+            <t t-esc="request.env['ir.config_parameter'].sudo().get_param('country.flag')" />
+        </xpath>
+    </template>
+</odoo>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="country_flag" model="ir.config_parameter">
+           <field name="key">country.flag</field>
+           <field name="value"></field>
+        </record>
+    </data>
+</odoo>

@@ -486,3 +486,8 @@ msgstr "Per favore, seleziona la sede delle RMA"
 #: selection:crm.claim,warehouse_location:0
 msgid "In transit"
 msgstr "In transito"
+
+#. module: crm_claim_rma_custom
+#: model:ir.model.fields,field_description:crm_claim_rma_custom.field_crm_claim_client_ref
+msgid "Client Ref"
+msgstr "Riferimento cliente"
