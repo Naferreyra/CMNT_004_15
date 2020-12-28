@@ -14,7 +14,7 @@
                 <button type="object" name="action_view_customizations"
                         class="oe_stat_button"
                         icon="fa-paint-brush"
-                        attrs="{'invisible': ['|',('state','!=','reserve'),('customization_count','=',0)]}">
+                        attrs="{'invisible': [('customization_count','=',0)]}">
                     <field name="customization_count" widget="statinfo" string="Customizations"/>
                 </button>
             </xpath>

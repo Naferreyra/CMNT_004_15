@@ -23,7 +23,6 @@ class KitchenCustomization(models.Model):
 
     state = fields.Selection([
         ('draft', 'New'),
-        ('waiting','Waiting Availability'),
         ('sent', 'Sent'),
         ('in_progress', 'In Progress'),
         ('done', 'Done'),
@@ -46,6 +45,9 @@ class KitchenCustomization(models.Model):
 
     def action_done(self):
         self.state = 'done'
+        if self.order_id:
+            if all([x.state in ('cancel','done') or x.id==self.id for x in self.order_id.customization_ids]):
+                self.order_id.picking_ids.filtered(lambda p: p.state not in ('done','cancel')).write({'not_sync': False})
         template = self.env.ref('kitchen.send_mail_to_commercials_customization_done')
         ctx = dict()
         ctx.update({
@@ -84,32 +86,19 @@ class KitchenCustomization(models.Model):
         if vals.get('order_id', False):
             self.env['sale.order'].browse(vals.get('order_id')).message_post(
                 body=_("The order contains customized products"))
-        if vals.get('order_id',False):
-            order_lines = self.env['sale.order.line'].search([('order_id','=',vals.get('order_id'))])
-            for line in order_lines:
-                for reserve in line.reservation_ids:
-                    reserve.date_validity = False
         return super(KitchenCustomization, self).create(vals)
 
     def action_cancel(self):
+        if self.order_id and self.state=='sent':
+            if all([x.state in ('cancel', 'done') or x.id == self.id for x in self.order_id.customization_ids]):
+                self.order_id.picking_ids.filtered(lambda p: p.state not in ('done', 'cancel')).write(
+                    {'not_sync': False})
         self.state = 'cancel'
+
 
     def action_draft(self):
         self.state = 'draft'
 
-    reservation_status = fields.Selection([
-        ('waiting', 'Waiting Availability'),
-        ('to customize', 'Fully Reserved')
-    ], string='Reservation Status', compute='_compute_reservation_status', store=True, default='to customize')
-
-    @api.depends('customization_line.reservation_status')
-    def _compute_reservation_status(self):
-        for customization in self:
-            customization.reservation_status = "waiting"
-            if customization.customization_line and all([x.reservation_status != "waiting" for x in customization.customization_line]):
-                customization.action_confirm()
-                customization.state = 'sent'
-                customization.reservation_status = "to customize"
 
     @api.onchange('order_id')
     def onchange_order_id(self):
@@ -169,7 +158,6 @@ class KitchenCustomizationLine(models.Model):
     sale_line_id = fields.Many2one('sale.order.line')
     state = fields.Selection([
         ('draft', 'New'),
-        ('waiting', 'Waiting Availability'),
         ('sent', 'Sent'),
         ('in_progress', 'In progress'),
         ('done', 'Done'),
@@ -178,29 +166,8 @@ class KitchenCustomizationLine(models.Model):
         default='draft')
     erase_logo = fields.Boolean()
 
-    reserved_qty = fields.Float(compute="_compute_reserved_qty", store=True)
     type_ids = fields.Many2many('customization.type', required=1, string="Type")
 
-    @api.depends('sale_line_id.move_ids.move_line_ids.product_id', 'sale_line_id.move_ids.move_line_ids.product_uom_id', 'sale_line_id.move_ids.move_line_ids.product_uom_qty')
-    def _compute_reserved_qty(self):
-        for line in self:
-            res_qty=sum(line.sale_line_id.move_ids.mapped('reserved_availability')) if line.sale_line_id and line.sale_line_id.move_ids else 0
-            if line.sale_line_id and line.customization_id.state=="draft" and res_qty<line.product_qty:
-                line.customization_id.write({'state':"waiting"})
-            line.reserved_qty = res_qty
-
-    reservation_status = fields.Selection([
-        ('waiting', 'Waiting Availability'),
-        ('to customize', 'Fully Reserved')
-    ], string='Reservation Status', compute='_compute_reservation_status', store=True,
-        default='waiting')
-
-    @api.depends('reserved_qty','customization_id.customization_line','product_qty')
-    def _compute_reservation_status(self):
-        for line in self:
-            line.reservation_status="waiting"
-            if line.reserved_qty >= line.product_qty and line.state == "waiting":
-                line.reservation_status = "to customize"
 
     @api.onchange('product_qty')
     def onchange_product_qty(self):

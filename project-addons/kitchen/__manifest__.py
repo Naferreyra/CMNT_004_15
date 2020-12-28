@@ -8,7 +8,7 @@
     "depends": ['base','sale','sale_stock'],
     "data": [
         'data/kitchen_group.xml','wizard/customization_wizard.xml', 'views/kitchen_customization.xml', 'data/sequence.xml',
-        'data/emails_kitchen.xml', 'data/parameters.xml', 'wizard/create_customization_wizard.xml',
+        'data/emails_kitchen.xml','wizard/create_customization_wizard.xml',
         'views/sale_order.xml','security/ir.model.access.csv','views/customization_type_view.xml'],
     "installable": True
 }

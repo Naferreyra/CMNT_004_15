@@ -56,7 +56,7 @@
                            statusbar_visible="draft,waiting,sent,in_progress,done"/>
                     <button name="action_confirm" string="Confirm" type="object"
                             attrs="{'invisible': [('state','!=','draft')]}"
-                            class="oe_highlight"/>
+                            class="oe_highlight" groups="kitchen.group_kitchen"/>
                     <button name="%(kitchen.mark_as_received)d" string="Received" type="action"
                             attrs="{'invisible': [('state','!=','sent')]}"
                             class="oe_highlight" groups="kitchen.group_kitchen"/>
@@ -79,9 +79,9 @@
                         <group>
                             <field name="is_manager" invisible="1"/>
                             <field name="order_id"
-                                   attrs="{'readonly': [('state', 'not in', ('draft','sent','waiting'))],'required': [('is_manager','=',False)]}"/>
+                                   attrs="{'readonly': [('state', '!=', 'draft')],'required': [('is_manager','=',False)]}"/>
                             <field name="partner_id"
-                                   attrs="{'readonly': [('state', 'not in', ('draft','sent','waiting'))],'required': [('is_manager','=',False)]}"/>
+                                   attrs="{'readonly': [('state', '!=', 'draft')],'required': [('is_manager','=',False)]}"/>
                             <field name="commercial_id" attrs="{'readonly': [('state', 'not in', ('draft','sent','waiting'))]}"/>
                             <field name="notify_users" widget="many2many_tags"/>
                             <field name="user"/>

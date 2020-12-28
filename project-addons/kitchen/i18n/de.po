@@ -307,7 +307,7 @@ msgid "<p>Customization <strong>${object.name}</strong> has been completed.</p>\
 "                <li>Products and quantities: <strong>${object.products_qty_format} </li>\n"
 "                <li>Responsible for customization: <strong>${object.user} </li>\n"
 "            </ul>\n"
-"            <p>Please check your order <strong>${object.order_id.name | safe}</strong>. You can now proceed it.</p>\n"
+"            <p>Please check your order <strong>${object.order_id.name | safe}</strong>.</p>\n"
 "            <p>Best regards.</p>"
 msgstr "<p>Die Personalisierung <strong>${object.name}</strong> ist abgeschlossen.</p>\n"
 "            <p>Die Personalisierungs informationen lauten wie folgt:</p>\n"
@@ -317,7 +317,7 @@ msgstr "<p>Die Personalisierung <strong>${object.name}</strong> ist abgeschlosse
 "                <li>Produkte und Mengen: <strong>${object.products_qty_format} </li>\n"
 "                <li>Verantwortliche Person für die Personalisierung: <strong>${object.user} </li>\n"
 "            </ul>\n"
-"            <p>Bitte überprüfen Sie Ihre Bestellung <strong>${object.order_id.name | safe}</strong>. Von nun an können Sie es verarbeiten.</p>\n"
+"            <p>Bitte überprüfen Sie Ihre Bestellung <strong>${object.order_id.name | safe}</strong>.</p>\n"
 "            <p>Grüße.</p>"
 
 #. module: kitchen

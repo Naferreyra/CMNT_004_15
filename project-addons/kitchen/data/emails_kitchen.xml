@@ -17,7 +17,7 @@
                 <li>Products and quantities: <strong>${object.products_qty_format} </li>
                 <li>Responsible for customization: <strong>${object.user} </li>
             </ul>
-            <p>Please check your order <strong>${object.order_id.name | safe}</strong>. You can now proceed it.</p>
+            <p>Please check your order <strong>${object.order_id.name | safe}</strong>.</p>
             <p>Best regards.</p>
          ]]>
         </field>

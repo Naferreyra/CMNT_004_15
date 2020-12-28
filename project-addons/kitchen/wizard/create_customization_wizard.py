@@ -26,7 +26,6 @@ class CustomizationWizard(models.TransientModel):
     @api.model
     def _get_lines(self):
         wiz_lines = []
-        customize_all = self.env['ir.config_parameter'].sudo().get_param('all.products.customize')
         for line in self.env['sale.order'].browse(self.env.context.get('active_ids')).order_line.filtered(
                 lambda l: not l.deposit and l.product_id.categ_id.with_context(
                     lang='es_ES').name != 'Portes' and l.price_unit >= 0):
@@ -37,33 +36,8 @@ class CustomizationWizard(models.TransientModel):
 
             qty_done = sum(self.env['kitchen.customization.line'].search(
                 [('sale_line_id', '=', line.id), ('state', '!=', 'cancel')]).mapped('product_qty'))
-            moves = line.move_ids.filtered(lambda mv: 'cancel' != mv.state)
-            qty = 0
-            pack = self.env['mrp.bom']._bom_find(product=line.product_id)
-            if pack and pack.type == 'phantom':
-                reserved_available = {}
-                for move in moves:
-                    avail = move.product_id.uom_id._compute_quantity(
-                        move.reserved_availability,
-                        move.product_uom,
-                        round=False)
-                    pack_lines = pack.bom_line_ids.filtered(lambda l, m=move: l.product_id == m.product_id)
-                    div_qty = 1
-                    if pack_lines:
-                        pack_lines_value = sum(pack_lines.mapped('product_qty'))
-                        div_qty = pack_lines_value if pack_lines_value > 0 else 1
-                    reserved_available[move.id] = avail // div_qty
-                if moves:
-                    qty = min(reserved_available.values())
-            else:
-                qty = sum(moves.mapped('reserved_availability'))
-            new_line["qty_reserved"] = qty
 
-            if customize_all == 'False':
-                if qty > 0:
-                    new_line.update({'product_qty': qty - qty_done,
-                                     'max_qty': qty - qty_done})
-            elif customize_all == 'True' and line.product_qty:
+            if line.product_qty:
                 new_line.update({'product_qty': line.product_qty - qty_done,
                                  'max_qty': line.product_qty - qty_done})
             if new_line.get('product_qty'):
@@ -86,7 +60,7 @@ class CustomizationWizard(models.TransientModel):
 
     def action_create(self):
         lines = []
-        customization = self.env['kitchen.customization'].create({'partner_id': self.order_id.partner_id.id,
+        customization = self.env['kitchen.customization'].sudo().create({'partner_id': self.order_id.partner_id.id,
                                                                   'order_id': self.order_id.id,
                                                                   'commercial_id': self.order_id.user_id.id,
                                                                   'comments': self.comments,
@@ -112,13 +86,8 @@ class CustomizationWizard(models.TransientModel):
                     'erase_logo': line.erase_logo,
                     'type_ids': [(6, 0, line.type_ids.ids)]
                 }
-                if line.qty_reserved < qty:
-                    customization.state = "waiting"
-                    new_line["state"] = "waiting"
                 lines += self.env['kitchen.customization.line'].create(new_line)
         if lines:
-            if customization.state != 'waiting':
-                customization.action_confirm()
             return {
                 'view_type': 'form',
                 'view_mode': 'form',

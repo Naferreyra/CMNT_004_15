@@ -13,10 +13,18 @@ class SaleOrder(models.Model):
 
     customization_count = fields.Integer(compute='_compute_customization_count', default=0)
 
-    def action_confirm(self):
-        if any(e not in ('done', 'cancel') for e in self.customization_ids.mapped('state')):
-            raise UserError(_("You can't transfer an order with pending customizations"))
-        return super(SaleOrder, self).action_confirm()
+    def _action_confirm(self):
+        res = super(SaleOrder, self)._action_confirm()
+        customizations = self.customization_ids.filtered(lambda p: p.state == 'draft')
+        if customizations:
+            pickings = self.picking_ids.filtered(lambda p: p.state != 'cancel')
+            pickings.write({'not_sync':True})
+            pickings.message_post(
+                body=_('This picking has been created from an order with customized products'))
+            for customization in customizations:
+                customization.action_confirm()
+        return res
+
 
     def action_view_customizations(self):
         if self.env.user.has_group('kitchen.group_kitchen'):
