@@ -71,14 +71,33 @@ class PurchaseOrder(models.Model):
     def create(self,vals):
         if self._context.get("default_state",False)=="purchase_order":
             vals["name"] = self.env['ir.sequence'].next_by_code('split.purchase.orders.name') or 'New'
-        return super(PurchaseOrder, self).create(vals)
+        res = super(PurchaseOrder, self).create(vals)
+        if res.state=="purchase_order" and res.order_line:
+            res.order_line.mapped('product_id.product_tmpl_id')._get_in_production_stock()
+        return res
+
+    @api.multi
+    def write(self, vals):
+        res = super(PurchaseOrder, self).write(vals)
+        for order in self:
+            if (order.state == "purchase_order" and vals.get('order_line',False)) or vals.get('state','')=="purchase_order":
+                order.order_line.mapped('product_id.product_tmpl_id')._get_in_production_stock()
+        return res
 
     @api.multi
     def button_cancel(self):
+        recalculate_production_stock={}
         for order in self:
-            if order.state=="purchase_order" and order.order_split_ids.filtered(lambda o:o.state!='cancel'):
-                raise UserError(_("You cannot cancel an order that has separate orders. Please cancel them earlier."))
-        return super(PurchaseOrder, self).button_cancel()
+            if order.state=="purchase_order":
+                if order.order_split_ids.filtered(lambda o:o.state!='cancel'):
+                    raise UserError(_("You cannot cancel an order that has separate orders. Please cancel them earlier."))
+                recalculate_production_stock[order] = True
+            elif order.state=="purchase":
+                recalculate_production_stock[order] = True
+        res = super(PurchaseOrder, self).button_cancel()
+        for po in recalculate_production_stock.keys():
+            po.order_line.mapped('product_id.product_tmpl_id')._get_in_production_stock()
+        return res
 
     @api.multi
     def button_purchase_order(self):
@@ -92,6 +111,13 @@ class PurchaseOrder(models.Model):
                 'state': 'purchase_order',
             })
         return super(PurchaseOrder, self).copy(default)
+
+    @api.multi
+    def button_confirm(self):
+        res = super().button_confirm()
+        for order in self:
+            order.order_line.mapped('product_id.product_tmpl_id')._get_in_production_stock()
+        return res
 
 
 class PurchaseOrderLine(models.Model):

@@ -141,7 +141,7 @@ class CreatePickingMove(models.TransientModel):
             for (key, value) in all_moves.items():
                 picking_vals = {
                     'picking_type_id': type_id.id,
-                    'move_lines': [(6, 0, [x.id for x in value])],
+                    'move_lines': [(6, 0, value.ids)],
                     'origin': ', '.join(value.mapped('purchase_line_id.order_id.name')),
                     'scheduled_date': self.date_picking,
                     'location_id': type_id.default_location_src_id.id,
@@ -157,6 +157,7 @@ class CreatePickingMove(models.TransientModel):
                 # We don't use all_moves because when it is a kit, one of the moves is deleted and several ones are created instead
                 picking_id.move_lines._force_assign()
                 pickings.append(picking_id.id)
+                value.mapped('product_id.product_tmpl_id')._get_in_production_stock()
             context2 = dict(context)
             context2['picking_ids'] = pickings
             return self.with_context(context2)._view_picking()

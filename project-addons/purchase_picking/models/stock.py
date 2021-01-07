@@ -116,6 +116,7 @@ class StockPicking(models.Model):
                         move._do_unreserve()
                     move.state = "draft"
                     move.picking_id = False
+                    move.product_id.product_tmpl_id._get_in_production_stock()
                 pick.state = "cancel"
 
         return super(StockPicking, self).action_cancel()
@@ -183,6 +184,17 @@ class StockMove(models.Model):
                 self.env.ref('purchase_picking.partner_multisupplier'):
             raise exceptions.Warning(
                 _('Partner error'), _('Set the partner in the created moves'))
+        return res
+
+    @api.multi
+    def unlink(self):
+        products = self.env['product.template']
+        for move in self:
+            if move.purchase_line_id and move.state!='cancel':
+                products += move.product_id.product_tmpl_id
+        res = super(StockMove, self).unlink()
+        if products:
+            products._get_in_production_stock()
         return res
 
 

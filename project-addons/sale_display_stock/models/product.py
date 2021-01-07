@@ -140,7 +140,7 @@ class ProductTemplate(models.Model):
               digits=dp.get_precision('Product Unit of Measure'))
     qty_in_production = fields.\
         Float("Qty. in production", compute="_get_in_production_stock",
-              readonly=True,
+              readonly=True,store=True,
               digits=dp.get_precision('Product Unit of Measure'))
     virtual_available_wo_incoming = fields.\
         Float("Virtual avail. conservative",

@@ -187,6 +187,8 @@ class StockPicking(models.Model):
 
     @api.multi
     def action_accept_confirmed_qty(self):
+        import ipdb
+        ipdb.set_trace()
         for pick in self:
             #check move lines confirmed qtys
             for move in pick.move_lines:
@@ -206,23 +208,30 @@ class StockPicking(models.Model):
                 if not move.qty_confirmed:
                     new_moves.append(move.id)
                 elif float_compare(remaining_qty, 0,
-                                   precision_rounding=precision) > 0 and \
-                    float_compare(remaining_qty, move.product_qty,
-                                  precision_rounding=precision) < 0:
+                                       precision_rounding=precision) > 0 > float_compare(remaining_qty,
+                                                                                         move.product_qty,
+                                                                                         precision_rounding=precision):
                     new_move = move._split(remaining_qty)
                     new_moves.append(new_move)
                 if not move.product_uom_qty:
                     move.state = 'draft'
                     move.unlink()
+            bck_customizations_not_canceled=False
             if new_moves:
                 new_moves = self.env['stock.move'].browse(new_moves)
                 bck = self._create_backorder_incidences(new_moves)
                 bck.write({'move_type': 'one'})
+                bck_customizations_not_canceled = bck.customization_ids.filtered(lambda c: c.state not in ('cancel','done'))
+                if bck_customizations_not_canceled:
+                    bck.message_post(
+                        body=_('This picking has been created from an order with customized products'))
+                    bck.not_sync = True
                 self.action_assign()
                 pick.move_lines.write({'state': 'assigned'})
+                pick.not_sync = True if pick.customization_ids.filtered(lambda c: c.state not in ('cancel','done')) else False
             pick.message_post(body=_("User %s accepted confirmed qties.") %
                               self.env.user.name)
-            if pick.sale_id.scheduled_date:
+            if pick.sale_id.scheduled_date and not bck_customizations_not_canceled:
                 bck.not_sync = True
                 bck.scheduled_picking = True
                 bck._process_picking_scheduled_time()

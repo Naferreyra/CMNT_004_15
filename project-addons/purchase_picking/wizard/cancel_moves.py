@@ -59,3 +59,4 @@ class CancelMovesWizard(models.TransientModel):
     @api.multi
     def action_cancel_moves(self):
         self.move_detail_ids.mapped('move_id')._action_cancel()
+        self.move_detail_ids.mapped('product_id.product_tmpl_id')._get_in_production_stock()
