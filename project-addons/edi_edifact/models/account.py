@@ -8,6 +8,8 @@ class AccountInvoice(models.Model):
 
     _inherit = 'account.invoice'
 
+    edi_partner = fields.Boolean(related="partner_id.edi_enabled", readonly=True)
+
     @api.multi
     def send_via_edi(self):
         for invoice in self:
@@ -47,7 +49,8 @@ class AccountInvoice(models.Model):
     def invoice_validate(self):
         res = super(AccountInvoice, self).invoice_validate()
         for invoice in self.filtered(lambda i: i.partner_id.commercial_partner_id.edi_enabled):
-            invoice.send_via_edi()
+            if invoice.type == 'out_invoice':
+                invoice.send_via_edi()
 
         return res
 

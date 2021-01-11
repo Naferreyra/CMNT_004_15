@@ -228,10 +228,10 @@ class SaleOrder(models.Model):
         if isinstance(res, bool):
             for sale in self:
                 products_to_order = ''
-                for product in sale.order_line.mapped('product_id'):
-                    if product.state == 'make_to_order':
-                        products_to_order = products_to_order + \
-                                            product.default_code + ', '
+                for line in sale.order_line.filtered(lambda l: l.product_id.state == 'make_to_order'):
+                    products_to_order = products_to_order + \
+                                        line.product_id.default_code + ' -> ' + \
+                                        str(line.product_uom_qty) + '    '
                 if products_to_order:
                     sale.send_email_to_purchases(products_to_order)
         return res

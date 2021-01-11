@@ -151,12 +151,14 @@ class ProductTemplate(models.Model):
     @api.multi
     def _get_outgoing_picking_qty(self):
         picking_types_ids = [item['id'] for item in self.env['stock.picking.type'].search_read([('code', '=', 'outgoing')], ['id'])]
+        location_it_id = self.env['stock.location'].search([('name', '=', 'Depósito Visiotech Italia')]).id
         for product in self:
             domain = [('product_id', 'in', product.product_variant_ids.ids),
                       ('state', 'in', ('confirmed', 'assigned', 'partially_available', 'waiting')),
                       ('picking_id', '!=', False), '|', '&',
                       ('sale_line_id', '!=', False),
-                      ('picking_type_id', 'in', picking_types_ids), ('raw_material_production_id', '!=', False)]
+                      ('picking_type_id', 'in', picking_types_ids), ('raw_material_production_id', '!=', False),
+                      ('location_id', '!=', location_it_id)]
             product.outgoing_picking_reserved_qty = sum(item['product_uom_qty'] for item in self.env['stock.move'].search_read(domain, ['product_uom_qty']))
 
     @api.multi
@@ -169,6 +171,7 @@ class ProductTemplate(models.Model):
     qty_available_italy = fields.Float(string="Qty. available Italy", compute="_get_stock_italy",
                              readonly=True,
                              digits=dp.get_precision('Product Unit of Measure'))
+
 
 class ProductProduct(models.Model):
 

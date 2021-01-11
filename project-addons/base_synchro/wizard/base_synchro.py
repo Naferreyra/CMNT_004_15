@@ -58,6 +58,7 @@ class BaseSynchro(models.TransientModel):
 
     @api.model
     def synchronize(self, server, object):
+        not_force = self._context.get('not_force', False)
         pool = self
         sync_ids = []
         records_limit = 1000
@@ -88,9 +89,11 @@ class BaseSynchro(models.TransientModel):
                 if field.name in fields_data:
                     del fields_data[field.name]
 
-            if object.model_id.model == 'product.product' and country_code == 'IT' and not fields_data.get(
-                    'virtual_stock_conservative', False):
-                fields_data['virtual_stock_conservative'] = {'type': 'float'}
+            if object.model_id.model == 'product.product' and country_code == 'IT':
+                if not fields_data.get('virtual_stock_conservative', False):
+                    fields_data['virtual_stock_conservative'] = {'type': 'float'}
+                if not fields_data.get('standard_price', False):
+                    fields_data['standard_price'] = {'type': 'float'}
 
             flds = list(fields_data.keys())
             sync_ids, domain = self.download_get_items(pool1, model_obj, dt, domain, object, flds, sync_ids,
@@ -106,15 +109,17 @@ class BaseSynchro(models.TransientModel):
                 if field.name in fields_data:
                     del fields_data[field.name]
 
-            if object.model_id.model == 'product.product' and country_code == 'ES' and not fields_data.get(
-                    'virtual_stock_conservative', False):
-                fields_data['virtual_stock_conservative'] = {'type': 'float'}
+            if object.model_id.model == 'product.product' and country_code == 'ES':
+                if not fields_data.get('virtual_stock_conservative', False):
+                    fields_data['virtual_stock_conservative'] = {'type': 'float'}
+                if not fields_data.get('standard_price', False):
+                    fields_data['standard_price'] = {'type': 'float'}
 
             flds = list(fields_data.keys())
             sync_ids, domain = pool2.upload_get_items(model_obj, dt, domain, object, flds, sync_ids, records_limit,
                                                       False)
 
-        if object.force_ids:
+        if not not_force and object.force_ids:
             flds = object.force_ids.mapped('name') + ['create_date']
             force_update = True
             sync_ids_is_empty = len(sync_ids) == 0
@@ -180,7 +185,10 @@ class BaseSynchro(models.TransientModel):
         return sync_ids, domain
 
     def update_elements(self, pool1, pool2, sync_ids, object, fields_data, ctx, create=True):
+        if object.model_id.model == 'product.product':
+            standard_price_inc_it = float(self.env['ir.config_parameter'].sudo().get_param('standard.price.inc.it'))
         for dt, id, action, value in sync_ids:
+            standard_price_incr = False
             if action == 'd':
                 pool_src = pool1
                 pool_dest = pool2
@@ -189,9 +197,13 @@ class BaseSynchro(models.TransientModel):
                 pool_src = pool2
                 pool_dest = pool1
                 destination_inverted = True
-            if object.model_id.model == 'product.product' and 'virtual_stock_conservative' in value:
-                value['virtual_stock_conservative_es'] = value['virtual_stock_conservative']
-                del value['virtual_stock_conservative']
+            if object.model_id.model == 'product.product':
+                if 'virtual_stock_conservative' in value:
+                    value['virtual_stock_conservative_es'] = value['virtual_stock_conservative']
+                    del value['virtual_stock_conservative']
+                if 'standard_price' in value:
+                    standard_price_incr = value['standard_price'] * standard_price_inc_it
+                    del value['standard_price']
             if 'create_date' in value:
                 del value['create_date']
             if 'write_date' in value:
@@ -212,14 +224,39 @@ class BaseSynchro(models.TransientModel):
                 if not destination_inverted:
                     pool = pool_dest.env[object.model_id.model]. \
                         with_context(ctx)
-                    pool.browse([id2]).write(value)
+                    object_dest = pool.browse([id2])
+                    if standard_price_incr:
+                        if not object_dest.seller_ids:
+                            value["seller_ids"] = [(6, 0, [self.env['product.supplierinfo'].create({
+                                'name': 27,
+                                'min_qty': 1,
+                                'price': standard_price_incr
+                            }).id])]
+                        else:
+                            object_dest.seller_ids[0].price = standard_price_incr
+                    object_dest.write(value)
                 else:
-                    pool_dest.get(object.model_id.model).with_context(ctx). \
-                        write([id2], value)
+                    object_dest = pool_dest.get(object.model_id.model)
+                    if standard_price_incr:
+                        if not object_dest.seller_ids:
+                            value["seller_ids"] = [(6, 0, [self.env['product.supplierinfo'].create({
+                                'name': 27,
+                                'min_qty': 1,
+                                'price': standard_price_incr
+                            }).id])]
+                        else:
+                            object_dest.seller_ids[0].price = standard_price_incr
+                    object_dest.with_context(ctx).write([id2], value)
                 self.report_total += 1
                 self.report_write += 1
             elif create:
                 _logger.debug("Creating model %s", object.model_id.name)
+                if standard_price_incr:
+                    value["seller_ids"] = [(6, 0, [self.env['product.supplierinfo'].create({
+                        'name': 27,
+                        'min_qty': 1,
+                        'price': standard_price_incr
+                    }).id])]
                 if not destination_inverted:
                     idnew = pool_dest.env[object.model_id.model]. \
                         with_context(ctx).create(value)

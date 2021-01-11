@@ -174,10 +174,15 @@ class ClaimMakePicking(models.TransientModel):
              'note': note,
              'claim_line_id': claim_line.id
              })
-        # In Italy, need to purchase the stock first
+        # In Italy, need to make the purchase order first if there is not stock available
+        location_stock = self.env.ref('stock.stock_location_stock')
         if picking_id.origin.startswith('IT-RMA') \
-                and picking_id.location_id == self.env.ref('stock.stock_location_stock'):
-            move_id.procure_method = 'make_to_order'
+                and picking_id.location_id == location_stock:
+            qty_on_stock = product.with_context(location=location_stock.id).qty_available
+            if not qty_on_stock \
+                    or qty_on_stock \
+                    and (qty_on_stock - product.outgoing_qty) < move_id.product_uom_qty:
+                move_id.procure_method = 'make_to_order'
         if p_type == 'outgoing' and claim_line.product_id.type == 'product':
             reserv_vals = {
                 'product_id': product.id,

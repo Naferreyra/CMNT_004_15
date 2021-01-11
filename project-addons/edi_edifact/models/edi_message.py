@@ -89,7 +89,7 @@ class EdifMenssage(models.Model):
         return msg
 
     def PRI(self, tpy, qty):
-        msg = "PRI+{}+{}'\n".format(tpy, qty)
+        msg = "PRI+{}:{}'\n".format(tpy, qty)
         return msg
 
     def TAX(self, tpy, qty):
@@ -108,6 +108,10 @@ class EdifMenssage(models.Model):
         invoice.ensure_one()
         msg = ""
         msg_ref = "VT{}".format(datetime.now().strftime("%Y%m%d%H%M"))
+        length = 35
+        street_partner = invoice.partner_id.commercial_partner_id.street
+        street_partner_cut = [street_partner[i:i+length] for i in range(0, len(street_partner), length)]
+
         msg += self.UNH(msg_ref, 'INVOIC')
         if invoice.type == 'out_invoice':
             msg += self.BGM('380', invoice.number)
@@ -115,6 +119,8 @@ class EdifMenssage(models.Model):
             msg += self.BGM('381', invoice.number)
         msg += self.DTM('137', invoice.date_invoice.replace("-", ""))
         msg += self.RFF('ON', invoice.name)
+        for pick in invoice.picking_ids:
+            msg += self.RFF('DQ', pick.name)
 
         # -- Interlocutors segment --
         msg += self.NAD('SU', invoice.company_id.vat[2:])
@@ -128,9 +134,10 @@ class EdifMenssage(models.Model):
         # msg += self.NAD('II') # Mismo que SCO
         msg += self.NAD('IV', invoice.partner_id.commercial_partner_id.ean)
         msg += self.NAD('BY', invoice.partner_shipping_id.ean)
+        msg += self.NAD('DP', invoice.partner_shipping_id.ean)
         msg += self.NAD('BCO', invoice.partner_id.commercial_partner_id.ean,
                         name=invoice.partner_id.commercial_partner_id.name,
-                        street=invoice.partner_id.commercial_partner_id.street,
+                        street=':'.join(street_partner_cut),
                         city=invoice.partner_id.commercial_partner_id.city,
                         pc=invoice.partner_id.commercial_partner_id.zip)
         msg += self.RFF('VA', invoice.partner_id.commercial_partner_id.vat)
@@ -156,10 +163,7 @@ class EdifMenssage(models.Model):
             # 1: identificacion adicional o 5: identificacion del producto
             msg += self.PIA('5', line.product_id.default_code)
             msg += self.IMD(line.name.replace("\n", " "))
-            if invoice.type == 'out_invoice':
-                msg += self.QTY('47', str(line.quantity))
-            elif invoice.type == 'out_refund':
-                msg += self.QTY('61', str(line.quantity))
+            msg += self.QTY('47', str(line.quantity))
             msg += self.MOA('66', '{:.2f}'.format(line.price_subtotal))
             msg += self.PRI('AAA', str(line.price_unit))
             for tax in line.invoice_line_tax_ids:
@@ -324,20 +328,17 @@ class EdifFile(models.Model):
 
         # Read the files
         files = []
-        lines = []
         latest_date = False
-        ftp.dir("", lines.append)  # Read every line in the folder
         date_reading = fields.Datetime.now()
         latest_date_str = self.search([], limit=1, order='read_date desc').read_date
 
-        for line in lines:  # Get the latest files only
-            pieces = line.split(maxsplit=9)
-            datetime_str = pieces[5] + " " + pieces[6] + " " + pieces[7]
+        for line in ftp.mlsd(ftp_folder):  # Get the latest files only
+            datetime_str = line[1].get("modify")
             line_datetime = parser.parse(datetime_str)
             if latest_date_str:
                 latest_date = parser.parse(latest_date_str)
-            if line_datetime > latest_date:
-                files.append(pieces[8])
+            if line_datetime > latest_date and line[0] not in ['.', '..']:
+                files.append(line[0])
 
         for file in files:
             vals = {

@@ -67,6 +67,9 @@
                 <field name="transport_incidence"/>
                 <field name="warehouse_location"/>
             </field>
+            <field name="model_ref_id" position="after">
+                <field name="client_ref" />
+            </field>
             <field name="email_from" position="after">
                 <field name="comercial"/>
                 <field name="country" invisible="True"/>

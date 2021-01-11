@@ -64,6 +64,7 @@ class CrmClaimRma(models.Model):
                                            ('madrid2', 'Madrid - Casablanca'),
                                            ('italia', 'Italia - Arcore'),
                                            ('transit', 'In transit')], "Warehouse Location")
+    client_ref = fields.Char('Client Ref')
 
     check_states = ['substate_received', 'substate_process', 'substate_due_receive']
 
@@ -196,6 +197,7 @@ class CrmClaimRma(models.Model):
             domain_journal = [('type', '=', 'sale')]
             acc_journal_obj = self.env['account.journal']
             acc_journal_ids = acc_journal_obj.search(domain_journal)
+            reference = claim_obj.client_ref or description
             header_vals = {
                 'partner_id': claim_obj.partner_id.id,
                 'fiscal_position_id':
@@ -215,8 +217,11 @@ class CrmClaimRma(models.Model):
                 'payment_mode_id':
                     claim_obj.partner_id.customer_payment_mode_id.id,
                 'mandate_id': claim_obj.partner_id.valid_mandate_id.id,
-                'name': description
+                'name': reference,
+                'partner_shipping_id': claim_obj.delivery_address_id.id
             }
+            if claim_obj.picking_ids:
+                header_vals['picking_ids'] = [(6, 0, [claim_obj.picking_ids[-1].id])]
             inv_obj = self.env['account.invoice']
             invoice_id = inv_obj.create(header_vals)
             fp_obj = self.env['account.fiscal.position']
