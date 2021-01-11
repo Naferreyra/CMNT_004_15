@@ -46,9 +46,10 @@ class KitchenCustomization(models.Model):
 
     def action_done(self):
         self.state = 'done'
-        if self.order_id:
-            if all([x.state in ('cancel','done') or x.id==self.id for x in self.order_id.customization_ids]):
-                self.order_id.picking_ids.filtered(lambda p: p.state not in ('done','cancel')).write({'not_sync': False})
+        if self.order_id and self.order_id.picking_ids:
+            for picking in self.order_id.picking_ids.filtered(lambda p: self in p.customization_ids and p.state not in ('done','cancel')):
+                if all([x.state in ('cancel','done') or x.id==self.id for x in picking.customization_ids]):
+                    picking.write({'not_sync': False})
         template = self.env.ref('kitchen.send_mail_to_commercials_customization_done')
         ctx = dict()
         ctx.update({
