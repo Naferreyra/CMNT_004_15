@@ -54,6 +54,7 @@
                 <header>
                     <field name="state" widget="statusbar" readonly="1"
                            statusbar_visible="draft,waiting,sent,in_progress,done"/>
+                    <field name="order_state" invisible="1"/>
                     <button name="action_confirm" string="Confirm" type="object"
                             attrs="{'invisible': [('state','!=','draft')]}"
                             class="oe_highlight" groups="kitchen.group_kitchen"/>
@@ -66,7 +67,7 @@
                     <button name="action_cancel" string="Cancel" type="object"
                             attrs="{'invisible': [('state','not in',('draft','sent'))]}"/>
                     <button name="action_draft" string="Draft" type="object"
-                            attrs="{'invisible': [('state','!=','cancel')]}"/>
+                            attrs="{'invisible': ['|',('state','!=','cancel'),('order_state','!=','reserve')]}"/>
                 </header>
                 <sheet>
                     <div class="oe_title">

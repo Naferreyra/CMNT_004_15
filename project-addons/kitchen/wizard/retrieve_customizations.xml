@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<odoo>
+    <record id="retrieve_customizations_wizard" model="ir.ui.view">
+        <field name="name">Retrieve Customizations</field>
+        <field name="model">retrieve.customizations.wiz</field>
+        <field name="arch" type="xml">
+            <form string="Retrieve Customizations">
+                <p>Do you want to retrieve any cancel customization?</p>
+                <field name="customizations_ids">
+                    <tree create="false" edit="false" open="false">
+                            <field name="name"/>
+                            <field name="products_qty_format"/>
+                    </tree>
+                </field>
+                <footer>
+                    <button string="Continue"
+                            class="oe_highlight"
+                            name="button_continue"
+                            type="object"
+                            />
+                    <button string="Cancel"
+                            class="oe_link"
+                            special="cancel"
+                            />
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_customization_button" model="ir.ui.view">
+        <field name="name">view.customization.button</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button type="object" name="action_view_customizations"
+                        class="oe_stat_button"
+                        icon="fa-paint-brush"
+                        attrs="{'invisible': [('customization_count','=',0)]}">
+                    <field name="customization_count" widget="statinfo" string="Customizations"/>
+                </button>
+            </div>
+
+        </field>
+    </record>
+</odoo>

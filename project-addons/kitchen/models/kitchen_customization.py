@@ -32,6 +32,7 @@ class KitchenCustomization(models.Model):
 
     date_planned = fields.Datetime()
     comments = fields.Text(string='Comments')
+    order_state = fields.Selection(related='order_id.state')
 
     def _compute_products_format(self):
         for customization in self:
@@ -88,12 +89,19 @@ class KitchenCustomization(models.Model):
                 body=_("The order contains customized products"))
         return super(KitchenCustomization, self).create(vals)
 
+    @api.multi
     def action_cancel(self):
-        if self.order_id and self.state=='sent':
-            if all([x.state in ('cancel', 'done') or x.id == self.id for x in self.order_id.customization_ids]):
-                self.order_id.picking_ids.filtered(lambda p: p.state not in ('done', 'cancel')).write(
-                    {'not_sync': False})
-        self.state = 'cancel'
+        for customization  in self:
+            if customization.state in ['done','in_progress']:
+                if not self.env.user.has_group('kitchen.group_kitchen'):
+                    raise exceptions.UserError(_("You can't cancel an active customization. Please, contact the kitchen staff."))
+            elif customization.order_id and customization.state=='sent':
+                pickings = customization.order_id.picking_ids.filtered(lambda p: p.state not in ('done', 'cancel') and customization in p.customization_ids)
+                for picking in pickings:
+                    customizations = picking.customization_ids.filtered(lambda c:c.state in ('sent','in_progress') and c.id!=customization.id)
+                    if not customizations:
+                        picking.write({'not_sync':False})
+            customization.state = 'cancel'
 
 
     def action_draft(self):
@@ -182,6 +190,19 @@ class KitchenCustomizationLine(models.Model):
                         %(self.product_id.default_code,(self.sale_line_id.product_qty-customization_qty)))
         if self.product_qty<0:
             raise exceptions.UserError(_("You cannot change the product quantity to less than 0"))
+
+    @api.onchange('product_id')
+    def onchange_product_id(self):
+        if self.product_id and self.customization_id and self.customization_id.order_id:
+            line = self.env['sale.order.line'].search(
+                [('product_id', '=', self.product_id.id), ('order_id', '=', self.customization_id.order_id.id)])
+            if not line:
+                raise exceptions.UserError(
+                    _(
+                        "you cannot select a product (%s) that is not in the order %s")
+                    % (self.product_id.default_code, self.customization_id.order_id.name))
+            self.sale_line_id = line.id
+            self.onchange_product_qty()
 
 
 

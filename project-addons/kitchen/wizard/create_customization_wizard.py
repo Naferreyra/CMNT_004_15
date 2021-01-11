@@ -13,7 +13,6 @@ class CustomizationLine(models.TransientModel):
     sale_line_id = fields.Many2one('sale.order.line')
     erase_logo = fields.Boolean()
     max_qty = fields.Float()
-    qty_reserved = fields.Float()
     type_ids = fields.Many2many('customization.type', required=1)
 
 
@@ -30,7 +29,6 @@ class CustomizationWizard(models.TransientModel):
                 lambda l: not l.deposit and l.product_id.categ_id.with_context(
                     lang='es_ES').name != 'Portes' and l.price_unit >= 0):
             new_line = {'product_id': line.product_id.id,
-                        'qty': line.product_qty,
                         'sale_line_id': line.id,
                         'type_ids': None}
 
@@ -38,7 +36,8 @@ class CustomizationWizard(models.TransientModel):
                 [('sale_line_id', '=', line.id), ('state', '!=', 'cancel')]).mapped('product_qty'))
 
             if line.product_qty:
-                new_line.update({'product_qty': line.product_qty - qty_done,
+                new_line.update({'qty': line.product_qty - qty_done,
+                                 'product_qty': line.product_qty - qty_done,
                                  'max_qty': line.product_qty - qty_done})
             if new_line.get('product_qty'):
                 wiz_lines.append(new_line)

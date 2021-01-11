@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<odoo>
+<odoo noupdate="1">
     <record id="send_mail_to_commercials_customization_done" model="mail.template">
         <field name="name">Notify customization done</field>
         <field name="email_from">${'odoo_team@visiotechsecurity.com'}</field>

@@ -220,73 +220,93 @@ msgid "(ERASE LOGO)"
 msgstr "(ELIMINA LOGO)"
 
 #. module: kitchen
-#: code:addons/kitchen/models/kitchen_customization.py:60
+#: code:addons/kitchen/models/kitchen_customization.py:63
 msgid "Please add some products before confirming the customization request"
 msgstr "Si prega di aggiungere dei prodotti prima di confermare la richiesta di personalizzazione"
 
 #. module: kitchen
-#: code:addons/kitchen/models/kitchen_customization.py:62
+#: code:addons/kitchen/models/kitchen_customization.py:65
 msgid "You can't create a customization with a quantity of less than one of a product"
 msgstr "Non è possibile creare una personalizzazione con quantità inferiore a uno di questo prodotto"
 
 #. module: kitchen
-#: code:addons/kitchen/models/kitchen_customization.py:66
+#: code:addons/kitchen/models/kitchen_customization.py:69
 msgid "You can't confirm a customization without a customization type: %s"
 msgstr "Non puoi confermare una personalizzazione senza un tipo di personalizzazione: %s"
 
 #. module: kitchen
-#: code:addons/kitchen/models/kitchen_customization.py:72
+#: code:addons/kitchen/models/kitchen_customization.py:75
 msgid "You can't confirm a customization with products that not belong to the original order: %s"
 msgstr "Non puoi confermare una personalizzazione con prodotti che non appartengono all'ordine originale: %s"
 
 #. module: kitchen
-#: code:addons/kitchen/models/kitchen_customization.py:86
+#: code:addons/kitchen/models/kitchen_customization.py:89
 msgid "The order contains customized products"
 msgstr "L'ordine contiene prodotti personalizzati"
 
 #. module: kitchen
-#: code:addons/kitchen/models/kitchen_customization.py:133
-#: code:addons/kitchen/models/kitchen_customization.py:140
+#: code:addons/kitchen/models/kitchen_customization.py:97
+msgid "You can't cancel an active customization. Please, contact the kitchen staff."
+msgstr "Non è possibile annullare una personalizzazione attiva. Si prega di contattare il personale di cucina."
+
+#. module: kitchen
+#: code:addons/kitchen/models/kitchen_customization.py:135
+#: code:addons/kitchen/models/kitchen_customization.py:142
 msgid "You can't confirm a customization without a customization type: %s"
 msgstr "Non puoi salva una personalizzazione senza un tipo di personalizzazione: %s"
 
 #. module: kitchen
-#: code:addons/kitchen/models/kitchen_customization.py:209
+#: code:addons/kitchen/models/kitchen_customization.py:189
 msgid "You cannot exceed the maximum product quantity to customize. The maximum quantity to customize is : %s-%i unit(s)"
 msgstr "Non puoi superare la quantità massima di prodotto da personalizzare. La quantità massima da personalizzare è: %s-%i Unità"
 
 #. module: kitchen
-#: code:addons/kitchen/models/kitchen_customization.py:212
+#: code:addons/kitchen/models/kitchen_customization.py:192
 msgid "You cannot change the product quantity to less than 0"
 msgstr "Non è possibile modificare la quantità del prodotto a meno di 0"
 
 #. module: kitchen
-#: code:addons/kitchen/models/sale_order.py:18
-msgid "You can't transfer an order with pending customizations"
-msgstr "Non è possibile trasferire un ordine con personalizzazioni in sospeso"
+#: code:addons/kitchen/models/kitchen_customization.py:202
+msgid "you cannot select a product (%s) that is not in the order %s"
+msgstr "non è possibile selezionare un prodotto (%s) che non è nell'ordine %s"
 
 #. module: kitchen
-#: code:addons/kitchen/models/stock_picking.py:17
+#: code:addons/kitchen/models/sale_order.py:23
 msgid "This picking has been created from an order with customized products"
 msgstr "Questa bolla di consegna è stata creata da un ordine con prodotti personalizzati"
 
 #. module: kitchen
-#: code:addons/kitchen/wizard/create_customization_wizard.py:99
+#: code:addons/kitchen/models/sale_order.py:51
+msgid "You cannot cancel this order because there are customizations in progress"
+msgstr "Non è possibile annullare questo ordine perché sono in corso personalizzazioni"
+
+#. module: kitchen
+#: code:addons/kitchen/models/picking.py:27
+msgid "You cannot change this value because there are customizations in progress. Please, cancel the customization first"
+msgstr "Non è possibile modificare questo valore perché sono in corso personalizzazioni. Per favore, annulla prima la personalizzazione"
+
+#. module: kitchen
+#: code:addons/kitchen/models/picking.py:50
+msgid "You cannot cancel this picking because there are customizations in progress"
+msgstr "Non è possibile annullare questa bolla di consegna perché sono in corso personalizzazioni"
+
+#. module: kitchen
+#: code:addons/kitchen/wizard/create_customization_wizard.py:72
 msgid "You can't create a customization without a customization type: %s"
 msgstr "Non puoi creare una personalizzazione senza un tipo di personalizzazione: %s"
 
 #. module: kitchen
-#: code:addons/kitchen/wizard/create_customization_wizard.py:102
+#: code:addons/kitchen/wizard/create_customization_wizard.py:75
 msgid "You can't create a customization with a quantity of less than zero of this product: %s"
 msgstr "Non è possibile creare una personalizzazione con quantità inferiore a zero di questo prodotto: %s"
 
 #. module: kitchen
-#: code:addons/kitchen/wizard/create_customization_wizard.py:105
+#: code:addons/kitchen/wizard/create_customization_wizard.py:78
 msgid "You can't create a customization with a bigger quantity of the product than what appears in the order: %s"
 msgstr "Non è possibile creare una personalizzazione con una quantità superiore a quella inserita in ordine per questo prodotto: %s"
 
 #. module: kitchen
-#: code:addons/kitchen/wizard/create_customization_wizard.py:133
+#: code:addons/kitchen/wizard/create_customization_wizard.py:99
 msgid "You cannot create an empty customization"
 msgstr "Non è possibile creare una personalizzazione vuota:"
 
@@ -331,6 +351,7 @@ msgstr "Vista commerciale"
 #. module: kitchen
 #: model:ir.ui.menu,name:kitchen.customizations_menu
 #: model:ir.model.fields,field_description:kitchen.field_sale_order_customization_count
+#: model:ir.ui.view,arch_db:kitchen.view_customization_button
 msgid "Customizations"
 msgstr "Personalizzazioni"
 
@@ -359,4 +380,39 @@ msgid "<p>The expected date of customization <strong>${object.name}</strong> has
 msgstr "<p>La data prevista per la personalizzazione <strong>${object.name}</strong> è cambiata.</p>\n"
 "            <p>La nuova data prevista è <strong>${object.date_planned}</strong></p>\n"
 "            <p>I migliori saluti.</p>"
+
+
+#. module: kitchen
+#: code:addons/kitchen/wizard/cancel_customizations.py:20
+#: model:ir.ui.view,arch_db:kitchen.cancel_customizations_wizard
+msgid "Cancel Customizations"
+msgstr "Annulla personalizzazioni"
+
+#. module: kitchen
+#: code:addons/kitchen/wizard/retrieve_customizations.py:20
+#: model:ir.ui.view,arch_db:kitchen.retrieve_customizations_wizard
+msgid "Retrieve Customizations"
+msgstr "Recupera personalizzazioni"
+
+#. module: kitchen
+#: model:ir.ui.view,arch_db:kitchen.cancel_customizations_wizard
+#: model:ir.ui.view,arch_db:kitchen.retrieve_customizations_wizard
+msgid "Continue"
+msgstr "Continua"
+
+#. module: kitchen
+#: model:ir.ui.view,arch_db:kitchen.cancel_customizations_wizard
+#: model:ir.ui.view,arch_db:kitchen.retrieve_customizations_wizard
+msgid "Cancel"
+msgstr "Annulla"
+
+#. module: kitchen
+#: model:ir.ui.view,arch_db:kitchen.cancel_customizations_wizard
+msgid "<p>If you accept, these customizations will be canceled</p>"
+msgstr "<p>Se accetti, queste personalizzazioni verranno annullate</p>"
+
+#. module: kitchen
+#: model:ir.ui.view,arch_db:kitchen.retrieve_customizations_wizard
+msgid "<p>Do you want to retrieve any cancel customization?</p>"
+msgstr "<p>Vuoi recuperare l'eventuale cancellazione della personalizzazione?</p>"
 
