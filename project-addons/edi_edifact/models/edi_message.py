@@ -328,20 +328,17 @@ class EdifFile(models.Model):
 
         # Read the files
         files = []
-        lines = []
         latest_date = False
-        ftp.dir("", lines.append)  # Read every line in the folder
         date_reading = fields.Datetime.now()
         latest_date_str = self.search([], limit=1, order='read_date desc').read_date
 
-        for line in lines:  # Get the latest files only
-            pieces = line.split(maxsplit=9)
-            datetime_str = pieces[5] + " " + pieces[6] + " " + pieces[7]
+        for line in ftp.mlsd(ftp_folder):  # Get the latest files only
+            datetime_str = line[1].get("modify")
             line_datetime = parser.parse(datetime_str)
             if latest_date_str:
                 latest_date = parser.parse(latest_date_str)
-            if line_datetime > latest_date:
-                files.append(pieces[8])
+            if line_datetime > latest_date and line[0] not in ['.', '..']:
+                files.append(line[0])
 
         for file in files:
             vals = {

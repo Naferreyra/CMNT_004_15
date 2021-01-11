@@ -45,14 +45,19 @@ class ProductTemplate(models.Model):
                     product.standard_price_2 = product.standard_price
             else:
                 product.standard_price_2 = product.standard_price
-
+            bom_ids = self.env['mrp.bom']
             if product.product_variant_ids.used_in_bom_count:
-                for bom in self.env['mrp.bom'].search([('bom_line_ids.product_id', '=', product.product_variant_ids.id)]):
+                bom_ids += self.env['mrp.bom'].search([('bom_line_ids.product_id', '=', product.product_variant_ids.id)])
+            if product.product_variant_ids.bom_ids:
+                bom_ids += product.product_variant_ids.bom_ids.filtered(lambda b: b.product_tmpl_id)
+
+            if bom_ids:
+                for bom in bom_ids:
                     cost = 0.0
                     for bom_line in bom.bom_line_ids:
                         cost += bom_line.product_id.standard_price_2 * bom_line.product_qty
-                    bom.product_id.product_tmpl_id.write({'standard_price_2': cost})
-                    bom.product_id._onchange_cost_increment()
+                    bom.product_tmpl_id.write({'standard_price_2': cost})
+                    bom.product_tmpl_id.product_variant_ids._onchange_cost_increment()
 
             product.product_variant_ids._onchange_cost_increment()
 

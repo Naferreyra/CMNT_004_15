@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="standard_price_mult_it" model="ir.config_parameter">
+        <field name="key">standard.price.inc.it</field>
+        <field name="value">1.1</field>
+    </record>
+</odoo>

@@ -1,7 +1,7 @@
 # Copyright 2019 Omar Castiñeira, Comunitea Servicios Tecnológicos S.L.
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 from odoo import models, fields, api, _, exceptions
-import numpy
+from statistics import mean
 
 
 class AccountMoveLine(models.Model):
@@ -243,7 +243,7 @@ class AccountInvoice(models.Model):
                             for move in line.move_line_ids:
                                 cost += move.price_unit * (move.product_qty/line.quantity) * -1
                         else:
-                            cost = numpy.average(line.move_line_ids.mapped('price_unit')) * -1
+                            cost = mean(line.move_line_ids.mapped('price_unit')) * -1
                     line.write({'cost_unit': cost or line.product_id.standard_price_2})
             else:
                 for line in inv.invoice_line_ids:

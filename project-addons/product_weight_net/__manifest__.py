@@ -7,7 +7,8 @@
     'website': 'www.visiotechsecurity.com',
     'depends': ["base",
                 "product",
-                "stock"],
+                "stock",
+                "sale_customer_discount"],
     'data': ["views/product_views.xml"],
     'installable': True
 }
