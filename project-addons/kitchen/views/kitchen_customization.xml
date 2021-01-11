@@ -67,7 +67,7 @@
                     <button name="action_cancel" string="Cancel" type="object"
                             attrs="{'invisible': [('state','not in',('draft','sent'))]}"/>
                     <button name="action_draft" string="Draft" type="object"
-                            attrs="{'invisible': ['|',('state','!=','cancel'),('order_state','!=','reserve')]}"/>
+                            attrs="{'invisible': ['|',('state','!=','cancel'),'&amp;',('order_state','!=','reserve'),('order_id','!=',False)]}"/>
                 </header>
                 <sheet>
                     <div class="oe_title">
