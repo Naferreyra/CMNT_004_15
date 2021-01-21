@@ -37,7 +37,8 @@
              'wizard/wzd_remove_partners_from_payment_order_view.xml',
              'report/account_invoice_contact_report_view.xml',
              'views/account_bank_statement.xml',
-             'wizard/statement_ignore.xml'
+             'wizard/statement_ignore.xml',
+             'data/res_partner_category_data.xml'
              ],
     "installable": True
 }

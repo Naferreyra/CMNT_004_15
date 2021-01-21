@@ -46,6 +46,7 @@
                 <field name="user_id"/>
                 <field name="date"/>
                 <field name="date_received"/>
+                <field name="warehouse_date"/>
                 <field name="stage_id"/>
                 <field name="rma_cost"/>
                 <field name="priority"/>
@@ -63,9 +64,10 @@
             <field name="rma_cost" position="after">
                 <field name="date_received"/>
                 <field name="allow_confirm_blocked" attrs="{'invisible': [('claim_type', '!=', %(crm_claim_type.crm_claim_type_customer)d)]}" groups="account.group_account_manager"/>
-                <field name="t_incidence_picking" attrs="{'invisible':[('transport_incidence', '=', False)]}"/>
-                <field name="transport_incidence"/>
                 <field name="warehouse_location"/>
+                <field name="t_incidence_picking" attrs="{'invisible':[('transport_incidence', '=', False)]}"/>
+                <field name="warehouse_date"/>
+                <field name="transport_incidence"/>
             </field>
             <field name="model_ref_id" position="after">
                 <field name="client_ref" />
@@ -126,6 +128,9 @@
             <field name="state" position="attributes">
                 <attribute name="invisible">1</attribute>
             </field>
+            <field name="product_id" position="before">
+                <field name="sequence" readonly="1" string=" "/>
+            </field>
             <field name="substate_id" position="replace"/>
             <field name="supplier_id" position="attributes">
                 <attribute name="context">{'search_product_id': product_id}</attribute>
@@ -180,6 +185,7 @@
             </xpath>
             <xpath expr="//field[@name='company_id']" position="replace">
                 <field name="warehouse_location"/>
+                <field name="warehouse_date"/>
             </xpath>
             <xpath expr="//field[@name='rma_cost']" position="before">
                 <field name="priority"/>

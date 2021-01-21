@@ -33,10 +33,21 @@ msgid "Partner Orders"
 msgstr "Pedidos Cliente"
 
 #. module: sale_custom
-#: code:addons/sale_custom/models/sale.py:190
+#: code:addons/sale_custom/models/sale.py:274
 #, python-format
 msgid "Sale has been blocked due to exceed the weight limit in DHL air shipments."
 msgstr "La transacción ha sido bloqueada debido al exceso de peso en envíos DHL aéreos."
+
+#. module: sale_custom
+#: code:addons/sale_custom/models/sale.py:282
+#, python-format
+msgid "This order to the Canary Islands exceeds %skg. Have you checked the shipping costs and conditions?"
+msgstr "Este pedido a Canarias supera los %skg. ¿Ha comprobado los gastos y condiciones de envío?"
+
+#. module: sale_custom
+#: model:ir.ui.view,arch_db:sale_custom.max_weight_advise_wizard
+msgid "Yes"
+msgstr "Si"
 
 #. module: sale_custom
 #: code:addons/sale_custom/models/sale.py:133

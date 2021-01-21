@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<odoo>
+    <record id="max_weight_advise_wizard" model="ir.ui.view">
+        <field name="name">Max Weight Advise</field>
+        <field name="model">max.weight.advise.wiz</field>
+        <field name="arch" type="xml">
+            <form string="Retrieve Customizations">
+                <h><field name="message"/></h>
+                <footer>
+                    <button string="Yes"
+                            class="oe_highlight"
+                            name="button_continue"
+                            type="object"
+                            />
+                    <button string="No"
+                            class="oe_link"
+                            special="cancel"
+                            />
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

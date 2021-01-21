@@ -129,6 +129,13 @@ class StockPicking(models.Model):
                     res.append(move.container_id.id)
             picking.container_ids = res
 
+    @api.onchange("location_id","location_dest_id")
+    def onchange_locations(self):
+        for picking in self:
+            for move in picking.move_lines:
+                move.location_id=picking.location_id
+                move.location_dest_id = picking.location_dest_id
+
 
 class StockMove(models.Model):
 

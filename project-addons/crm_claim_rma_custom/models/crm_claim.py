@@ -65,6 +65,7 @@ class CrmClaimRma(models.Model):
                                            ('italia', 'Italia - Arcore'),
                                            ('transit', 'In transit')], "Warehouse Location")
     client_ref = fields.Char('Client Ref')
+    warehouse_date = fields.Date('Final Received Date')
 
     check_states = ['substate_received', 'substate_process', 'substate_due_receive']
 
@@ -276,6 +277,14 @@ class CrmClaimRma(models.Model):
                 action['domain'] = "[('id','in', [" + str(invoice_id.id) + "])]"
                 return action
 
+    @api.multi
+    def resequence(self):
+        for claim in self:
+            seq = 1
+            for line in claim.claim_line_ids:
+                line.sequence = seq
+                seq += 1
+
 
 class ClaimInvoiceLine(models.Model):
     _name = 'claim.invoice.line'
@@ -374,11 +383,18 @@ class CrmClaimLine(models.Model):
     substate_id = fields. \
         Many2one(default=lambda self: self.env.ref('crm_claim_rma_custom.substate_due_receive').id)
     claim_name = fields.Selection(related='claim_id.name', readonly=True)
+    sequence = fields.Integer()
 
     res = {}
 
     @api.model
     def create(self, vals):
+        sec_list = self.env['crm.claim'].browse(vals['claim_id']).claim_line_ids.mapped('sequence')
+        if sec_list:
+            vals['sequence'] = max(sec_list) + 1
+        else:
+            vals['sequence'] = 0
+
         if 'substate_id' not in vals.keys():
             vals['substate_id'] = self.env.ref(
                 'crm_claim_rma_custom.substate_due_receive').id
@@ -395,7 +411,6 @@ class CrmClaimLine(models.Model):
         if 'equivalent_product_id' in vals.keys():
             vals['substate_id'] = self.env.ref(
                 'crm_claim_rma_custom.substate_replaced').id
-
 
         return super(CrmClaimLine, self).write(vals)
 
@@ -415,6 +430,13 @@ class CrmClaimLine(models.Model):
         res = wzd.make()
         return res
 
+    @api.multi
+    def unlink(self):
+        claims = self.mapped('claim_id')
+        super().unlink()
+        if claims:
+            claims.resequence()
+        return True
 
 
 

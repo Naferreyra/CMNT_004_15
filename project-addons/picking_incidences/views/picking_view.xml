@@ -10,8 +10,11 @@
                 <button name="action_copy_reserv_qty" attrs="{'invisible': ['|','|',('state', 'not in', ['confirmed','partially_available']),('with_incidences','=',True),('move_type', '!=' , 'direct')]}" string="Copy reserved qty. to confirmed qty." groups="base.group_user" type="object"/>
                 <button name="action_accept_confirmed_qty" attrs="{'invisible': ['|','|',('state', 'not in', ['confirmed','partially_available']),('with_incidences','=',True),('move_type', '!=' , 'direct')]}" string="Confirm assignation" groups="base.group_user" type="object" confirm="Are you sure? Backorder will be created with remaining quantities"/>
             </button>
-            <xpath expr="//field[@name='location_id']" position="after">
-                    <field name="location_dest_id" visible="1"/>
+            <xpath expr="//field[@name='location_id']" position="attributes">
+                <attribute name="attrs">{'invisible': False}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='location_dest_id']" position="attributes">
+                <attribute name="attrs">{'invisible': False}</attribute>
             </xpath>
             <field name="origin" position="after">
                 <field name="with_incidences"/>

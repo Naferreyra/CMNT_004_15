@@ -8,7 +8,7 @@ class ProductProduct(models.Model):
     _inherit = 'product.product'
 
     def cron_stock_catalog(self):
-        headers = ["ID", "Proveedor principal", "Referencia interna", "Fabricando", "Entrante", "Stock cocina",
+        headers = ["ID", "Último Proveedor", "Referencia interna", "Fabricando", "Entrante", "Stock cocina",
                    "Stock real", "Stock disponible", "Ventas en los últimos 60 días con stock",
                    "Cant. pedido más grande", "Días de stock restantes", "Stock en playa",
                    "Media de margen de últimas ventas", "Cost Price", "Último precio de compra",
@@ -16,7 +16,7 @@ class ProductProduct(models.Model):
 
         domain = [('custom', '=', False), ('type', '!=', 'service'), ('seller_id.name', 'not ilike', 'outlet')]
 
-        fields = ["id", "seller_id", "code", "qty_in_production", "incoming_qty", "qty_available_wo_wh",
+        fields = ["id", "last_supplier_id", "code", "qty_in_production", "incoming_qty", "qty_available_wo_wh",
                   "qty_available", "virtual_stock_conservative", "last_sixty_days_sales", "biggest_sale_qty",
                   "remaining_days_sale", "qty_available_input_loc", "average_margin",
                   "standard_price", "last_purchase_price", "last_purchase_date", "replacement_id", "state"]
@@ -24,13 +24,16 @@ class ProductProduct(models.Model):
         translate_state = {"draft": "En desarrollo", "sellable": "Normal", "end": "Fin del ciclo de vida",
                            "obsolete": "Obsoleto", "make_to_order": "Bajo pedido"}
 
-        products = self.env['product.product'].search_read(domain, fields)
+        products = self.env['product.product'].search_read(domain, fields + ["seller_id"])
         for product in products:
             product_fields = []
             for field in fields:
                 if product[field] is False:
-                    product_fields.append("")
-                elif field in ('seller_id', 'replacement_id'):
+                    if field != "last_supplier_id" or product["seller_id"] is False:
+                        product_fields.append("")
+                    else:
+                        product_fields.append(product["seller_id"][1])
+                elif field in ('last_supplier_id', 'replacement_id'):
                     product_fields.append(product[field][1])
                 elif field == 'state':
                     product_fields.append(translate_state[product[field]])
@@ -125,6 +128,59 @@ class ProductProduct(models.Model):
         self.send_email(file_b64, "product_valuation",
                         "product_valuation_{}.xlsx".format(to_date),
                         "cron_stock_catalog.email_template_product_valuation")
+
+    def cron_general_alberto_3(self):
+        headers = ["ID", "Referencia interna", "Entrante",
+                   "PVP_A", "PVP_B", "PVP_C", "PVP_D", "PVI_A", "PVI_B", "PVI_C", "PVI_D",
+                   "Margen PVD_A", "Margen PVD_B", "Margen PVD_C", "Margen PVI_A", "Margen PVI_B",
+                   "Margen PVI_C", "Margen PVI_D", "Stock Real", "Stock Disponible", "Coste 2",
+                   "Nombre de la categoría Padre", "Nombre de la categoría", "Ventas en los últimos 60 días con stock",
+                   "Días de stock restantes", "Nombre de la marca", "Stock Cocina", "Estado", "Joking",
+                   "Fabricando"]
+
+        domain = [('sale_ok', '=', True)]
+
+        fields = ["id", "default_code", "incoming_qty", "list_price1", "list_price2", "list_price3",
+                  "list_price4", "pvi1_price", "pvi2_price", "pvi3_price", "pvi4_price", "margin_pvd1", "margin_pvd2",
+                  "margin_pvd3", "margin_pvi1", "margin_pvi2", "margin_pvi3", "margin_pvi4", "qty_available",
+                  "virtual_available_wo_incoming", "standard_price_2", "categ_id",
+                  "last_sixty_days_sales", "remaining_days_sale", "product_brand_id", "qty_available_wo_wh",
+                  "state", "joking", "qty_in_production"]
+
+        translate_state = {"draft": "En desarrollo", "sellable": "Normal", "end": "Fin del ciclo de vida",
+                           "obsolete": "Obsoleto", "make_to_order": "Bajo pedido"}
+        rows = []
+
+        products = self.env['product.product'].search_read(domain, fields + ["seller_id"])
+        for product in products:
+            product_fields = []
+            for field in fields:
+                if product[field] is False:
+                    product_fields.append("")
+                    if field == 'categ_id':
+                        product_fields.append("")
+                elif field == 'product_brand_id':
+                    product_fields.append(product[field][1])
+                elif field == 'categ_id':
+                    categ = self.env['product.category'].browse([product[field][0]])
+                    if categ.parent_id:
+                        product_fields.append(categ.parent_id.name or "")
+                    else:
+                        product_fields.append("")
+                    product_fields.append(categ.name)
+                elif field == 'state':
+                    product_fields.append(translate_state[product[field]])
+                elif field in ('standard_price_2', 'joking'):
+                    product_fields.append(round(product[field], 2))
+                else:
+                    product_fields.append(product[field])
+            rows.append(product_fields)
+
+        file_b64 = self.generate_xls(headers, rows)
+        self.send_email(file_b64, "general_Alberto3",
+                        "general_Alberto3_{}.xlsx"
+                        .format(datetime.now().strftime('%m%d')),
+                        "cron_stock_catalog.email_template_general_alberto_3")
 
     @api.multi
     def send_email(self, file, name, datas_fname, template_name):

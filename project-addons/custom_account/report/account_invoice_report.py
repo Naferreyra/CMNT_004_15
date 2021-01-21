@@ -20,6 +20,7 @@ class AccountInvoiceReport(models.Model):
     parent_product_categ_id = fields.Many2one('product.category','Parent product category')
     tag_ids = fields. \
         Many2many(related='product_id.tag_ids')
+    partner_category = fields.Many2many(related="commercial_partner_id.category_id")
 
     def _select(self):
         select_str = super()._select()

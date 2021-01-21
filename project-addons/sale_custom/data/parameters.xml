@@ -5,6 +5,10 @@
            <field name="key">dhl_max_weight</field>
            <field name="value">50</field>
         </record>
+        <record id="canary_max_weight" model="ir.config_parameter">
+           <field name="key">canary_max_weight</field>
+           <field name="value">50</field>
+        </record>
     </data>
 </odoo>
 

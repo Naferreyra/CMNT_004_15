@@ -99,6 +99,7 @@
                     <field name="force_ids">
                         <tree string="Fields" editable="bottom">
                             <field name="name"/>
+                            <field name="type"/>
                         </tree>
                     </field>
                 </sheet>

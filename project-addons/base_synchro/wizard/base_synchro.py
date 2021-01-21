@@ -89,11 +89,10 @@ class BaseSynchro(models.TransientModel):
                 if field.name in fields_data:
                     del fields_data[field.name]
 
-            if object.model_id.model == 'product.product' and country_code == 'IT':
-                if not fields_data.get('virtual_stock_conservative', False):
-                    fields_data['virtual_stock_conservative'] = {'type': 'float'}
-                if not fields_data.get('standard_price', False):
-                    fields_data['standard_price'] = {'type': 'float'}
+            if country_code == 'IT':
+                for obj_field in object.force_ids:
+                    if not fields_data.get(obj_field.name, False):
+                        fields_data[obj_field.name] = {'type': obj_field.type}
 
             flds = list(fields_data.keys())
             sync_ids, domain = self.download_get_items(pool1, model_obj, dt, domain, object, flds, sync_ids,
@@ -109,11 +108,10 @@ class BaseSynchro(models.TransientModel):
                 if field.name in fields_data:
                     del fields_data[field.name]
 
-            if object.model_id.model == 'product.product' and country_code == 'ES':
-                if not fields_data.get('virtual_stock_conservative', False):
-                    fields_data['virtual_stock_conservative'] = {'type': 'float'}
-                if not fields_data.get('standard_price', False):
-                    fields_data['standard_price'] = {'type': 'float'}
+            if country_code == 'ES':
+                for obj_field in object.force_ids:
+                    if not fields_data.get(obj_field.name, False):
+                        fields_data[obj_field.name] = {'type': obj_field.type}
 
             flds = list(fields_data.keys())
             sync_ids, domain = pool2.upload_get_items(model_obj, dt, domain, object, flds, sync_ids, records_limit,
@@ -185,7 +183,7 @@ class BaseSynchro(models.TransientModel):
         return sync_ids, domain
 
     def update_elements(self, pool1, pool2, sync_ids, object, fields_data, ctx, create=True):
-        if object.model_id.model == 'product.product':
+        if object.model_id.model in ('product.product', 'product.template'):
             standard_price_inc_it = float(self.env['ir.config_parameter'].sudo().get_param('standard.price.inc.it'))
         for dt, id, action, value in sync_ids:
             standard_price_incr = False
@@ -204,6 +202,11 @@ class BaseSynchro(models.TransientModel):
                 if 'standard_price' in value:
                     standard_price_incr = value['standard_price'] * standard_price_inc_it
                     del value['standard_price']
+                if 'standard_price_2_inc' in value:
+                    value['standard_price_2_inc'] *= standard_price_inc_it
+            if object.model_id.model == 'product.template':
+                if 'standard_price_2' in value:
+                    value['standard_price_2'] *= standard_price_inc_it
             if 'create_date' in value:
                 del value['create_date']
             if 'write_date' in value:

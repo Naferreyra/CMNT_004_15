@@ -119,6 +119,7 @@ class StockReservation(models.Model):
             reserve.refresh()
             moves |= res
             for move in res:
+                move.sale_line_id = current_sale_line_id
                 reservation = self.env['stock.reservation'].search(
                     [('move_id', '=', move.id)])
                 if not reservation:

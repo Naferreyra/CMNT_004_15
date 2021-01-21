@@ -27,4 +27,17 @@
             ]]>
          </field>
     </record>
+    <record id="email_template_general_alberto_3" model="mail.template">
+        <field name="name">General Alberto 3 Report</field>
+        <field name="email_from">odoo_team@visiotechsecurity.com</field>
+        <field name="subject">General Alberto 3 Report</field>
+        <field name="email_to">azamorano@visiotechsecurity.com</field>
+        <field name="model_id" ref="base.model_res_users"/>
+        <field name="auto_delete" eval="False"/>
+        <field name="body_html"><![CDATA[
+            <p>Hello</p>
+            <p>Here is the report for today</p>
+            ]]>
+         </field>
+    </record>
 </odoo>

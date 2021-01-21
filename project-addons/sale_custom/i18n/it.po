@@ -166,3 +166,14 @@ msgstr "La quantità del prodotto selezionato (%i unità) non è al momento disp
 #, python-format
 msgid "Not enough inventory but we have a replacement product!"
 msgstr "Inventario non sufficiente, ma esiste un altro prodotto che può sostituirlo!"
+
+#. module: sale_custom
+#: code:addons/sale_custom/models/sale.py:282
+#, python-format
+msgid "This order to the Canary Islands exceeds %skg. Have you checked the shipping costs and conditions?"
+msgstr "Quest'ordine per le Canarie supera i %skg. Ha controllato le spese e le condizioni della spedizione?"
+
+#. module: sale_custom
+#: model:ir.ui.view,arch_db:sale_custom.max_weight_advise_wizard
+msgid "Yes"
+msgstr "Sì"

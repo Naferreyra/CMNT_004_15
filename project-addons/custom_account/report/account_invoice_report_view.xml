@@ -30,6 +30,7 @@
 
         <record id="account.action_account_invoice_report_all" model="ir.actions.act_window">
             <field name="context">{'search_default_current':1, 'search_default_customer':1, 'search_default_without_ef':1, 'group_by':['date'], 'group_by_no_leaf':1, 'search_default_thisyear': 1}</field>
+            <field name="domain">['|',('company_id.name','not like','Pruebas'),'&amp;',('partner_category','not like','Empleado'),('company_id.name','like','Pruebas')]</field>
         </record>
 
 </odoo>

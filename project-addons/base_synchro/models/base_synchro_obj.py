@@ -107,6 +107,7 @@ class BaseSynchroObjForce(models.Model):
     name = fields.Char('Field Name', required=True)
     obj_id = fields.Many2one('base.synchro.obj', 'Object', required=True,
                              ondelete='cascade')
+    type = fields.Char('Field Type', required=True)
 
 
 class BaseSynchroObjLine(models.Model):

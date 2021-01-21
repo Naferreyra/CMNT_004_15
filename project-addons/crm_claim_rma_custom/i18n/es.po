@@ -492,3 +492,8 @@ msgstr "En tránsito"
 #: model:ir.model.fields,field_description:crm_claim_rma_custom.field_crm_claim_client_ref
 msgid "Client Ref"
 msgstr "Referencia cliente"
+
+#. module: crm_claim_rma_custom
+#: model:ir.model.fields,field_description:crm_claim_rma_custom.field_crm_claim_warehouse_date
+msgid "Final Received Date"
+msgstr "Fecha recepción final"

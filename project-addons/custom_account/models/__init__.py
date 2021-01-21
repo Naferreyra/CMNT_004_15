@@ -9,3 +9,4 @@ from . import stock
 from . import email_template
 from . import account_banking_mandate
 from . import account_bank_statement
+from . import users

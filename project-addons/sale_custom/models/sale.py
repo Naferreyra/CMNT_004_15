@@ -80,6 +80,18 @@ class SaleOrderLine(models.Model):
                     return {'warning': warning_mess}
         return {}
 
+    @api.multi
+    def _update_reservation_price_qty(self):
+        lines_released = self.env['sale.order.line']
+        if not self.env.context.get('later', False):
+            for line in self:
+                if len(line.reservation_ids) > 1 or line.product_id.bom_ids:
+                    line.reservation_ids.release()
+                    lines_released += line
+            super()._update_reservation_price_qty()
+        if lines_released:
+            lines_released.stock_reserve()
+
 
 class SaleOrder(models.Model):
 
@@ -201,7 +213,9 @@ class SaleOrder(models.Model):
             user_buyer = self.env['ir.config_parameter'].sudo().get_param(
                 'web.user.buyer')
             for sale in self:
-                sale.check_weight_dhl_flight()
+                exception = sale.check_weight()
+                if exception:
+                    return exception
                 if not sale.validated_dir and sale.create_uid.email == \
                         user_buyer:
                     message = _('Please, validate shipping address.')
@@ -255,17 +269,30 @@ class SaleOrder(models.Model):
 
         return True
 
-    def check_weight_dhl_flight(self):
+    def check_weight(self):
         dhl_flight = self.transporter_id.name == "DHL" and self.service_id.name == "UE Aéreo (U)"
-        if dhl_flight:
-            max_weight = self.env['ir.config_parameter'].sudo().get_param('dhl_max_weight')
+        canary = self.partner_shipping_id and \
+                 not self.env.context.get("bypass_canary_max_weight", False) and \
+                 self.partner_shipping_id.state_id.id in (
+                 self.env.ref("base.state_es_tf").id, self.env.ref("base.state_es_gc").id)
+        if dhl_flight or canary:
+            dhl_max_weight = self.env['ir.config_parameter'].sudo().get_param('dhl_max_weight')
+            canary_max_weight = self.env['ir.config_parameter'].sudo().get_param('canary_max_weight')
             products_weight = 0
             for line in self.order_line:
                 if isinstance(line.id, int):
                     products_weight += line.product_id.weight * line.product_uom_qty
-            if products_weight > float(max_weight):
+            if dhl_flight and products_weight > float(dhl_max_weight):
                 message = _('Sale has been blocked due to exceed the weight limit in DHL air shipments.')
                 raise exceptions.Warning(message)
+            if canary and products_weight > float(canary_max_weight):
+                return self.env['max.weight.advise.wiz'].create({
+                    'sale_id': self.id,
+                    'origin_reference':
+                        '%s,%s' % ('sale.order', self.id),
+                    'continue_method': 'action_confirm',
+                    'message': _("This order to the Canary Islands exceeds %skg. Have you checked the shipping costs and conditions?") %canary_max_weight
+                }).action_show()
 
 
 class MailMail(models.Model):
