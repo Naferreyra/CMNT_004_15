@@ -63,4 +63,4 @@ class StockPicking(models.Model):
 class StockMove(models.Model):
     _inherit = 'stock.move'
 
-    customization_line = fields.One2many('kitchen.customization.line', related="sale_line_id.customization_line")
+    customization_line = fields.Many2one('kitchen.customization.line')

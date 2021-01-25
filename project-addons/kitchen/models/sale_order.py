@@ -10,19 +10,27 @@ class SaleOrder(models.Model):
     def _compute_customization_count(self):
         for order in self:
             order.customization_count = len(order.customization_ids)
+            order.customization_count_not_cancelled = len(order.customization_ids.filtered(lambda c:c.state!='cancel'))
 
     customization_count = fields.Integer(compute='_compute_customization_count', default=0)
+    customization_count_not_cancelled = fields.Integer(compute='_compute_customization_count', default=0)
 
     def _action_confirm(self):
         res = super(SaleOrder, self)._action_confirm()
-        customizations = self.customization_ids.filtered(lambda p: p.state == 'draft')
-        if customizations:
-            pickings = self.picking_ids.filtered(lambda p: p.state != 'cancel')
-            pickings.write({'not_sync': True})
-            pickings.message_post(
-                body=_('This picking has been created from an order with customized products'))
-            for customization in customizations:
-                customization.action_confirm()
+        for sale in self:
+            customizations = sale.customization_ids.filtered(lambda p: p.state == 'draft')
+            if customizations:
+                pickings = sale.picking_ids.filtered(lambda p: p.state != 'cancel')
+                pickings.write({'not_sync': True})
+                pickings.message_post(
+                    body=_('This picking has been created from an order with customized products'))
+                for move in pickings.move_lines:
+                    move.customization_line = move.sale_line_id.customization_line
+                if pickings.state=='assigned':
+                    customizations.action_confirm()
+                else:
+                    customizations.state = 'waiting'
+
         return res
 
     def action_view_customizations(self):
@@ -55,14 +63,15 @@ class SaleOrder(models.Model):
         return super(SaleOrder, self).action_cancel()
 
     def action_confirm(self):
-        if self.customization_ids and all([x.state == 'cancel' for x in self.customization_ids]):
-            return self.env['retrieve.customizations.wiz'].create({
-                'sale_id': self.id,
-                'origin_reference':
-                    '%s,%s' % ('sale.order', self.id),
-                'continue_method': 'action_confirm',
-                'customizations_ids': [(6, 0, self.customization_ids.ids)]
-            }).action_show()
+        for sale in self:
+            if sale.customization_ids and all([x.state == 'cancel' for x in sale.customization_ids]):
+                return sale.env['retrieve.customizations.wiz'].create({
+                    'sale_id': sale.id,
+                    'origin_reference':
+                        '%s,%s' % ('sale.order', sale.id),
+                    'continue_method': 'action_confirm',
+                    'customizations_ids': [(6, 0, sale.customization_ids.ids)]
+                }).action_show()
         return super(SaleOrder, self).action_confirm()
 
 

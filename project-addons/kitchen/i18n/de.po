@@ -227,22 +227,22 @@ msgid "(ERASE LOGO)"
 msgstr "(LOGO LÖSCHEN)"
 
 #. module: kitchen
-#: code:addons/kitchen/models/kitchen_customization.py:63
+#: code:addons/kitchen/models/kitchen_customization.py:66
 msgid "Please add some products before confirming the customization request"
 msgstr "Bitte fügen Sie ein Produkt hinzu, bevor Sie die Personalisierung bestätigen"
 
 #. module: kitchen
-#: code:addons/kitchen/models/kitchen_customization.py:65
+#: code:addons/kitchen/models/kitchen_customization.py:69
 msgid "You can't create a customization with a quantity of less than one of a product"
 msgstr "Sie können keine Anpassung mit einer Menge von weniger als einem dieses Produkts erstellen"
 
 #. module: kitchen
-#: code:addons/kitchen/models/kitchen_customization.py:69
+#: code:addons/kitchen/models/kitchen_customization.py:73
 msgid "You can't confirm a customization without a customization type: %s"
 msgstr "Sie können eine Anpassung ohne Anpassungstyp nicht bestätigen: %s"
 
 #. module: kitchen
-#: code:addons/kitchen/models/kitchen_customization.py:75
+#: code:addons/kitchen/models/kitchen_customization.py:80
 msgid "You can't confirm a customization with products that not belong to the original order: %s"
 msgstr "Sie können eine Anpassung nicht mit Produkten bestätigen, die nicht zur ursprünglichen Bestellung gehören: %s"
 
@@ -252,38 +252,38 @@ msgid "The order contains customized products"
 msgstr "Die Bestellung enthält Personalisierte Produkte"
 
 #. module: kitchen
-#: code:addons/kitchen/models/kitchen_customization.py:97
+#: code:addons/kitchen/models/kitchen_customization.py:115
 msgid "You can't cancel an active customization. Please, contact the kitchen staff."
 msgstr "Sie können eine aktive Anpassung nicht abbrechen. Bitte wenden Sie sich an das Küchenpersonal."
 
 #. module: kitchen
-#: code:addons/kitchen/models/kitchen_customization.py:135
-#: code:addons/kitchen/models/kitchen_customization.py:142
+#: code:addons/kitchen/models/kitchen_customization.py:188
+#: code:addons/kitchen/models/kitchen_customization.py:176
 msgid "You can't save a customization without a customization type: %s"
 msgstr "Sie können eine Anpassung ohne Anpassungstyp nicht sparen: %s"
 
 #. module: kitchen
-#: code:addons/kitchen/models/kitchen_customization.py:189
+#: code:addons/kitchen/models/kitchen_customization.py:254
 msgid "You cannot exceed the maximum product quantity to customize. The maximum quantity to customize is : %s-%i unit(s)"
 msgstr "Sie können die maximale Produktmenge zum Anpassen nicht überschreiten. Die maximale Menge zum Anpassen ist: %s-%i Einheiten"
 
 #. module: kitchen
-#: code:addons/kitchen/models/kitchen_customization.py:192
+#: code:addons/kitchen/models/kitchen_customization.py:257
 msgid "You cannot change the product quantity to less than 0"
 msgstr "Sie können die Produktmenge nicht auf weniger als 0 ändern"
 
 #. module: kitchen
-#: code:addons/kitchen/models/kitchen_customization.py:202
+#: code:addons/kitchen/models/kitchen_customization.py:265
 msgid "you cannot select a product (%s) that is not in the order %s"
 msgstr "Sie können kein Produkt (%s) auswählen, das nicht in der Bestellung enthalten ist %s"
 
 #. module: kitchen
-#: code:addons/kitchen/models/sale_order.py:23
+#: code:addons/kitchen/models/sale_order.py:26
 msgid "This picking has been created from an order with customized products"
 msgstr "Dieser Lieferschein wurde aus einer Bestellung mit personalisierten Produkten erstellt"
 
 #. module: kitchen
-#: code:addons/kitchen/models/sale_order.py:51
+#: code:addons/kitchen/models/sale_order.py:59
 msgid "You cannot cancel this order because there are customizations in progress"
 msgstr "Sie können diese Bestellung nicht stornieren, da Anpassungen vorgenommen werden"
 

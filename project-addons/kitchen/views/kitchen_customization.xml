@@ -65,7 +65,7 @@
                             attrs="{'invisible': [('state','!=','in_progress')]}"
                             class="oe_highlight" groups="kitchen.group_kitchen"/>
                     <button name="action_cancel" string="Cancel" type="object"
-                            attrs="{'invisible': [('state','not in',('draft','sent'))]}"/>
+                            attrs="{'invisible': [('state','not in',('draft','sent','waiting'))]}"/>
                     <button name="action_draft" string="Draft" type="object"
                             attrs="{'invisible': ['|',('state','!=','cancel'),'&amp;',('order_state','!=','reserve'),('order_id','!=',False)]}"/>
                 </header>

@@ -7,7 +7,7 @@
         <field name="arch" type="xml">
             <header position="inside">
                 <button name="%(kitchen.create_customization)d" string="Create customization" type="action"
-                        attrs="{'invisible': [('state','!=','reserve')]}"
+                        attrs="{'invisible': ['|',('state','!=','reserve'),('customization_count_not_cancelled','>=',1)]}"
                         class="oe_highlight"/>
             </header>
             <xpath expr="//button[@name='action_view_invoice']" position="before">
@@ -16,6 +16,7 @@
                         icon="fa-paint-brush"
                         attrs="{'invisible': [('customization_count','=',0)]}">
                     <field name="customization_count" widget="statinfo" string="Customizations"/>
+                    <field name="customization_count_not_cancelled" invisible="1"/>
                 </button>
             </xpath>
         </field>
