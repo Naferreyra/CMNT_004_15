@@ -220,9 +220,14 @@ class StockPicking(models.Model):
                 bck.write({'move_type': 'one'})
                 self.action_assign()
                 pick.move_lines.write({'state': 'assigned'})
+                if bck.customization_ids:
+                    bck.customization_ids.create_backorder_customization(new_moves)
+                    bck.not_sync = True
+                    bck.message_post(
+                        body=_('This picking has been created from an order with customized products'))
             pick.message_post(body=_("User %s accepted confirmed qties.") %
                               self.env.user.name)
-            if pick.sale_id.scheduled_date:
+            if pick.sale_id.scheduled_date and not bck.customization_ids:
                 bck.not_sync = True
                 bck.scheduled_picking = True
                 bck._process_picking_scheduled_time()
